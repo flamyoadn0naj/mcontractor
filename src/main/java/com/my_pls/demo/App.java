@@ -40,12 +40,12 @@ public class App {
         internalServerError("<html><body>Something went wrong!</body></html>");
         staticFileLocation("/public"); //So that it has access to the pubic resources(stylesheets, etc.)
 
-        FirebaseOptions options = FirebaseOptions.builder()
-                .setCredentials(GoogleCredentials.getApplicationDefault())
-                .setDatabaseUrl("https://<DATABASE_NAME>.firebaseio.com/")
-                .build();
-
-        FirebaseApp.initializeApp(options);
+//        FirebaseOptions options = FirebaseOptions.builder()
+//                .setCredentials(GoogleCredentials.getApplicationDefault())
+//                .setDatabaseUrl("https://<DATABASE_NAME>.firebaseio.com/")
+//                .build();
+//
+//        FirebaseApp.initializeApp(options);
 
         post("/sub", ((request, response) -> {
 
@@ -81,12 +81,12 @@ public class App {
 
         },engine);
 
-        post("/verify-register",(request, response) -> {
+        post("/verify-register",((request, response) -> {
             Map<String,String> map = extractFields(request.body());
+            return map;
+//            return new ModelAndView(map,"verifyRegister.ftl");
 
-            return new ModelAndView(map,"verifyRegister.ftl");
-
-        },engine);
+        }));
 
         get("/first/*/last/*",(request, response) -> {
 

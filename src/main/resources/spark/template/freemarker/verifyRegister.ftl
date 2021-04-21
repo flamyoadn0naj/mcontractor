@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="/css/style.css">
 </head>
 <body>
-    <#assign resend = false>
+<#--    <#assign resend = false>-->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary" style="display:flex; justify-content:space-between">
       <a class="navbar-brand" href="">My Personal Learning Space (myPLS)</a>
       <ul class="navbar-nav">
@@ -29,8 +29,8 @@
         Resend Email
       </button>
     </div>
-    <#if resend == true>
-      ${toast}
-    </#if>
+<#--    <#if resend == true>-->
+<#--      ${toast}-->
+<#--    </#if>-->
 </body>
 </html>
