@@ -1,6 +1,9 @@
 package com.my_pls.demo;
 
 
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
 import spark.ModelAndView;
 import spark.TemplateEngine;
 import spark.template.freemarker.FreeMarkerEngine;
@@ -9,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.net.URLDecoder;
 
 
 import static spark.Spark.*;
@@ -40,12 +44,12 @@ public class App {
         internalServerError("<html><body>Something went wrong!</body></html>");
         staticFileLocation("/public"); //So that it has access to the pubic resources(stylesheets, etc.)
 
-//        FirebaseOptions options = FirebaseOptions.builder()
-//                .setCredentials(GoogleCredentials.getApplicationDefault())
-//                .setDatabaseUrl("https://<DATABASE_NAME>.firebaseio.com/")
-//                .build();
-//
-//        FirebaseApp.initializeApp(options);
+        FirebaseOptions options = FirebaseOptions.builder()
+                .setCredentials(GoogleCredentials.getApplicationDefault())
+                .setDatabaseUrl("https://<mypls-added-value>.firebaseio.com/")
+                .build();
+
+        FirebaseApp.initializeApp(options);
 
         post("/sub", ((request, response) -> {
 
@@ -66,27 +70,102 @@ public class App {
 
         get("/login",(request, response) -> {
             Map<String,Object> map = new HashMap<>();
+            map.put("actionLink", "/login");
+            map.put("errorEmail", "");
+            map.put("errorPassMatch", "");
+            map.put("loginErr", "");
+            map.put("emailVal","");
             map.put("pageType","Login");
-            map.put("styleVal", "max-width:32rem; margin-top:12%; left:30%");
+            map.put("styleVal", "margin-top:12%; width:45%");
+            return new ModelAndView(map,"login.ftl");
+
+        },engine);
+
+        post("/login",(request, response) -> {
+            Map<String,Object> map = new HashMap<>();
+            Map<String,String> formFields = extractFields(request.body());
+
+            if (formFields.size() > 0) {
+                if (!formFields.get("email").contains("rit.edu")) {
+                    map.put("errorEmail", "display:list-item;margin-left:5%");
+                    map.put("emailVal","");
+                    map.put("loginErr", "");
+                } else {
+                    map.put("loginErr", "display:list-item;margin-left:5%");
+                    map.put("errorEmail", "");
+                    String emVal = URLDecoder.decode(formFields.get("email"), "UTF-8");
+                    map.put("emailVal",formFields.get("email"));
+                }
+            } else {
+                map.put("loginErr", "");
+                map.put("emailVal", "");
+            }
+            map.put("actionLink", "/login");
+            map.put("errorPassMatch", "");
+            map.put("pageType","Login");
+            map.put("styleVal", "margin-top:12%; width:45%");
             return new ModelAndView(map,"login.ftl");
 
         },engine);
 
         get("/register",(request, response) -> {
             Map<String,Object> map = new HashMap<>();
+            map.put("actionLink", "/register");
+            map.put("loginErr", "");
+            map.put("errorEmail", "");
+            map.put("errorPassMatch", "");
+            map.put("fname","");
+            map.put("lname","");
+            map.put("emailVal","");
             map.put("pageType","Register");
-            map.put("styleVal", "max-width:32rem; margin-top:5%; left:30%");
+            map.put("styleVal", "margin-top:5%; width:45%");
 //            map.put("toast",(""))
             return new ModelAndView(map,"login.ftl");
 
         },engine);
 
-        post("/verify-register",((request, response) -> {
-            Map<String,String> map = extractFields(request.body());
-            return map;
-//            return new ModelAndView(map,"verifyRegister.ftl");
+        post("/register",(request, response) -> {
+            Map<String,Object> map = new HashMap<>();
+            Map<String,String> formFields = extractFields(request.body());
+            map.put("actionLink", "/register");
+            map.put("loginErr", "");
+            if (formFields.size() > 0) {
+                System.out.println(formFields);
+                System.out.println(formFields.get("email"));
+                Boolean flag = true;
+                if (!formFields.get("email").contains("rit.edu")) {
+                    map.put("errorEmail", "display:list-item;margin-left:5%");
+                    map.put("emailVal","");
+                    flag = false;
+                } else {
+                    map.put("errorEmail", "");
+                    String emVal = URLDecoder.decode(formFields.get("email"), "UTF-8");
+                    map.put("emailVal",formFields.get("email"));
+                }
+                if (formFields.get("pass").equals(formFields.get("retPass"))) {
+                    map.put("errorPassMatch", "");
+                } else {
+                    flag = false;
+                    map.put("errorPassMatch", "display:list-item;margin-left:5%");
+                }
+                if (flag) {
+                    response.redirect("/verify-register");
+                } else {
+                    map.put("fname",formFields.get("firstName"));
+                    map.put("lname",formFields.get("lastName"));
+                }
+            }
+            map.put("pageType","Register");
+            map.put("styleVal", "margin-top:5%; width:45%");
+            return new ModelAndView(map,"login.ftl");
 
-        }));
+        },engine);
+
+        get("/verify-register",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            return new ModelAndView(map,"verifyRegister.ftl");
+
+        }),engine);
 
         get("/first/*/last/*",(request, response) -> {
 

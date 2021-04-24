@@ -1,8 +1,7 @@
 <!DOCTYPE html>
+<html>
 <head>
-<#--    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></meta>-->
-<#--    <meta http-equiv="refresh" content="10">-->
-    <title>Title</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></meta>
     <link rel="stylesheet"  href="/css/_bootswatch.scss">
     <link rel="stylesheet"  href="/css/_variables.scss">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
@@ -21,35 +20,41 @@
         </li>
     </ul>
 </nav>
-<div class="card text-black border-primary mb-3" style="${styleVal}"!"max-width:32rem; margin-top:5%; left:30%">
-<h2 class="card-header text-white bg-primary mb-3" style="padding:10pt">
-    <#if pageType == "Login">
-        Login
-    <#else>
-        Register
-    </#if>
-</h2>
-<form style="padding:20pt" action="/verify-register" method="post">
+<div style="display: flex;justify-content: center">
+    <div class="card text-black border-primary mb-3" style="${styleVal}"!"width:45%; margin-top:5%">
+    <h2 class="card-header text-white bg-primary mb-3" style="padding:10pt">
+        <#if pageType == "Login">
+            Login
+        <#else>
+            Register
+        </#if>
+    </h2>
+
+    <div class="invalid-feedback" style="${errorEmail}">Email must be in the form _@rit.edu</div>
+    <div class="invalid-feedback" style="${errorPassMatch}">The passwords do not match. Try again.</div>
+    <div class="invalid-feedback" style="${loginErr}">Email and Password mismatch!</div>
+
+    <form style="padding:20pt" action=${actionLink} method="post">
     <fieldset>
         <#if pageType == "Register">
             <div style="display:flex; justify-content:space-between;">
                 <div class="form-group">
                     <label for="firstName">First Name</label>
-                    <input type="text" name="firstName" class="form-control" id="firstName" placeholder="First Name">
+                    <input required type="text" name="firstName" class="form-control" id="firstName" placeholder="First Name" value=${fname}>
                 </div>
                 <div class="form-group">
                     <label for="lastName">Last Name</label>
-                    <input type="text" name="lastName" class="form-control" id="lastName" placeholder="Last Name">
+                    <input required type="text" name="lastName" class="form-control" id="lastName" placeholder="Last Name" value=${lname}>
                 </div>
             </div>
         </#if>
         <div class="form-group">
             <label for="email">Email address</label>
-            <input type="email" class="form-control" name="email" id="email" aria-describedby="emailHelp" placeholder="rit@rit.edu">
+            <input required type="email" class="form-control" name="email" id="email" aria-describedby="emailHelp" placeholder="rit@rit.edu" value=${emailVal}>
         </div>
         <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" class="form-control" name="pass" id="password" placeholder="Password">
+            <input required type="password" class="form-control" name="pass" id="password" placeholder="Password">
             <#if pageType == "Login">
                 <small id="forgotPassword" class="form-text" style="float:right;" href="">Forgot your password?</small>
             </#if>
@@ -57,10 +62,10 @@
         <#if pageType == "Register">
             <div class="form-group">
                 <label for="retypePassword">Retype Password</label>
-                <input type="password" class="form-control" name="retPass" id="retypePassword" placeholder="Retype Password">
+                <input required type="password" class="form-control" name="retPass" id="retypePassword" placeholder="Retype Password">
             </div>
         </#if>
-        <div class="form-group" style="padding-top: 50pt;">
+        <div class="form-group" style="padding-top: 35pt;">
             <#if pageType == "Login">
                 <small id="register" class="form-text" href="\register" style="float:left;">
                     <a href="\register" class="form-text"> Not a member? Register </a>
@@ -76,8 +81,6 @@
         </div>
     </fieldset>
 </form>
-</div>
-
 </div>
 </body>
 </html>
