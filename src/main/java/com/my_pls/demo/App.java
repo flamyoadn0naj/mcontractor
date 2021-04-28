@@ -1,22 +1,29 @@
 package com.my_pls.demo;
 
-
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.api.gax.paging.Page;
+import com.google.cloud.storage.Bucket;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
+import com.google.common.collect.Lists;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import spark.ModelAndView;
 import spark.TemplateEngine;
 import spark.template.freemarker.FreeMarkerEngine;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.net.URLDecoder;
 
-
 import static spark.Spark.*;
+
 public class App {
+    public static String firebase_auth_json = "json_auth/mypls-added-value-firebase-adminsdk-6j3xx-5271a3d0db.json";
 
     private static Map<String,String> extractFields(String body){
         try{
@@ -36,7 +43,7 @@ public class App {
 //    Map<String,String> map = extractFields(request.body());
 //        return map;
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws IOException {
 
         port(8080);
 
@@ -44,9 +51,12 @@ public class App {
         internalServerError("<html><body>Something went wrong!</body></html>");
         staticFileLocation("/public"); //So that it has access to the pubic resources(stylesheets, etc.)
 
+
+        GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(firebase_auth_json))
+                .createScoped(Lists.newArrayList("https://www.googleapis.com/auth/cloud-platform"));
         FirebaseOptions options = FirebaseOptions.builder()
-                .setCredentials(GoogleCredentials.getApplicationDefault())
-                .setDatabaseUrl("https://<mypls-added-value>.firebaseio.com/")
+                .setCredentials(credentials)
+                .setDatabaseUrl("https://mypls-added-value.firebaseio.com/")
                 .build();
 
         FirebaseApp.initializeApp(options);
@@ -221,6 +231,19 @@ public class App {
 
         public String getType() {
             return type;
+        }
+    }
+    static void authExplicit(String jsonPath) throws IOException {
+        // You can specify a credential file by providing a path to GoogleCredentials.
+        // Otherwise credentials are read from the GOOGLE_APPLICATION_CREDENTIALS environment variable.
+        GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(firebase_auth_json))
+                .createScoped(Lists.newArrayList("https://www.googleapis.com/auth/cloud-platform"));
+        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+
+        System.out.println("Buckets:");
+        Page<Bucket> buckets = storage.list();
+        for (Bucket bucket : buckets.iterateAll()) {
+            System.out.println(bucket.toString());
         }
     }
 
