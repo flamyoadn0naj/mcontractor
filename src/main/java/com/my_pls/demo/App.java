@@ -8,6 +8,9 @@ import com.google.cloud.storage.StorageOptions;
 import com.google.common.collect.Lists;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.UserRecord;
 import spark.ModelAndView;
 import spark.TemplateEngine;
 import spark.template.freemarker.FreeMarkerEngine;
@@ -43,7 +46,7 @@ public class App {
 //    Map<String,String> map = extractFields(request.body());
 //        return map;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, FirebaseAuthException {
 
         port(8080);
 
@@ -60,6 +63,13 @@ public class App {
                 .build();
 
         FirebaseApp.initializeApp(options);
+        FirebaseAuth mAuth;
+        mAuth = FirebaseAuth.getInstance();
+
+
+//        mAuth.createUser(user_request);
+//        UserRecord user = mAuth.getUser("TG4b6yMyPYaHiW2yYpyBfU6lAki2");
+//        System.out.println(user.getEmail());
 
         post("/sub", ((request, response) -> {
 
@@ -159,6 +169,14 @@ public class App {
                     map.put("errorPassMatch", "display:list-item;margin-left:5%");
                 }
                 if (flag) {
+                    UserRecord.CreateRequest new_user = new UserRecord.CreateRequest();
+                    String email = formFields.get("email");
+                    email.replace("%40","@");
+                    new_user.setEmail(email);
+                    String display_name = formFields.get("fname") +" " +  formFields.get("lname");
+                    new_user.setDisplayName(display_name);
+                    new_user.setPassword(formFields.get("password"));
+                    mAuth.createUser(new_user);
                     response.redirect("/verify-register");
                 } else {
                     map.put("fname",formFields.get("firstName"));
