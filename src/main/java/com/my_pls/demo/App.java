@@ -171,11 +171,12 @@ public class App {
                 if (flag) {
                     UserRecord.CreateRequest new_user = new UserRecord.CreateRequest();
                     String email = formFields.get("email");
-                    email.replace("%40","@");
+                    email = URLDecoder.decode(email,"UTF-8");
                     new_user.setEmail(email);
+
                     String display_name = formFields.get("fname") +" " +  formFields.get("lname");
                     new_user.setDisplayName(display_name);
-                    new_user.setPassword(formFields.get("password"));
+                    new_user.setPassword(formFields.get("pass"));
                     mAuth.createUser(new_user);
                     response.redirect("/verify-register");
                 } else {
