@@ -24,7 +24,6 @@
       <version>7.0.0</version>
     </dependency>
 
-
     <!-- sl4j -->
     <dependency>
       <groupId>org.slf4j</groupId>

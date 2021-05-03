@@ -66,6 +66,8 @@ public class App {
         FirebaseAuth mAuth;
         mAuth = FirebaseAuth.getInstance();
 
+        CurrUser user_current = new CurrUser();
+
 
 //        mAuth.createUser(user_request);
 //        UserRecord user = mAuth.getUser("TG4b6yMyPYaHiW2yYpyBfU6lAki2");
@@ -111,10 +113,18 @@ public class App {
                     map.put("emailVal","");
                     map.put("loginErr", "");
                 } else {
+                    String emVal = formFields.get("email");
+                    try {
+                        emVal = URLDecoder.decode(emVal, "UTF-8");
+                    } catch (Exception e) {}
+//                    try {
+//                        UserRecord login_user = mAuth().
+////                        String password = login_user.
+//                    }
                     map.put("loginErr", "display:list-item;margin-left:5%");
                     map.put("errorEmail", "");
-                    String emVal = URLDecoder.decode(formFields.get("email"), "UTF-8");
-                    map.put("emailVal",formFields.get("email"));
+
+                    map.put("emailVal",emVal);
                 }
             } else {
                 map.put("loginErr", "");
@@ -150,8 +160,6 @@ public class App {
             map.put("actionLink", "/register");
             map.put("loginErr", "");
             if (formFields.size() > 0) {
-                System.out.println(formFields);
-                System.out.println(formFields.get("email"));
                 Boolean flag = true;
                 if (!formFields.get("email").contains("rit.edu")) {
                     map.put("errorEmail", "display:list-item;margin-left:5%");
@@ -159,10 +167,13 @@ public class App {
                     flag = false;
                 } else {
                     map.put("errorEmail", "");
-                    String emVal = URLDecoder.decode(formFields.get("email"), "UTF-8");
-                    map.put("emailVal",formFields.get("email"));
+                    String emVal = formFields.get("email");
+                    try {
+                        emVal = URLDecoder.decode(emVal, "UTF-8");
+                    } catch (Exception e) {}
+                    map.put("emailVal",emVal);
                 }
-                if (formFields.get("pass").equals(formFields.get("retPass"))) {
+                if (formFields.get("pass").equals(formFields.get("retPass")) && formFields.get("pass").length() >= 6) {
                     map.put("errorPassMatch", "");
                 } else {
                     flag = false;
@@ -178,6 +189,10 @@ public class App {
                     new_user.setDisplayName(display_name);
                     new_user.setPassword(formFields.get("pass"));
                     mAuth.createUser(new_user);
+                    user_current.firstName = formFields.get("fname");
+                    user_current.lastName = formFields.get("lname");
+                    user_current.email = formFields.get("email");
+                    user_current.password = formFields.get("pass");
                     response.redirect("/verify-register");
                 } else {
                     map.put("fname",formFields.get("firstName"));
@@ -193,6 +208,54 @@ public class App {
         get("/verify-register",((request, response) -> {
             Map<String,String> map = new HashMap<>();
             return new ModelAndView(map,"verifyRegister.ftl");
+
+        }),engine);
+
+        get("/forgot-password/:type",((request, response) -> {
+            String pageType = request.params(":type");
+            Map<String,String> map = new HashMap<>();
+            map.put("pageType", pageType);
+            map.put("actionLink", ("/forgot-password/" + pageType));
+            map.put("success", "false");
+            map.put("succMsg", "");
+            map.put("errorEmail", "");
+            map.put("errorPassMatch", "");
+            return new ModelAndView(map,"forgotPassword.ftl");
+
+        }),engine);
+
+        post("/forgot-password/:type",((request, response) -> {
+            String pageType = request.params(":type");
+            Map<String,String> map = new HashMap<>();
+            Map<String,String> formFields = extractFields(request.body());
+           if (pageType.equals("email")) {
+               map.put("errorPassMatch", "");
+               if (!formFields.get("email").contains("rit.edu")) {
+                   map.put("errorEmail", "display:block;margin-left:5%; width:90%");
+                   map.put("emailVal","");
+                   map.put("success", "false");
+                   map.put("succMsg", "");
+               } else {
+                   map.put("errorEmail", "");
+                   map.put("success", "true");
+                   map.put("succMsg", "A verification link has been emailed to you!");
+               }
+           } else {
+               map.put("errorEmail", "");
+               if (formFields.get("pass").equals(formFields.get("retPass")) && formFields.get("pass").length() >= 6) {
+                   map.put("errorPassMatch", "");
+                   map.put("success", "true");
+                   map.put("succMsg", "Your password has been changed. Please log in again.");
+               } else {
+                   map.put("errorPassMatch", "display:block;margin-left:5%; width:90%");
+                   map.put("success", "false");
+                   map.put("succMsg", "");
+               }
+           }
+
+            map.put("pageType", pageType);
+            map.put("actionLink", ("/forgot-password/" + pageType));
+            return new ModelAndView(map,"forgotPassword.ftl");
 
         }),engine);
 
@@ -238,6 +301,13 @@ public class App {
 
         });
 
+    }
+
+    public static class CurrUser {
+        String firstName;
+        String lastName;
+        String password;
+        String email;
     }
 
     public static class Pokemon{
