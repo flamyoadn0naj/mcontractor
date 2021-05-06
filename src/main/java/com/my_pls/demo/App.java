@@ -269,7 +269,11 @@ public class App {
 
         },engine);
 
+        get("/home",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            return new ModelAndView(map,"homePage.ftl");
 
+        }),engine);
 
         Pokemon charmander  = new Pokemon();
         charmander.name = "Charry";
