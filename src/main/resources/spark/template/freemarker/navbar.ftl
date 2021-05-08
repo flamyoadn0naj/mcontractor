@@ -11,7 +11,7 @@
             <a class="navbar-brand" href="/home">My Personal Learning Space (myPLS)</a>
             <ul class="navbar-nav">
                 <li class="nav-item active">
-                    <a class="nav-link" href="">Courses <span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="/courses">Courses <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item active" >
                     <a class="nav-link" href="">Enroll <span class="sr-only">(current)</span></a>
