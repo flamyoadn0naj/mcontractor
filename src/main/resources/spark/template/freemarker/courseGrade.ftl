@@ -31,44 +31,86 @@
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="/course/classlist">Classlist</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="/course/rate">Rate</a>
-                </li>
+                <#if role != "prof">
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="/course/rate">Rate</a>
+                    </li>
+                </#if>
             </ul>
             <div id="myTabContent" class="tab-content" style="margin:2%">
                 <div class="tab-pane fade active show" id="grade">
-                    <div class="mb-3" style="display: flex; justify-content: space-between">
-                        <span>
-                            Lesson #1
-                        </span>
-                        <span>
-                            50/100
-                        </span>
-                    </div>
-                    <div class="mb-3" style="display: flex; justify-content: space-between">
-                        <span>
-                            Lesson #2
-                        </span>
-                        <span>
-                            30/100
-                        </span>
-                    </div>
-                    <div class="mb-3" style="display: flex; justify-content: space-between">
-                        <span>
-                            Lesson #3
-                        </span>
-                        <span>
-                            90/100
-                        </span>
-                    </div>
-                    <div class="mb-3" style="display: flex; justify-content: space-between">
-                        <span>
-                            Midterm #1
-                        </span>
-                        <span>
-                            75/100
-                        </span>
-                    </div>
+                    <#if role == "prof">
+                        <form>
+                            <div class="mb-3" style="display: flex; justify-content: space-between">
+                            <span>
+                                Lesson #1
+                            </span>
+                                <span style="display: flex;justify-content:flex-end;">
+                                    <input type="number" class="form-control" name="1" style="width: 30%" value="30">  /100
+                                </span>
+                            </div>
+                            <div class="mb-3" style="display: flex; justify-content: space-between">
+                            <span>
+                                Lesson #2
+                            </span>
+                                <span style="display: flex;justify-content:flex-end;">
+                                    <input type="number" class="form-control" name="1" style="width: 30%" value="40">  /100
+                                </span>
+                            </div>
+                            <div class="mb-3" style="display: flex; justify-content: space-between">
+                                <span>
+                                    Lesson #3
+                                </span>
+                                <span style="display: flex;justify-content:flex-end;">
+                                    <input type="number" class="form-control" name="1" style="width: 30%" value="60">  /100
+                                </span>
+                            </div>
+                            <div class="mb-3" style="display: flex; justify-content: space-between">
+                            <span>
+                                Midterm #1
+                            </span>
+                                <span style="display: flex;justify-content:flex-end;">
+                                    <input type="number" class="form-control" name="1" style="width: 30%" value="75">  /100
+                                </span>
+                            </div>
+                            <button type="submit" class="btn btn-primary"  style="width:10rem; float:right;">
+                                Save
+                            </button>
+                        </form>
+                    <#else>
+                        <div class="mb-3" style="display: flex; justify-content: space-between">
+                            <span>
+                                Lesson #1
+                            </span>
+                            <span>
+                                50/100
+                            </span>
+                        </div>
+                        <div class="mb-3" style="display: flex; justify-content: space-between">
+                            <span>
+                                Lesson #2
+                            </span>
+                            <span>
+                                30/100
+                            </span>
+                        </div>
+                        <div class="mb-3" style="display: flex; justify-content: space-between">
+                            <span>
+                                Lesson #3
+                            </span>
+                            <span>
+                                90/100
+                            </span>
+                        </div>
+                        <div class="mb-3" style="display: flex; justify-content: space-between">
+                            <span>
+                                Midterm #1
+                            </span>
+                            <span>
+                                75/100
+                            </span>
+                        </div>
+                    </#if>
                 </div>
             </div>
         </div>

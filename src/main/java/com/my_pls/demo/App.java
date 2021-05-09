@@ -266,6 +266,7 @@ public class App {
 
         get("/course/about",((request, response) -> {
             Map<String,String> map = new HashMap<>();
+            map.put("role", "prof");
             return new ModelAndView(map,"courseAbout.ftl");
         }),engine);
 
@@ -277,16 +278,19 @@ public class App {
 
         get("/course/quiz",((request, response) -> {
             Map<String,String> map = new HashMap<>();
+            map.put("role", "prof");
             return new ModelAndView(map,"courseQuiz.ftl");
         }),engine);
 
         get("/course/grade",((request, response) -> {
             Map<String,String> map = new HashMap<>();
+            map.put("role", "prof");
             return new ModelAndView(map,"courseGrade.ftl");
         }),engine);
 
         get("/course/classlist",((request, response) -> {
             Map<String,String> map = new HashMap<>();
+            map.put("role", "prof");
             return new ModelAndView(map,"courseClasslist.ftl");
         }),engine);
 

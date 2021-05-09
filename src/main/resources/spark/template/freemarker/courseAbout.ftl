@@ -31,9 +31,11 @@
                     <li class="nav-item">
                         <a class="nav-link" data-toggle="tab" href="/course/classlist">Classlist</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="/course/rate">Rate</a>
-                    </li>
+                    <#if role != "prof">
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="/course/rate">Rate</a>
+                        </li>
+                    </#if>
                 </ul>
                 <div id="myTabContent" class="tab-content" style="margin:2%">
                     <div class="tab-pane fade active show" id="about">

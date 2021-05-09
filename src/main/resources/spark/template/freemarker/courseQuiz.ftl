@@ -15,6 +15,9 @@
             Introduction to Software Engineering
         </h2>
         <div style="width: 90%; margin-left: 2%">
+            <#if role == "prof">
+                <button type="button" class="btn btn-primary" style="float: right">Add</button>
+            </#if>
             <ul class="nav nav-tabs">
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="/course/about">About</a>
@@ -31,9 +34,11 @@
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="/course/classlist">Classlist</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="/course/rate">Rate</a>
-                </li>
+                <#if role != "prof">
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="/course/rate">Rate</a>
+                    </li>
+                </#if>
             </ul>
             <div id="myTabContent" class="tab-content" style="margin:2%">
                 <div class="tab-pane fade active show" id="quiz">
@@ -44,7 +49,11 @@
                         <span>
                             50/100
                         </span>
-                        <button type="button" class="btn btn-primary">Take</button>
+                        <#if role == "prof">
+                            <button type="button" class="btn btn-primary">Edit</button>
+                        <#else>
+                            <button type="button" class="btn btn-primary">Take</button>
+                        </#if>
                     </div>
                     <div class="mb-3" style="display: flex; justify-content: space-between">
                         <span>
@@ -53,7 +62,11 @@
                         <span>
                             30/100
                         </span>
-                        <button type="button" class="btn btn-primary">Take</button>
+                        <#if role == "prof">
+                            <button type="button" class="btn btn-primary">Edit</button>
+                        <#else>
+                            <button type="button" class="btn btn-primary">Take</button>
+                        </#if>
                     </div>
                     <div class="mb-3" style="display: flex; justify-content: space-between">
                         <span>
@@ -62,7 +75,11 @@
                         <span>
                             90/100
                         </span>
-                        <button type="button" class="btn btn-primary">Take</button>
+                        <#if role == "prof">
+                            <button type="button" class="btn btn-primary">Edit</button>
+                        <#else>
+                            <button type="button" class="btn btn-primary">Take</button>
+                        </#if>
                     </div>
                 </div>
             </div>
