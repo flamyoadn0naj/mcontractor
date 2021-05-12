@@ -21,3 +21,12 @@
 .large {
     font-size: x-large !important;
 }
+
+.space-between {
+    display: flex;
+    justify-content: space-between;
+}
+
+.padding2right {
+    padding-right: 2%;
+}

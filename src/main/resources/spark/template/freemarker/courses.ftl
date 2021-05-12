@@ -23,7 +23,7 @@
                 <th scope="col">End Date</th>
             </tr>
             <tr>
-                <th scope="row">Introduction to Software Engineering</th>
+                <th scope="row"><a class="text-muted" href="course/about">Introduction to Software Engineering</a></th>
                 <td>AbdulMutalib Wahaishi</td>
                 <td>September 2020</td>
                 <td>December 2020</td>

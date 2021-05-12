@@ -77,7 +77,7 @@
                     <a href="/login" class="form-text"> Already a member? Login </a>
                 </small>
             </#if>
-            <button type="submit" class="btn btn-primary"  style="width:10rem; float:right;">
+            <button type="submit" name="action" value="submit" class="btn btn-primary" style="width:10rem; float:right;">
                 Submit
             </button>
         </div>

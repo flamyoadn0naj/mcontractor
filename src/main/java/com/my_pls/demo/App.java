@@ -304,6 +304,28 @@ public class App {
             return new ModelAndView(map,"courses.ftl");
         }),engine);
 
+        get("/course/create-quiz",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            return new ModelAndView(map,"createQuiz.ftl");
+        }),engine);
+
+        get("/enroll",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            return new ModelAndView(map,"enroll.ftl");
+        }),engine);
+
+        post("/enroll",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            Map<String,String> formFields = extractFields(request.body());
+            System.out.println(formFields);
+            return new ModelAndView(map,"enroll.ftl");
+        }),engine);
+
+        get("/enroll/about",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            return new ModelAndView(map,"enrollAbout.ftl");
+        }),engine);
+
         Pokemon charmander  = new Pokemon();
         charmander.name = "Charry";
         charmander.type = "fire";

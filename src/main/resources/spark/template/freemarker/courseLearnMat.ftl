@@ -30,7 +30,7 @@
                     <a class="nav-link" data-toggle="tab" href="/course/grade">Grades</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="/course/classlist">Class List</a>
+                    <a class="nav-link" data-toggle="tab" href="/course/classlist">Classlist</a>
                 </li>
                 <#if role != "prof">
                     <li class="nav-item">
