@@ -30,3 +30,15 @@
 .padding2right {
     padding-right: 2%;
 }
+
+.btn-download {
+    background: none;
+    border: none;
+    color: #78C2AD !important;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.btn-download:hover {
+    color: #4aa48a !important;
+}

@@ -24,6 +24,11 @@
       <version>7.0.0</version>
     </dependency>
 
+<!--    <dependency>-->
+<!--      <groupId>firebase_auth</groupId>-->
+<!--      <artifactId></artifactId>-->
+<!--      <version></version>-->
+<!--    </dependency>-->
     <!-- sl4j -->
     <dependency>
       <groupId>org.slf4j</groupId>

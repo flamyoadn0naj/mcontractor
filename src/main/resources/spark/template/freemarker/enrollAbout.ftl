@@ -26,9 +26,9 @@
                     <p><b>Credits:</b> 3</p>
                     <p><b>Pre-requisite:</b> None</p>
                     <p><b>Requirements:</b> To pass, you must get a C minimum</p>
-                    <p><b>Learning Objectives:</b>None</p>
-                    <p><b>Total Capacity</b>30</p>
-                    <p><b>Seats Available</b>5</p>
+                    <p><b>Learning Objectives:</b> None</p>
+                    <p><b>Total Capacity:</b> 30</p>
+                    <p><b>Seats Available:</b> 5</p>
                     <p><b>Rating:</b>
                         <span class="fa fa-star checked "></span>
                         <span class="fa fa-star checked "></span>
@@ -36,6 +36,10 @@
                         <span class="fa fa-star checked"></span>
                         <span class="fa fa-star "></span>
                     </p>
+                    <p class="mb-3"><b>Schedule Compatability:</b> Yes</p>
+                    <button type="button" class="btn btn-primary mb-3" style="float: right">
+                        Enroll
+                    </button>
                 </div>
             </div>
         </div>

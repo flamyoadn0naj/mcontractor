@@ -26,7 +26,7 @@
                     <a class="nav-link" data-toggle="tab" href="/course/quiz">Quizzes</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="/course/grade">Grades</a>
+                    <a class="nav-link" data-toggle="tab" href="/course/grades">Grades</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link active" data-toggle="tab" href="/course/classlist">Classlist</a>

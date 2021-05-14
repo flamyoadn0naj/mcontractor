@@ -27,7 +27,7 @@
                     <a class="nav-link" data-toggle="tab" href="/course/quiz">Quizzes</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="/course/grade">Grades</a>
+                    <a class="nav-link" data-toggle="tab" href="/course/grades">Grades</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="/course/classlist">Classlist</a>
@@ -50,32 +50,44 @@
                                     </span>
                                     <#if role == "prof">
                                         <div style="float: right">
+                                            <button class="btn-download" style="float: right"><i class="fa fa-trash"></i></button>
+                                            <button type="button" class="btn-download" style="float: right"><i class="fa fa-upload"></i></button>
                                             <input type="file" class="small" id="inputGroupFile02" style="width: 50%; float: right; margin-left: 2%;">
-                                            <button type="button" class="btn btn-primary" style="float: right">Upload</button>
                                         </div>
                                     </#if>
                                 </h5>
                             </div>
                             <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
                                 <div class="card-body">
+                                    <div class="mb-3"> <b>Requirements:</b> The student must get at least 80 marks in Quiz 1.</div>
                                     <ul class="list-group">
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
                                             Notes1.pdf
-                                            <#if role == "prof">
-                                                <button type="button" class="btn btn-primary" style="float: right">Delete</button>
-                                            </#if>
+                                            <div>
+                                                <button class="btn-download"><i class="fa fa-download"></i></button>
+                                                <#if role == "prof">
+                                                    <button class="btn-download"><i class="fa fa-trash"></i></button>
+                                                </#if>
+                                            </div>
                                         </li>
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
                                             Notes2.pdf
-                                            <#if role == "prof">
-                                                <button type="button" class="btn btn-primary" style="float: right">Delete</button>
-                                            </#if>
+                                            <div>
+                                                <button class="btn-download"><i class="fa fa-download"></i></button>
+                                                <#if role == "prof">
+                                                    <button class="btn-download"><i class="fa fa-trash"></i></button>
+                                                </#if>
+                                            </div>
                                         </li>
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
                                             Lecture1.mp4
-                                            <#if role == "prof">
-                                                <button type="button" class="btn btn-primary" style="float: right">Delete</button>
-                                            </#if>
+                                            <div>
+                                                <button class="btn-download"><i class="fa fa-eye"></i></button>
+                                                <button class="btn-download"><i class="fa fa-download"></i></button>
+                                                <#if role == "prof">
+                                                    <button class="btn-download"><i class="fa fa-trash"></i></button>
+                                                </#if>
+                                            </div>
                                         </li>
                                     </ul>
                                 </div>
@@ -89,32 +101,44 @@
                                     </span>
                                     <#if role == "prof">
                                         <div style="float: right">
+                                            <button class="btn-download" style="float:right;"><i class="fa fa-trash"></i></button>
+                                            <button type="button" class="btn-download" style="float: right"><i class="fa fa-upload"></i></button>
                                             <input type="file" class="small" id="inputGroupFile02" style="width: 50%; float: right; margin-left: 2%;">
-                                            <button type="button" class="btn btn-primary" style="float: right">Upload</button>
                                         </div>
                                     </#if>
                                 </h5>
                             </div>
                             <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordion">
                                 <div class="card-body">
+                                    <div class="mb-3"> <b>Requirements:</b> The student must get at least 70 marks in Quiz 2. </div>
                                     <ul class="list-group">
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
                                             Notes1.pdf
-                                            <#if role == "prof">
-                                                <button type="button" class="btn btn-primary" style="float: right">Delete</button>
-                                            </#if>
+                                            <div>
+                                                <button class="btn-download"><i class="fa fa-download"></i></button>
+                                                <#if role == "prof">
+                                                    <button class="btn-download"><i class="fa fa-trash"></i></button>
+                                                </#if>
+                                            </div>
                                         </li>
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
                                             Notes2.pdf
-                                            <#if role == "prof">
-                                                <button type="button" class="btn btn-primary" style="float: right">Delete</button>
-                                            </#if>
+                                            <div>
+                                                <button class="btn-download"><i class="fa fa-download"></i></button>
+                                                <#if role == "prof">
+                                                    <button class="btn-download"><i class="fa fa-trash"></i></button>
+                                                </#if>
+                                            </div>
                                         </li>
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
                                             Lecture2.mp4
-                                            <#if role == "prof">
-                                                <button type="button" class="btn btn-primary" style="float: right">Delete</button>
-                                            </#if>
+                                            <div>
+                                                <button class="btn-download"><i class="fa fa-eye"></i></button>
+                                                <button class="btn-download"><i class="fa fa-download"></i></button>
+                                                <#if role == "prof">
+                                                    <button class="btn-download"><i class="fa fa-trash"></i></button>
+                                                </#if>
+                                            </div>
                                         </li>
                                     </ul>
                                 </div>

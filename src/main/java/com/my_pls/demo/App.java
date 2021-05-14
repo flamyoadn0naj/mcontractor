@@ -64,8 +64,7 @@ public class App {
                 .build();
 
         FirebaseApp.initializeApp(options);
-        FirebaseAuth mAuth;
-        mAuth = FirebaseAuth.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
         CurrUser user_current = new CurrUser();
 
@@ -182,13 +181,13 @@ public class App {
                     new_user.setEmail(email);
 
                     String display_name = formFields.get("fname") +" " +  formFields.get("lname");
-                    new_user.setDisplayName(display_name);
-                    new_user.setPassword(formFields.get("pass"));
-                    mAuth.createUser(new_user);
-                    user_current.firstName = formFields.get("fname");
-                    user_current.lastName = formFields.get("lname");
-                    user_current.email = formFields.get("email");
-                    user_current.password = formFields.get("pass");
+//                    new_user.setDisplayName(display_name);
+//                    new_user.setPassword(formFields.get("pass"));
+//                    mAuth.createUser(new_user);
+//                    user_current.firstName = formFields.get("fname");
+//                    user_current.lastName = formFields.get("lname");
+//                    user_current.email = formFields.get("email");
+//                    user_current.password = formFields.get("pass");
                     response.redirect("/verify-register");
                 } else {
                     map.put("fname",formFields.get("firstName"));
@@ -273,7 +272,7 @@ public class App {
 
         get("/course/learnMat",((request, response) -> {
             Map<String,String> map = new HashMap<>();
-            map.put("role", "prof");
+            map.put("role", "student");
             return new ModelAndView(map,"courseLearnMat.ftl");
         }),engine);
 
@@ -283,15 +282,21 @@ public class App {
             return new ModelAndView(map,"courseQuiz.ftl");
         }),engine);
 
-        get("/course/grade",((request, response) -> {
+        get("/course/grades",((request, response) -> {
             Map<String,String> map = new HashMap<>();
-            map.put("role", "prof");
+            map.put("role", "student");
             return new ModelAndView(map,"courseGrade.ftl");
+        }),engine);
+
+        get("/course/grade/individual",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            map.put("role", "student");
+            return new ModelAndView(map,"courseGradeIndividual.ftl");
         }),engine);
 
         get("/course/classlist",((request, response) -> {
             Map<String,String> map = new HashMap<>();
-            map.put("role", "prof");
+            map.put("role", "student");
             return new ModelAndView(map,"courseClasslist.ftl");
         }),engine);
 
@@ -302,6 +307,13 @@ public class App {
 
         get("/courses",((request, response) -> {
             Map<String,String> map = new HashMap<>();
+            return new ModelAndView(map,"courses.ftl");
+        }),engine);
+
+        post("/courses",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            Map<String,String> formFields = extractFields(request.body());
+            System.out.println(formFields);
             return new ModelAndView(map,"courses.ftl");
         }),engine);
 
@@ -325,6 +337,17 @@ public class App {
         get("/enroll/about",((request, response) -> {
             Map<String,String> map = new HashMap<>();
             return new ModelAndView(map,"enrollAbout.ftl");
+        }),engine);
+
+        get("/ratings",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            map.put("role","prof");
+            return new ModelAndView(map,"ratings.ftl");
+        }),engine);
+
+        get("/rating/individual",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            return new ModelAndView(map,"ratingsIndividual.ftl");
         }),engine);
 
         Pokemon charmander  = new Pokemon();

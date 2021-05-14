@@ -26,7 +26,7 @@
                         <a class="nav-link" data-toggle="tab" href="/course/quiz">Quizzes</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="/course/grade">Grades</a>
+                        <a class="nav-link" data-toggle="tab" href="/course/grades">Grades</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" data-toggle="tab" href="/course/classlist">Classlist</a>
@@ -39,18 +39,30 @@
                 </ul>
                 <div id="myTabContent" class="tab-content" style="margin:2%">
                     <div class="tab-pane fade active show" id="about">
-                        <p><b>Professor:</b> AbdulMutalib Wahaishi</p>
-                        <p><b>Meeting Days:</b> Tuesday, Thursday</p>
-                        <p><b>Meeting Time:</b> 5pm - 6:15pm </p>
-                        <p><b>Pre-requisite:</b> None</p>
-                        <p><b>Requirements:</b> To pass, you must get a C minimum</p>
-                        <p><b>Rating:</b>
-                            <span class="fa fa-star checked "></span>
-                            <span class="fa fa-star checked "></span>
-                            <span class="fa fa-star checked "></span>
-                            <span class="fa fa-star checked"></span>
-                            <span class="fa fa-star "></span>
-                        </p>
+                        <form>
+                            <p class="mb-3"><b>Professor:</b> AbdulMutalib Wahaishi</p>
+                            <p class="mb-3"><b>Meeting Days:</b> Tuesday, Thursday</p>
+                            <p class="mb-3"><b>Meeting Time:</b> 5pm - 6:15pm </p>
+                            <p class="mb-3"><b>Pre-requisite:</b> None</p>
+                            <#if role == "prof">
+                                <div class="mb-3">
+                                    <b>Requirements:</b>
+                                    <input style="width: 80%" name="req" type="text" id="req" value="To pass, you must get a C minimum">
+                                </div>
+                            <#else>
+                                <p class="mb-3"><b>Requirements:</b>To pass, you must get a C minimum</p>
+                            </#if>
+                            <p class="mb-3"><b>Rating:</b>
+                                <span class="fa fa-star checked "></span>
+                                <span class="fa fa-star checked "></span>
+                                <span class="fa fa-star checked "></span>
+                                <span class="fa fa-star checked"></span>
+                                <span class="fa fa-star "></span>
+                            </p>
+                            <button type="button" class="btn btn-primary mb-3" style="float: right">
+                                Save
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>

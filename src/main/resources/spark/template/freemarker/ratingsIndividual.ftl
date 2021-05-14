@@ -15,26 +15,6 @@
             Introduction to Software Engineering
         </h2>
         <div style="width: 90%; margin-left: 2%">
-            <ul class="nav nav-tabs">
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="/course/about">About</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="/course/learnMat">Learning Material</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="/course/quiz">Quizzes</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="/course/grades">Grades</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="/course/classlist">Classlist</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" data-toggle="tab" href="/course/rate">Rate</a>
-                </li>
-            </ul>
             <form>
                 <div id="myTabContent" class="tab-content" style="margin:2%">
                     <div class="tab-pane fade active show" id="rate">

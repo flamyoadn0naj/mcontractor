@@ -26,7 +26,7 @@
                     <a class="nav-link" data-toggle="tab" href="/course/quiz">Quizzes</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" data-toggle="tab" href="/course/grades">Grades</a>
+                    <a class="nav-link active" data-toggle="tab" href="/course/grade">Grades</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="/course/classlist">Classlist</a>
@@ -40,45 +40,51 @@
             <div id="myTabContent" class="tab-content" style="margin:2%">
                 <div class="tab-pane fade active show" id="grade">
                     <#if role == "prof">
-<#--                        <div class="space-between">-->
-<#--                            <a href="/course/grade/individual">Maheen Riaz Contractor</a>-->
-<#--                        </div>-->
-                    <table class="table">
-                        <tr class="table-primary justify-content-between">
-                        </tr>
-                        <tr>
-                            <th scope="row">Maheen Riaz Contractor</th>
-                            <td>
-                                <button type="button" class="btn-download" style="float: right">
-                                    <a href="/course/grade/individual"><i class="fa fa-edit"></i></a>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Tharindu Cyril Weerasooriya</th>
-                            <td>
-                                <button type="button" class="btn-download" style="float: right">
-                                    <i class="fa fa-edit"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Malcolm Lambrecht</th>
-                            <td>
-                                <button type="button" class="btn-download" style="float: right">
-                                    <i class="fa fa-edit"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Saad Hassan</th>
-                            <td>
-                                <button type="button" class="btn-download" style="float: right">
-                                    <i class="fa fa-edit"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </table>
+                        <form>
+                            <div class="mb-3" style="display: flex; justify-content: space-between">
+                            <span>
+                                Lesson #1
+                            </span>
+                                <span style="display: flex;justify-content:flex-end;">
+                                    <input type="number" class="form-control" name="1" style="width: 30%" value="30">
+                                    <div style="margin-right: 2%; margin-left: 2%">/</div>
+                                    <input type="number" class="form-control" name="1_tot" style="width: 30%" value="100">
+                                </span>
+                            </div>
+                            <div class="mb-3" style="display: flex; justify-content: space-between">
+                            <span>
+                                Lesson #2
+                            </span>
+                                <span style="display: flex;justify-content:flex-end;">
+                                    <input type="number" class="form-control" name="2" style="width: 30%" value="40">
+                                    <div style="margin-right: 2%; margin-left: 2%">/</div>
+                                    <input type="number" class="form-control" name="2_tot" style="width: 30%" value="100">
+                                </span>
+                            </div>
+                            <div class="mb-3" style="display: flex; justify-content: space-between">
+                                <span>
+                                    Lesson #3
+                                </span>
+                                <span style="display: flex;justify-content:flex-end;">
+                                    <input type="number" class="form-control" name="3" style="width: 30%" value="60">
+                                    <div style="margin-right: 2%; margin-left: 2%">/</div>
+                                    <input type="number" class="form-control" name="3_tot" style="width: 30%" value="100">
+                                </span>
+                            </div>
+                            <div class="mb-3" style="display: flex; justify-content: space-between">
+                            <span>
+                                Midterm #1
+                            </span>
+                                <span style="display: flex;justify-content:flex-end;">
+                                    <input type="number" class="form-control" name="4" style="width: 30%" value="75">
+                                    <div style="margin-right: 2%; margin-left: 2%">/</div>
+                                    <input type="number" class="form-control" name="4_tot" style="width: 30%" value="100">
+                                </span>
+                            </div>
+                            <button type="submit" class="btn btn-primary"  style="width:10rem; float:right;">
+                                Save
+                            </button>
+                        </form>
                     <#else>
                         <div class="mb-3" style="display: flex; justify-content: space-between">
                             <span>
