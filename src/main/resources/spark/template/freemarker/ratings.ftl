@@ -49,7 +49,7 @@
                                 <span class="fa fa-star large"></span>
                             </td>
                             <td>
-                                <button type="button" class="btn btn-primary mb-3">
+                                <button type="button" class="btn btn-primary">
                                     <a href="/rating/individual" class="text-white">Rate</a>
                                 </button>
                             </td>
@@ -65,7 +65,7 @@
                                 <span class="fa fa-star large"></span>
                             </td>
                             <td>
-                                <button type="button" class="btn btn-primary mb-3">
+                                <button type="button" class="btn btn-primary">
                                     <a href="" class="text-white">Rate</a>
                                 </button>
                             </td>

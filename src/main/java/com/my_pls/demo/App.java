@@ -244,7 +244,6 @@ public class App {
                    map.put("succMsg", "");
                }
            }
-
             map.put("pageType", pageType);
             map.put("actionLink", ("/forgot-password/" + pageType));
             return new ModelAndView(map,"forgotPassword.ftl");
@@ -261,6 +260,7 @@ public class App {
 
         get("/home",((request, response) -> {
             Map<String,String> map = new HashMap<>();
+            map.put("notAuthorized", "true");
             return new ModelAndView(map,"homePage.ftl");
         }),engine);
 
@@ -272,7 +272,7 @@ public class App {
 
         get("/course/learnMat",((request, response) -> {
             Map<String,String> map = new HashMap<>();
-            map.put("role", "student");
+            map.put("role", "prof");
             return new ModelAndView(map,"courseLearnMat.ftl");
         }),engine);
 
@@ -284,7 +284,7 @@ public class App {
 
         get("/course/grades",((request, response) -> {
             Map<String,String> map = new HashMap<>();
-            map.put("role", "student");
+            map.put("role", "prof");
             return new ModelAndView(map,"courseGrade.ftl");
         }),engine);
 
@@ -343,6 +343,16 @@ public class App {
             Map<String,String> map = new HashMap<>();
             map.put("role","prof");
             return new ModelAndView(map,"ratings.ftl");
+        }),engine);
+
+        get("/discussion-groups",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            return new ModelAndView(map,"discussionGroups.ftl");
+        }),engine);
+
+        get("/discussion/group-desc",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            return new ModelAndView(map,"groupDesc.ftl");
         }),engine);
 
         get("/rating/individual",((request, response) -> {

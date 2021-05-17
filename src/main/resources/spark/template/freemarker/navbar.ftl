@@ -17,7 +17,7 @@
                     <a class="nav-link" href="/enroll">Enroll <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item active">
-                    <a class="nav-link" href="">Discussion Groups <span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="/discussion-groups">Discussion Groups <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item active" >
                     <a class="nav-link" href="/ratings">Ratings <span class="sr-only">(current)</span></a>

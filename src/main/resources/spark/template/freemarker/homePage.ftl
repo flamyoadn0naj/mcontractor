@@ -9,7 +9,12 @@
 </head>
 <body>
     <#include  "navbar.ftl">
-
+    <#if notAuthorized == "true">
+        <div class="alert alert-dismissible alert-danger">
+            <strong>Not Authorized! </strong>
+            You have been redirected to the home page as you were not authorized to view the page you selected.
+        </div>
+    </#if>
     <div style="display: flex;justify-content: center">
         <div class="card text-black mb-3" style="width:100%; border: none">
             <h2 class="card-header text-black-50 mb-3" style="padding:10pt">
