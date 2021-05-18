@@ -16,14 +16,23 @@
         </h2>
         <div style="width: 90%; margin-left: 2%">
             <form method="post" action="/courses">
-                <div class="mb-3" style="float: right; display: flex">
-                    <b style="margin-right: 2%" class="col-5">Filter By:</b>
-                    <select class="form-control col-5" name="filterBy" id="exampleSelect1" style="margin-right: 2%">
-                        <option>All</option>
-                        <option>Current</option>
-                        <option>Completed</option>
-                    </select>
-                    <button class="btn btn-primary col-5" type="submit">Search</button>
+                <div class="space-between">
+                    <div>
+                        <#if role == "admin">
+                            <button class="btn btn-primary col-12 text-white" style="float:left" type="submit">
+                                <a href="/courses/create-course" class="text-white">Create Course</a>
+                            </button>
+                        </#if>
+                    </div>
+                    <div class="mb-3" style="float: right; display: flex">
+                        <b style="margin-right: 2%" class="col-5">Filter By:</b>
+                        <select class="form-control col-5" name="filterBy" id="exampleSelect1" style="margin-right: 2%">
+                            <option>All</option>
+                            <option>Current</option>
+                            <option>Completed</option>
+                        </select>
+                        <button class="btn btn-primary col-5" type="submit">Search</button>
+                    </div>
                 </div>
             </form>
             <table class="table table-bordered">

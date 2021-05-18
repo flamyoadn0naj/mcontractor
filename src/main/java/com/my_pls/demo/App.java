@@ -307,6 +307,7 @@ public class App {
 
         get("/courses",((request, response) -> {
             Map<String,String> map = new HashMap<>();
+            map.put("role","admin");
             return new ModelAndView(map,"courses.ftl");
         }),engine);
 
@@ -314,7 +315,13 @@ public class App {
             Map<String,String> map = new HashMap<>();
             Map<String,String> formFields = extractFields(request.body());
             System.out.println(formFields);
+            map.put("role","admin");
             return new ModelAndView(map,"courses.ftl");
+        }),engine);
+
+        get("/courses/create-course",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            return new ModelAndView(map,"createCourse.ftl");
         }),engine);
 
         get("/course/create-quiz",((request, response) -> {
@@ -353,6 +360,11 @@ public class App {
         get("/discussion/group-desc",((request, response) -> {
             Map<String,String> map = new HashMap<>();
             return new ModelAndView(map,"groupDesc.ftl");
+        }),engine);
+
+        get("/discussion/create-post",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            return new ModelAndView(map,"discussionPost.ftl");
         }),engine);
 
         get("/rating/individual",((request, response) -> {

@@ -19,7 +19,9 @@
 <#--            <div class="space-between" style="display:flex">-->
 <#--                <input class="form-control col-7" name="searchText" type="text" placeholder="Search" value="added">-->
 <#--                <button class="btn btn-primary col-2"  type="submit">Search</button>-->
-                <button class="btn btn-primary col-4" style="float:right" type="submit">Create Post</button>
+                <button class="btn btn-primary col-4 text-white" style="float:right" type="submit">
+                    <a href="/discussion/create-post" class="text-white">Create Post</a>
+                </button>
 <#--            </div>-->
 <#--            <div class="space-between">-->
 
