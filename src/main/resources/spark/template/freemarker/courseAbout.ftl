@@ -59,9 +59,11 @@
                                 <span class="fa fa-star checked"></span>
                                 <span class="fa fa-star "></span>
                             </p>
-                            <button type="button" class="btn btn-primary mb-3" style="float: right">
-                                Save
-                            </button>
+                            <#if role == "prof">
+                                <button type="button" class="btn btn-primary mb-3" style="float: right">
+                                    Save
+                                </button>
+                            </#if>
                         </form>
                     </div>
                 </div>

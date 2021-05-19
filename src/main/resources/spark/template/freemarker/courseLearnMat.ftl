@@ -15,7 +15,11 @@
             Introduction to Software Engineering
         </h2>
         <div style="width: 90%; margin-left: 2%">
-            <#if role == "prof"><button type="button" class="btn btn-primary" style="float: right">Add Lesson</button></#if>
+            <#if role == "prof">
+                <button type="button" class="btn btn-primary" style="float: right;">Save</button>
+                <button type="button" class="btn btn-primary" style="float: right; margin-right: 2%">Add Lesson</button>
+
+            </#if>
             <ul class="nav nav-tabs">
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="/course/about">About</a>
@@ -59,7 +63,14 @@
                             </div>
                             <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
                                 <div class="card-body">
-                                    <div class="mb-3"> <b>Requirements:</b> The student must get at least 80 marks in Quiz 1.</div>
+                                    <#if role == "prof">
+                                        <div class="mb-3">
+                                            <b>Requirements:</b>
+                                            <input style="width: 80%" name="req1" type="text" id="req1" value="The student must get at least 80 marks in Quiz 1.">
+                                        </div>
+                                    <#else>
+                                        <div class="mb-3"> <b>Requirements:</b> The student must get at least 80 marks in Quiz 1.</div>
+                                    </#if>
                                     <ul class="list-group">
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
                                             Notes1.pdf
@@ -110,7 +121,14 @@
                             </div>
                             <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordion">
                                 <div class="card-body">
-                                    <div class="mb-3"> <b>Requirements:</b> The student must get at least 70 marks in Quiz 2. </div>
+                                    <#if role == "prof">
+                                        <div class="mb-3">
+                                            <b>Requirements:</b>
+                                            <input style="width: 80%" name="req1" type="text" id="req1" value="The student must get at least 80 marks in Quiz 1.">
+                                        </div>
+                                    <#else>
+                                        <div class="mb-3"> <b>Requirements:</b> The student must get at least 80 marks in Quiz 1.</div>
+                                    </#if>
                                     <ul class="list-group">
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
                                             Notes1.pdf

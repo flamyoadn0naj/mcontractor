@@ -290,13 +290,13 @@ public class App {
 
         get("/course/grade/individual",((request, response) -> {
             Map<String,String> map = new HashMap<>();
-            map.put("role", "student");
+            map.put("role", "prof");
             return new ModelAndView(map,"courseGradeIndividual.ftl");
         }),engine);
 
         get("/course/classlist",((request, response) -> {
             Map<String,String> map = new HashMap<>();
-            map.put("role", "student");
+            map.put("role", "prof");
             return new ModelAndView(map,"courseClasslist.ftl");
         }),engine);
 
@@ -307,7 +307,7 @@ public class App {
 
         get("/courses",((request, response) -> {
             Map<String,String> map = new HashMap<>();
-            map.put("role","admin");
+            map.put("role","prof");
             return new ModelAndView(map,"courses.ftl");
         }),engine);
 
