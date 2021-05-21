@@ -17,61 +17,91 @@
         <form style="display:flex; justify-content:center;" action="/ratings" method="post">
             <div class="card" style="width: 95%; border: none">
                 <div class="space-between">
-                    <input class="form-control col-7" name="searchText" type="text" placeholder="Search" value="software">
-                    <select class="form-control col-2" name="filterBy" id="exampleSelect1">
-                        <option>All</option>
-                        <option>Course</option>
-                        <#if role == "prof">
-                            <option>Student</option>
-                        <#else>
-                            <option>Professor</option>
-                        </#if>
-                    </select>
+                    <input class="form-control col-7" name="searchText" type="text" placeholder="Search" value="">
                     <button class="btn btn-primary my-2 my-sm-0 col-2" type="submit">Search</button>
                 </div>
 
-                <div style="margin-top: 2%">
-                    <table class="table table-bordered">
-                        <tr class="table-primary">
-                            <th scope="col">Course Name</th>
-                            <th scope="col">Professor</th>
-                            <th scope="col">Rating</th>
-                            <th scope="col">Action</th>
-                        </tr>
-                        <tr>
-                            <th scope="row">Introduction to Software Engineering</th>
-                            <td>AbdulMutalib Wahaishi</td>
-                            <td>
-                                <span class="fa fa-star checked large"></span>
-                                <span class="fa fa-star checked large"></span>
-                                <span class="fa fa-star checked large"></span>
-                                <span class="fa fa-star checked large"></span>
-                                <span class="fa fa-star large"></span>
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-primary">
-                                    <a href="/rating/individual" class="text-white">Rate</a>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Software Process and Management</th>
-                            <td>Samuel Malachowsky</td>
-                            <td>
-                                <span class="fa fa-star checked large"></span>
-                                <span class="fa fa-star checked large"></span>
-                                <span class="fa fa-star checked large"></span>
-                                <span class="fa fa-star large"></span>
-                                <span class="fa fa-star large"></span>
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-primary">
-                                    <a href="" class="text-white">Rate</a>
-                                </button>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
+                <#if role == "prof">
+                    <div style="margin-top: 2%">
+                        <table class="table table-bordered">
+                            <tr class="table-primary">
+                                <th scope="col">Learner</th>
+                                <th scope="col">Rating</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                            <tr>
+                                <th scope="row">Saad Hassan</th>
+                                <td>
+                                    <span class="fa fa-star checked large"></span>
+                                    <span class="fa fa-star checked large"></span>
+                                    <span class="fa fa-star checked large"></span>
+                                    <span class="fa fa-star checked large"></span>
+                                    <span class="fa fa-star large"></span>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-primary">
+                                        <a href="/rating/individual" class="text-white">Rate</a>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Maheen Contractor</th>
+                                <td>
+                                    <span class="fa fa-star checked large"></span>
+                                    <span class="fa fa-star checked large"></span>
+                                    <span class="fa fa-star checked large"></span>
+                                    <span class="fa fa-star large"></span>
+                                    <span class="fa fa-star large"></span>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-primary">
+                                        <a href="" class="text-white">Rate</a>
+                                    </button>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                <#else>
+                    <div style="margin-top: 2%">
+                        <table class="table table-bordered">
+                            <tr class="table-primary">
+                                <th scope="col">Professor</th>
+                                <th scope="col">Rating</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                            <tr>
+                                <th scope="row">AbdulMutalib Wahaishi</th>
+                                <td>
+                                    <span class="fa fa-star checked large"></span>
+                                    <span class="fa fa-star checked large"></span>
+                                    <span class="fa fa-star checked large"></span>
+                                    <span class="fa fa-star checked large"></span>
+                                    <span class="fa fa-star large"></span>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-primary">
+                                        <a href="/rating/individual" class="text-white">Rate</a>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Samuel Malachowsky</th>
+                                <td>
+                                    <span class="fa fa-star checked large"></span>
+                                    <span class="fa fa-star checked large"></span>
+                                    <span class="fa fa-star checked large"></span>
+                                    <span class="fa fa-star large"></span>
+                                    <span class="fa fa-star large"></span>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-primary">
+                                        <a href="" class="text-white">Rate</a>
+                                    </button>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </#if>
             </div>
         </form>
     </div>

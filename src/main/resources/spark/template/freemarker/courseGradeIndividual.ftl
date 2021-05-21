@@ -14,6 +14,9 @@
         <h2 class="card-header border-primary text-black-50 mb-3">
             Introduction to Software Engineering
         </h2>
+        <h4 class="card-header border-primary text-black-50 mb-3" style="margin-top: -1.5%">
+            Maheen Riaz Contractor
+        </h4>
         <div style="width: 90%; margin-left: 2%">
             <ul class="nav nav-tabs">
                 <li class="nav-item">

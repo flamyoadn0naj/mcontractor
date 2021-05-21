@@ -12,7 +12,7 @@
 <div style="display: flex;justify-content: center">
     <div class="card text-black mb-3" style="width:100%; border: none">
         <h2 class="card-header border-primary text-black-50 mb-3">
-            Introduction to Software Engineering
+            Saad Hassan
         </h2>
         <div style="width: 90%; margin-left: 2%">
             <form>

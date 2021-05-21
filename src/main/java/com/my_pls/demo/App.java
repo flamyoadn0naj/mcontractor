@@ -348,7 +348,7 @@ public class App {
 
         get("/ratings",((request, response) -> {
             Map<String,String> map = new HashMap<>();
-            map.put("role","prof");
+            map.put("role","student");
             return new ModelAndView(map,"ratings.ftl");
         }),engine);
 
