@@ -8,6 +8,7 @@ import com.google.cloud.storage.StorageOptions;
 import com.google.common.collect.Lists;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
@@ -173,11 +174,30 @@ public class App {
                     String email = formFields.get("email");
                     email = URLDecoder.decode(email,"UTF-8");
                     new_user.setEmail(email);
-
-                    String display_name = formFields.get("fname") +" " +  formFields.get("lname");
+                    new_user.setEmailVerified(false);
+                    String display_name = formFields.get("firstName") +" " +  formFields.get("lastName");
                     new_user.setDisplayName(display_name);
                     new_user.setPassword(formFields.get("pass"));
-                    mAuth.createUser(new_user);
+                    mAuth.createUser(new_user); //Create firebase user
+                    mAuth.generateEmailVerificationLink(email);
+//                    UserRecord userRecord = FirebaseAuth.getInstance().getUserByEmail(email);
+
+                    //Sending verification email
+                    ActionCodeSettings actionCodeSettings = ActionCodeSettings.builder()
+                            .setUrl("/verify-register")
+                            .setHandleCodeInApp(true)
+                            .build();
+                    try {
+                        String link = FirebaseAuth.getInstance().generateEmailVerificationLink(
+                                email);
+
+                        // Construct email verification template, embed the link and send
+                        // using custom SMTP server.
+
+//                        sendCustomEmail(email, display_name, link);
+                    } catch (FirebaseAuthException e) {
+                        System.out.println("Error generating email link: " + e.getMessage());
+                    }
                     response.redirect("/verify-register");
                 } else {
                     map.put("fname",formFields.get("firstName"));
