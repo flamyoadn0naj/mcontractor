@@ -180,7 +180,8 @@ public class App {
                     new_user.setPassword(formFields.get("pass"));
                     mAuth.createUser(new_user); //Create firebase user
                     mAuth.generateEmailVerificationLink(email);
-//                    UserRecord userRecord = FirebaseAuth.getInstance().getUserByEmail(email);
+
+                    UserRecord userRecord = FirebaseAuth.getInstance().getUserByEmail(email);
 
                     //Sending verification email
                     ActionCodeSettings actionCodeSettings = ActionCodeSettings.builder()
