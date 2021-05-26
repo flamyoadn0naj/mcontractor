@@ -10,10 +10,10 @@ public class MySqlConnection {
 
             System.out.println("Connecting... ");
 
-            Class.forName("com.mysql.jdbc.Driver");
+            Class.forName("com.mysql.cj.jdbc.Driver");
 
             // Database link, username and password
-            conn = DriverManager.getConnection("jdbc:mysql://us-cdbr-east-02.cleardb.com/heroku_d47d83ae3d838cf?reconnect=true", "b8bfeaec94d3d2", "b7e7427e");
+            conn = DriverManager.getConnection("jdbc:mysql://b8bfeaec94d3d2:b7e7427e@us-cdbr-east-02.cleardb.com/heroku_d47d83ae3d838cf?reconnect=true");
             System.out.println("Connection Succeeded");
 
         } catch (Exception e) {
@@ -22,5 +22,6 @@ public class MySqlConnection {
 
         return conn;
     }
+
 
 }

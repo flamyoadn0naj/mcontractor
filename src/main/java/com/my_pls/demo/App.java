@@ -1,33 +1,25 @@
 package com.my_pls.demo;
 
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.api.gax.paging.Page;
-import com.google.cloud.storage.Bucket;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
-import com.google.common.collect.Lists;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.auth.ActionCodeSettings;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.UserRecord;
+
+import org.apache.commons.codec.digest.DigestUtils;
 import spark.ModelAndView;
 import spark.TemplateEngine;
 import spark.template.freemarker.FreeMarkerEngine;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import com.my_pls.MySqlConnection;
+import com.my_pls.sendEmail;
+
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.net.URLDecoder;
 
 import static spark.Spark.*;
 
 public class App {
-    public static String firebase_auth_json = "json_auth/mypls-added-value-firebase-adminsdk-6j3xx-5271a3d0db.json";
+
 
     private static Map<String,String> extractFields(String body){
         try{
@@ -44,10 +36,9 @@ public class App {
         }
 
     }
-//    Map<String,String> map = extractFields(request.body());
-//        return map;
 
-    public static void main(String[] args) throws IOException, FirebaseAuthException {
+
+    public static void main(String[] args) throws IOException {
 
         port(8080);
 
@@ -56,21 +47,6 @@ public class App {
         staticFileLocation("/public"); //So that it has access to the pubic resources(stylesheets, etc.)
 
 
-        GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(firebase_auth_json))
-                .createScoped(Lists.newArrayList("https://www.googleapis.com/auth/cloud-platform"));
-        FirebaseOptions options = FirebaseOptions.builder()
-                .setCredentials(credentials)
-                .setDatabaseUrl("https://mypls-added-value.firebaseio.com/")
-                .build();
-
-        FirebaseApp.initializeApp(options);
-        FirebaseAuth mAuth;
-        mAuth = FirebaseAuth.getInstance();
-
-
-//        mAuth.createUser(user_request);
-//        UserRecord user = mAuth.getUser("TG4b6yMyPYaHiW2yYpyBfU6lAki2");
-//        System.out.println(user.getEmail());
 
         post("/sub", ((request, response) -> {
 
@@ -170,34 +146,37 @@ public class App {
                     map.put("errorPassMatch", "display:list-item;margin-left:5%");
                 }
                 if (flag) {
-                    UserRecord.CreateRequest new_user = new UserRecord.CreateRequest();
+
                     String email = formFields.get("email");
                     email = URLDecoder.decode(email,"UTF-8");
-                    new_user.setEmail(email);
-                    new_user.setEmailVerified(false);
-                    String display_name = formFields.get("firstName") +" " +  formFields.get("lastName");
-                    new_user.setDisplayName(display_name);
-                    new_user.setPassword(formFields.get("pass"));
-                    mAuth.createUser(new_user); //Create firebase user
-                    mAuth.generateEmailVerificationLink(email);
-
-                    UserRecord userRecord = FirebaseAuth.getInstance().getUserByEmail(email);
-
-                    //Sending verification email
-                    ActionCodeSettings actionCodeSettings = ActionCodeSettings.builder()
-                            .setUrl("/verify-register")
-                            .setHandleCodeInApp(true)
-                            .build();
+                    String password = formFields.get("pass");
+                    String fName = formFields.get("firstName");
+                    String lName = formFields.get("lastName");
+                    String newPassword = DigestUtils.md5Hex(password); //Create random hash for verification link
+                    Random theRandom = new Random();
+                    theRandom.nextInt(999999);
+                    String myHash = DigestUtils.md5Hex("" +	theRandom);
+                    Connection conn = MySqlConnection.getConnection();
                     try {
-                        String link = FirebaseAuth.getInstance().generateEmailVerificationLink(
-                                email);
 
-                        // Construct email verification template, embed the link and send
-                        // using custom SMTP server.
+                        String sqlQuery = "insert into user_details (First_Name,Last_Name,Email,Password,Hash,Active) values(?,?,?,?,?,?)";
+                        PreparedStatement pst = conn.prepareStatement(sqlQuery);
+                        pst.setString(1, fName);
+                        pst.setString(2, lName);
+                        pst.setString(3, email);
+                        pst.setString(4, password);
+                        pst.setString(5, myHash);
+                        pst.setInt(6, 0);
+                        int i = pst.executeUpdate();
+                        String body =  "Click this link to confirm your email address and complete setup for your account." + "\n\nVerification Link: " + "http://localhost:8080/EmailVerification/ActivateAccount?key1=" + email + "&key2=" + myHash;
+                        if (i != 0) {
 
-//                        sendCustomEmail(email, display_name, link);
-                    } catch (FirebaseAuthException e) {
-                        System.out.println("Error generating email link: " + e.getMessage());
+                            sendEmail se = new sendEmail();
+                            se.sendEmail_content(email,"Verify Email at MyPLS",body);
+
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Error at Registration: " + e);
                     }
                     response.redirect("/verify-register");
                 } else {
@@ -273,18 +252,6 @@ public class App {
             return type;
         }
     }
-    static void authExplicit(String jsonPath) throws IOException {
-        // You can specify a credential file by providing a path to GoogleCredentials.
-        // Otherwise credentials are read from the GOOGLE_APPLICATION_CREDENTIALS environment variable.
-        GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(firebase_auth_json))
-                .createScoped(Lists.newArrayList("https://www.googleapis.com/auth/cloud-platform"));
-        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
 
-        System.out.println("Buckets:");
-        Page<Bucket> buckets = storage.list();
-        for (Bucket bucket : buckets.iterateAll()) {
-            System.out.println(bucket.toString());
-        }
-    }
 
 }
