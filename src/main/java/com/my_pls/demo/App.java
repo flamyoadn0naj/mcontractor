@@ -178,7 +178,7 @@ public class App {
                     } catch (Exception e) {
                         System.out.println("Error at Registration: " + e);
                     }
-                    response.redirect("/verify-register");
+                    response.redirect("/verify-register/send");
                 } else {
                     map.put("fname",formFields.get("firstName"));
                     map.put("lname",formFields.get("lastName"));
@@ -190,8 +190,13 @@ public class App {
 
         },engine);
 
-        get("/verify-register",((request, response) -> {
+        get("/verify-register/:type",((request, response) -> {
+            String type = request.params(":type");
             Map<String,String> map = new HashMap<>();
+            map.put("type", type);
+            if(type == "confirmed") {
+                //add account activation code here
+            }
             return new ModelAndView(map,"verifyRegister.ftl");
 
         }),engine);
