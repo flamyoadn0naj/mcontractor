@@ -13,6 +13,7 @@ import com.my_pls.sendEmail;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.util.*;
 import java.net.URLDecoder;
 
@@ -168,7 +169,7 @@ public class App {
                         pst.setString(5, myHash);
                         pst.setInt(6, 0);
                         int i = pst.executeUpdate();
-                        String body =  "Click this link to confirm your email address and complete setup for your account." + "\n\nVerification Link: " + "http://localhost:8080/EmailVerification/ActivateAccount?key1=" + email + "&key2=" + myHash;
+                        String body =  "Click this link to confirm your email address and complete setup for your account." + "\n\nVerification Link: " + "http://localhost:8080/verify-register/confirmed?key1=" + email + "&key2=" + myHash;
                         if (i != 0) {
 
                             sendEmail se = new sendEmail();
@@ -194,8 +195,23 @@ public class App {
             String type = request.params(":type");
             Map<String,String> map = new HashMap<>();
             map.put("type", type);
-            if(type == "confirmed") {
-                //add account activation code here
+
+            if(type.equals("confirm")) {
+                String email = request.queryParams("key1");
+                email = URLDecoder.decode(email,"UTF-8");
+                String hash = request.queryParams("key2");
+                Connection conn = MySqlConnection.getConnection();
+                PreparedStatement pst = conn.prepareStatement("select Email, Hash, Active from user_details where Email=? and Hash=? and Active='0'");
+                pst.setString(1, email);
+                pst.setString(2, hash);
+                ResultSet rs = pst.executeQuery();
+                if(rs.next()) {
+                    PreparedStatement pst1 = conn.prepareStatement("update user_details set Active='1' where Email=? and Hash=?");
+                    pst1.setString(1, email);
+                    pst1.setString(2, hash);
+
+                    int i = pst1.executeUpdate();
+                }
             }
             return new ModelAndView(map,"verifyRegister.ftl");
 
