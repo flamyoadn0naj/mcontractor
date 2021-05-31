@@ -169,7 +169,7 @@ public class App {
                         pst.setString(5, myHash);
                         pst.setInt(6, 0);
                         int i = pst.executeUpdate();
-                        String body =  "Click this link to confirm your email address and complete setup for your account." + "\n\nVerification Link: " + "http://localhost:8080/verify-register/confirmed?key1=" + email + "&key2=" + myHash;
+                        String body =  "Click this link to confirm your email address and complete setup for your account." + "\n\nVerification Link: " + "http://localhost:8080/verify-register/confirm?key1=" + email + "&key2=" + myHash;
                         if (i != 0) {
 
                             sendEmail se = new sendEmail();
