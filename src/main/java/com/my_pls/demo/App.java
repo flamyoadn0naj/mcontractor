@@ -10,8 +10,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import com.my_pls.MySqlConnection;
 import com.my_pls.sendEmail;
+import com.my_pls.securePassword;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.util.*;
@@ -47,7 +47,9 @@ public class App {
         internalServerError("<html><body>Something went wrong!</body></html>");
         staticFileLocation("/public"); //So that it has access to the pubic resources(stylesheets, etc.)
 
-
+        Connection conn = MySqlConnection.getConnection();
+        securePassword pwd_manager = new securePassword();
+        CurrUser user_current = new CurrUser();
 
         post("/sub", ((request, response) -> {
 
@@ -89,10 +91,37 @@ public class App {
                     map.put("emailVal","");
                     map.put("loginErr", "");
                 } else {
+                    String emVal = formFields.get("email");
+                    //Cyril Added
+                    emVal = URLDecoder.decode(emVal, "UTF-8");
+                    PreparedStatement pst = conn.prepareStatement("select * from user_details where Email=?");
+                    pst.setString(1, emVal);
+                    ResultSet rs = pst.executeQuery();
+                    if(rs.next()) {
+                        String db_password = rs.getString("Password");
+                        String input_password = formFields.get("pass");
+                        if (pwd_manager.comparePassword(db_password,input_password)){
+                            //everything good password matches with db
+                            user_current.email = emVal;
+                            user_current.firstName = rs.getString("First_Name");
+                            user_current.lastName = rs.getString("Last_Name");
+                            user_current.password = db_password;
+                        }
+                        else
+                        {
+                            //passwords do not match
+                        }
+
+                    }
+                    else{
+                        //add error message for email not found
+                    }
+                    //Cyril end
+
                     map.put("loginErr", "display:list-item;margin-left:5%");
                     map.put("errorEmail", "");
-                    String emVal = URLDecoder.decode(formFields.get("email"), "UTF-8");
-                    map.put("emailVal",formFields.get("email"));
+
+                    map.put("emailVal",emVal);
                 }
             } else {
                 map.put("loginErr", "");
@@ -103,7 +132,6 @@ public class App {
             map.put("pageType","Login");
             map.put("styleVal", "margin-top:12%; width:45%");
             return new ModelAndView(map,"login.ftl");
-
         },engine);
 
         get("/register",(request, response) -> {
@@ -151,13 +179,13 @@ public class App {
                     String email = formFields.get("email");
                     email = URLDecoder.decode(email,"UTF-8");
                     String password = formFields.get("pass");
+                    password = pwd_manager.hashPassword(password);
                     String fName = formFields.get("firstName");
                     String lName = formFields.get("lastName");
-                    String newPassword = DigestUtils.md5Hex(password); //Create random hash for verification link
                     Random theRandom = new Random();
                     theRandom.nextInt(999999);
                     String myHash = DigestUtils.md5Hex("" +	theRandom);
-                    Connection conn = MySqlConnection.getConnection();
+
                     try {
 
                         String sqlQuery = "insert into user_details (First_Name,Last_Name,Email,Password,Hash,Active) values(?,?,?,?,?,?)";
@@ -200,7 +228,7 @@ public class App {
                 String email = request.queryParams("key1");
                 email = URLDecoder.decode(email,"UTF-8");
                 String hash = request.queryParams("key2");
-                Connection conn = MySqlConnection.getConnection();
+
                 PreparedStatement pst = conn.prepareStatement("select Email, Hash, Active from user_details where Email=? and Hash=? and Active='0'");
                 pst.setString(1, email);
                 pst.setString(2, hash);
@@ -228,27 +256,6 @@ public class App {
         },engine);
 
 
-
-        Pokemon charmander  = new Pokemon();
-        charmander.name = "Charry";
-        charmander.type = "fire";
-
-        Pokemon rattata = new Pokemon();
-        rattata.name = "ratbi";
-        rattata.type = "grass";
-
-        get("/list",(request, response) -> {
-
-            List<Pokemon> pokeList = new ArrayList<>(4);
-            pokeList.add(charmander);
-            pokeList.add(rattata);
-
-            Map<String,Object> map = new HashMap<>();
-            map.put("pokemon",pokeList);
-            return new ModelAndView(map,"example.ftl");
-
-        },engine);
-
         path("/user",()->{
             get("/",(req,res)-> req.session().attribute("name"));
             get("/update/:name",(req,res)->{
@@ -261,18 +268,13 @@ public class App {
 
     }
 
-    public static class Pokemon{
-        String name;
-        String type;
-
-        public String getName() {
-            return name;
-        }
-
-        public String getType() {
-            return type;
-        }
+    public static class CurrUser {
+        String firstName;
+        String lastName;
+        String password;
+        String email;
     }
+
 
 
 }
