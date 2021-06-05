@@ -13,3 +13,32 @@
  */
 @import "bootstrap.min.css";
 @import "bootstrap.css";
+
+.checked {
+    color: orange;
+}
+
+.large {
+    font-size: x-large !important;
+}
+
+.space-between {
+    display: flex;
+    justify-content: space-between;
+}
+
+.padding2right {
+    padding-right: 2%;
+}
+
+.btn-download {
+    background: none;
+    border: none;
+    color: #78C2AD !important;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.btn-download:hover {
+    color: #4aa48a !important;
+}

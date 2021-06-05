@@ -1,6 +1,5 @@
 package com.my_pls.demo;
 
-
 import org.apache.commons.codec.digest.DigestUtils;
 import spark.ModelAndView;
 import spark.TemplateEngine;
@@ -65,7 +64,6 @@ public class App {
             Map<String,Object> map = new HashMap<>();
             map.put("title",name);
             return new ModelAndView(map,"home.ftl");
-
         },engine);
 
         get("/login",(request, response) -> {
@@ -78,7 +76,6 @@ public class App {
             map.put("pageType","Login");
             map.put("styleVal", "margin-top:12%; width:45%");
             return new ModelAndView(map,"login.ftl");
-
         },engine);
 
         post("/login",(request, response) -> {
@@ -92,6 +89,7 @@ public class App {
                     map.put("loginErr", "");
                 } else {
                     String emVal = formFields.get("email");
+
                     //Cyril Added
                     emVal = URLDecoder.decode(emVal, "UTF-8");
                     PreparedStatement pst = conn.prepareStatement("select * from user_details where Email=?");
@@ -145,9 +143,7 @@ public class App {
             map.put("emailVal","");
             map.put("pageType","Register");
             map.put("styleVal", "margin-top:5%; width:45%");
-//            map.put("toast",(""))
             return new ModelAndView(map,"login.ftl");
-
         },engine);
 
         post("/register",(request, response) -> {
@@ -156,8 +152,6 @@ public class App {
             map.put("actionLink", "/register");
             map.put("loginErr", "");
             if (formFields.size() > 0) {
-                System.out.println(formFields);
-                System.out.println(formFields.get("email"));
                 Boolean flag = true;
                 if (!formFields.get("email").contains("rit.edu")) {
                     map.put("errorEmail", "display:list-item;margin-left:5%");
@@ -165,10 +159,13 @@ public class App {
                     flag = false;
                 } else {
                     map.put("errorEmail", "");
-                    String emVal = URLDecoder.decode(formFields.get("email"), "UTF-8");
-                    map.put("emailVal",formFields.get("email"));
+                    String emVal = formFields.get("email");
+                    try {
+                        emVal = URLDecoder.decode(emVal, "UTF-8");
+                    } catch (Exception e) {}
+                    map.put("emailVal",emVal);
                 }
-                if (formFields.get("pass").equals(formFields.get("retPass"))) {
+                if (formFields.get("pass").equals(formFields.get("retPass")) && formFields.get("pass").length() >= 6) {
                     map.put("errorPassMatch", "");
                 } else {
                     flag = false;
@@ -208,6 +205,7 @@ public class App {
                         System.out.println("Error at Registration: " + e);
                     }
                     response.redirect("/verify-register/send");
+
                 } else {
                     map.put("fname",formFields.get("firstName"));
                     map.put("lname",formFields.get("lastName"));
@@ -216,7 +214,6 @@ public class App {
             map.put("pageType","Register");
             map.put("styleVal", "margin-top:5%; width:45%");
             return new ModelAndView(map,"login.ftl");
-
         },engine);
 
         get("/verify-register/:type",((request, response) -> {
@@ -242,7 +239,51 @@ public class App {
                 }
             }
             return new ModelAndView(map,"verifyRegister.ftl");
+        }),engine);
 
+        get("/forgot-password/:type",((request, response) -> {
+            String pageType = request.params(":type");
+            Map<String,String> map = new HashMap<>();
+            map.put("pageType", pageType);
+            map.put("actionLink", ("/forgot-password/" + pageType));
+            map.put("success", "false");
+            map.put("succMsg", "");
+            map.put("errorEmail", "");
+            map.put("errorPassMatch", "");
+            return new ModelAndView(map,"forgotPassword.ftl");
+        }),engine);
+
+        post("/forgot-password/:type",((request, response) -> {
+            String pageType = request.params(":type");
+            Map<String,String> map = new HashMap<>();
+            Map<String,String> formFields = extractFields(request.body());
+           if (pageType.equals("email")) {
+               map.put("errorPassMatch", "");
+               if (!formFields.get("email").contains("rit.edu")) {
+                   map.put("errorEmail", "display:block;margin-left:5%; width:90%");
+                   map.put("emailVal","");
+                   map.put("success", "false");
+                   map.put("succMsg", "");
+               } else {
+                   map.put("errorEmail", "");
+                   map.put("success", "true");
+                   map.put("succMsg", "A verification link has been emailed to you!");
+               }
+           } else {
+               map.put("errorEmail", "");
+               if (formFields.get("pass").equals(formFields.get("retPass")) && formFields.get("pass").length() >= 6) {
+                   map.put("errorPassMatch", "");
+                   map.put("success", "true");
+                   map.put("succMsg", "Your password has been changed. Please log in again.");
+               } else {
+                   map.put("errorPassMatch", "display:block;margin-left:5%; width:90%");
+                   map.put("success", "false");
+                   map.put("succMsg", "");
+               }
+           }
+            map.put("pageType", pageType);
+            map.put("actionLink", ("/forgot-password/" + pageType));
+            return new ModelAndView(map,"forgotPassword.ftl");
         }),engine);
 
         get("/first/*/last/*",(request, response) -> {
@@ -252,9 +293,116 @@ public class App {
             Map<String,Object> map = new HashMap<>();
             map.put("title",String.format("%s %s",firstName,lastName));
             return new ModelAndView(map,"home.ftl");
-
         },engine);
 
+        get("/home",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            map.put("notAuthorized", "true");
+            return new ModelAndView(map,"homePage.ftl");
+        }),engine);
+
+        get("/course/about",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            map.put("role", "prof");
+            return new ModelAndView(map,"courseAbout.ftl");
+        }),engine);
+
+        get("/course/learnMat",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            map.put("role", "prof");
+            return new ModelAndView(map,"courseLearnMat.ftl");
+        }),engine);
+
+        get("/course/quiz",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            map.put("role", "prof");
+            return new ModelAndView(map,"courseQuiz.ftl");
+        }),engine);
+
+        get("/course/grades",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            map.put("role", "prof");
+            return new ModelAndView(map,"courseGrade.ftl");
+        }),engine);
+
+        get("/course/grade/individual",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            map.put("role", "prof");
+            return new ModelAndView(map,"courseGradeIndividual.ftl");
+        }),engine);
+
+        get("/course/classlist",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            map.put("role", "prof");
+            return new ModelAndView(map,"courseClasslist.ftl");
+        }),engine);
+
+        get("/course/rate",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            return new ModelAndView(map,"courseRate.ftl");
+        }),engine);
+
+        get("/courses",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            map.put("role","prof");
+            return new ModelAndView(map,"courses.ftl");
+        }),engine);
+
+        post("/courses",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            Map<String,String> formFields = extractFields(request.body());
+            System.out.println(formFields);
+            map.put("role","admin");
+            return new ModelAndView(map,"courses.ftl");
+        }),engine);
+
+        get("/courses/create-course",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            return new ModelAndView(map,"createCourse.ftl");
+        }),engine);
+
+        get("/course/create-quiz",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            return new ModelAndView(map,"createQuiz.ftl");
+        }),engine);
+
+        get("/enroll",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            return new ModelAndView(map,"enroll.ftl");
+        }),engine);
+
+        post("/enroll",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            Map<String,String> formFields = extractFields(request.body());
+            System.out.println(formFields);
+            return new ModelAndView(map,"enroll.ftl");
+        }),engine);
+
+        get("/enroll/about",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            return new ModelAndView(map,"enrollAbout.ftl");
+        }),engine);
+
+        get("/ratings",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            map.put("role","prof");
+            return new ModelAndView(map,"ratings.ftl");
+        }),engine);
+
+        get("/discussion-groups",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            return new ModelAndView(map,"discussionGroups.ftl");
+        }),engine);
+
+        get("/discussion/group-desc",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            return new ModelAndView(map,"groupDesc.ftl");
+        }),engine);
+
+        get("/discussion/create-post",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            return new ModelAndView(map,"discussionPost.ftl");
+        }),engine);
 
         path("/user",()->{
             get("/",(req,res)-> req.session().attribute("name"));
@@ -274,7 +422,4 @@ public class App {
         String password;
         String email;
     }
-
-
-
 }

@@ -31,7 +31,7 @@
     </h2>
 
     <div class="invalid-feedback" style="${errorEmail}">Email must be in the form _@rit.edu</div>
-    <div class="invalid-feedback" style="${errorPassMatch}">The passwords do not match. Try again.</div>
+    <div class="invalid-feedback" style="${errorPassMatch}">The passwords do not match or must be at least 6 characters. Try again.</div>
     <div class="invalid-feedback" style="${loginErr}">Email and Password mismatch!</div>
 
     <form style="padding:20pt" action=${actionLink} method="post">
@@ -56,7 +56,9 @@
             <label for="password">Password</label>
             <input required type="password" class="form-control" name="pass" id="password" placeholder="Password">
             <#if pageType == "Login">
-                <small id="forgotPassword" class="form-text" style="float:right;" href="">Forgot your password?</small>
+                <small id="forgotPassword" class="form-text" style="float:right;" href="">
+                    <a href="/forgot-password/email"> Forgot your password?
+                </small>
             </#if>
         </div>
         <#if pageType == "Register">
@@ -67,15 +69,15 @@
         </#if>
         <div class="form-group" style="padding-top: 35pt;">
             <#if pageType == "Login">
-                <small id="register" class="form-text" href="\register" style="float:left;">
-                    <a href="\register" class="form-text"> Not a member? Register </a>
+                <small id="register" class="form-text" href="/register" style="float:left;">
+                    <a href="/register" class="form-text"> Not a member? Register </a>
                 </small>
             <#else>
-                <small id="login" class="form-text" href="\login" style="float:left;">
-                    <a href="\login" class="form-text"> Already a member? Login </a>
+                <small id="login" class="form-text" href="/login" style="float:left;">
+                    <a href="/login" class="form-text"> Already a member? Login </a>
                 </small>
             </#if>
-            <button type="submit" class="btn btn-primary"  style="width:10rem; float:right;">
+            <button type="submit" name="action" value="submit" class="btn btn-primary" style="width:10rem; float:right;">
                 Submit
             </button>
         </div>
