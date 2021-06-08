@@ -1,33 +1,25 @@
 package com.my_pls.demo;
 
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.api.gax.paging.Page;
-import com.google.cloud.storage.Bucket;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
-import com.google.common.collect.Lists;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.UserRecord;
-
+import org.apache.commons.codec.digest.DigestUtils;
 import spark.ModelAndView;
 import spark.TemplateEngine;
 import spark.template.freemarker.FreeMarkerEngine;
 
-import java.io.FileInputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import com.my_pls.MySqlConnection;
+import com.my_pls.sendEmail;
+import com.my_pls.securePassword;
+
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.ResultSet;
+import java.util.*;
 import java.net.URLDecoder;
 
 import static spark.Spark.*;
 
 public class App {
-    public static String firebase_auth_json = "json_auth/mypls-added-value-firebase-adminsdk-6j3xx-5271a3d0db.json";
+
 
     private static Map<String,String> extractFields(String body){
         try{
@@ -44,10 +36,9 @@ public class App {
         }
 
     }
-//    Map<String,String> map = extractFields(request.body());
-//        return map;
 
-    public static void main(String[] args) throws IOException, FirebaseAuthException {
+
+    public static void main(String[] args) throws IOException {
 
         port(8080);
 
@@ -55,23 +46,9 @@ public class App {
         internalServerError("<html><body>Something went wrong!</body></html>");
         staticFileLocation("/public"); //So that it has access to the pubic resources(stylesheets, etc.)
 
-
-        GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(firebase_auth_json))
-                .createScoped(Lists.newArrayList("https://www.googleapis.com/auth/cloud-platform"));
-        FirebaseOptions options = FirebaseOptions.builder()
-                .setCredentials(credentials)
-                .setDatabaseUrl("https://mypls-added-value.firebaseio.com/")
-                .build();
-
-        FirebaseApp.initializeApp(options);
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-
+        Connection conn = MySqlConnection.getConnection();
+        securePassword pwd_manager = new securePassword();
         CurrUser user_current = new CurrUser();
-
-
-//        mAuth.createUser(user_request);
-//        UserRecord user = mAuth.getUser("TG4b6yMyPYaHiW2yYpyBfU6lAki2");
-//        System.out.println(user.getEmail());
 
         post("/sub", ((request, response) -> {
 
@@ -112,13 +89,33 @@ public class App {
                     map.put("loginErr", "");
                 } else {
                     String emVal = formFields.get("email");
-                    try {
-                        emVal = URLDecoder.decode(emVal, "UTF-8");
-                    } catch (Exception e) {}
-//                    try {
-//                        UserRecord login_user = mAuth().
-////                        String password = login_user.
-//                    }
+
+                    //Cyril Added
+                    emVal = URLDecoder.decode(emVal, "UTF-8");
+                    PreparedStatement pst = conn.prepareStatement("select * from user_details where Email=?");
+                    pst.setString(1, emVal);
+                    ResultSet rs = pst.executeQuery();
+                    if(rs.next()) {
+                        String db_password = rs.getString("Password");
+                        String input_password = formFields.get("pass");
+                        if (pwd_manager.comparePassword(db_password,input_password)){
+                            //everything good password matches with db
+                            user_current.email = emVal;
+                            user_current.firstName = rs.getString("First_Name");
+                            user_current.lastName = rs.getString("Last_Name");
+                            user_current.password = db_password;
+                        }
+                        else
+                        {
+                            //passwords do not match
+                        }
+
+                    }
+                    else{
+                        //add error message for email not found
+                    }
+                    //Cyril end
+
                     map.put("loginErr", "display:list-item;margin-left:5%");
                     map.put("errorEmail", "");
 
@@ -175,20 +172,40 @@ public class App {
                     map.put("errorPassMatch", "display:list-item;margin-left:5%");
                 }
                 if (flag) {
-                    UserRecord.CreateRequest new_user = new UserRecord.CreateRequest();
+
                     String email = formFields.get("email");
                     email = URLDecoder.decode(email,"UTF-8");
-                    new_user.setEmail(email);
+                    String password = formFields.get("pass");
+                    password = pwd_manager.hashPassword(password);
+                    String fName = formFields.get("firstName");
+                    String lName = formFields.get("lastName");
+                    Random theRandom = new Random();
+                    theRandom.nextInt(999999);
+                    String myHash = DigestUtils.md5Hex("" +	theRandom);
 
-                    String display_name = formFields.get("fname") +" " +  formFields.get("lname");
-//                    new_user.setDisplayName(display_name);
-//                    new_user.setPassword(formFields.get("pass"));
-//                    mAuth.createUser(new_user);
-//                    user_current.firstName = formFields.get("fname");
-//                    user_current.lastName = formFields.get("lname");
-//                    user_current.email = formFields.get("email");
-//                    user_current.password = formFields.get("pass");
-                    response.redirect("/verify-register");
+                    try {
+
+                        String sqlQuery = "insert into user_details (First_Name,Last_Name,Email,Password,Hash,Active) values(?,?,?,?,?,?)";
+                        PreparedStatement pst = conn.prepareStatement(sqlQuery);
+                        pst.setString(1, fName);
+                        pst.setString(2, lName);
+                        pst.setString(3, email);
+                        pst.setString(4, password);
+                        pst.setString(5, myHash);
+                        pst.setInt(6, 0);
+                        int i = pst.executeUpdate();
+                        String body =  "Click this link to confirm your email address and complete setup for your account." + "\n\nVerification Link: " + "http://localhost:8080/verify-register/confirm?key1=" + email + "&key2=" + myHash;
+                        if (i != 0) {
+
+                            sendEmail se = new sendEmail();
+                            se.sendEmail_content(email,"Verify Email at MyPLS",body);
+
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Error at Registration: " + e);
+                    }
+                    response.redirect("/verify-register/send");
+
                 } else {
                     map.put("fname",formFields.get("firstName"));
                     map.put("lname",formFields.get("lastName"));
@@ -199,8 +216,28 @@ public class App {
             return new ModelAndView(map,"login.ftl");
         },engine);
 
-        get("/verify-register",((request, response) -> {
+        get("/verify-register/:type",((request, response) -> {
+            String type = request.params(":type");
             Map<String,String> map = new HashMap<>();
+            map.put("type", type);
+
+            if(type.equals("confirm")) {
+                String email = request.queryParams("key1");
+                email = URLDecoder.decode(email,"UTF-8");
+                String hash = request.queryParams("key2");
+
+                PreparedStatement pst = conn.prepareStatement("select Email, Hash, Active from user_details where Email=? and Hash=? and Active='0'");
+                pst.setString(1, email);
+                pst.setString(2, hash);
+                ResultSet rs = pst.executeQuery();
+                if(rs.next()) {
+                    PreparedStatement pst1 = conn.prepareStatement("update user_details set Active='1' where Email=? and Hash=?");
+                    pst1.setString(1, email);
+                    pst1.setString(2, hash);
+
+                    int i = pst1.executeUpdate();
+                }
+            }
             return new ModelAndView(map,"verifyRegister.ftl");
         }),engine);
 
@@ -367,31 +404,6 @@ public class App {
             return new ModelAndView(map,"discussionPost.ftl");
         }),engine);
 
-        get("/rating/individual",((request, response) -> {
-            Map<String,String> map = new HashMap<>();
-            return new ModelAndView(map,"ratingsIndividual.ftl");
-        }),engine);
-
-        Pokemon charmander  = new Pokemon();
-        charmander.name = "Charry";
-        charmander.type = "fire";
-
-        Pokemon rattata = new Pokemon();
-        rattata.name = "ratbi";
-        rattata.type = "grass";
-
-        get("/list",(request, response) -> {
-
-            List<Pokemon> pokeList = new ArrayList<>(4);
-            pokeList.add(charmander);
-            pokeList.add(rattata);
-
-            Map<String,Object> map = new HashMap<>();
-            map.put("pokemon",pokeList);
-            return new ModelAndView(map,"example.ftl");
-
-        },engine);
-
         path("/user",()->{
             get("/",(req,res)-> req.session().attribute("name"));
             get("/update/:name",(req,res)->{
@@ -410,31 +422,4 @@ public class App {
         String password;
         String email;
     }
-
-    public static class Pokemon{
-        String name;
-        String type;
-
-        public String getName() {
-            return name;
-        }
-
-        public String getType() {
-            return type;
-        }
-    }
-    static void authExplicit(String jsonPath) throws IOException {
-        // You can specify a credential file by providing a path to GoogleCredentials.
-        // Otherwise credentials are read from the GOOGLE_APPLICATION_CREDENTIALS environment variable.
-        GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(firebase_auth_json))
-                .createScoped(Lists.newArrayList("https://www.googleapis.com/auth/cloud-platform"));
-        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-
-        System.out.println("Buckets:");
-        Page<Bucket> buckets = storage.list();
-        for (Bucket bucket : buckets.iterateAll()) {
-            System.out.println(bucket.toString());
-        }
-    }
-        //test change
 }
