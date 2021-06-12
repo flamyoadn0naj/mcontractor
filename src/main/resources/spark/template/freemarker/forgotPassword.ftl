@@ -51,6 +51,14 @@
                     </div>
                 <#else>
                     <div class="form-group">
+                        <label for="email">Email</label>
+                        <input required type="email" class="form-control" name="email" id="email" aria-describedby="emailHelp" placeholder="rit@rit.edu" value="">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmationCode">Confirmation Code</label>
+                        <input required type="number" class="form-control" name="confirmCode" id="confirmCode" placeholder="4 Digit Code" maxlength="4">
+                    </div>
+                    <div class="form-group">
                         <label for="password">Password</label>
                         <input required type="password" class="form-control" name="pass" id="password" placeholder="Password">
                     </div>
