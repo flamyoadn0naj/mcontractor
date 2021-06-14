@@ -107,12 +107,12 @@ public class App {
                         }
                         else
                         {
-                            //passwords do not match
+                            //MCAdd - passwords do not match
                         }
 
                     }
                     else{
-                        //add error message for email not found
+                        //MCAdd - add error message for email not found
                     }
                     //Cyril end
 
@@ -322,7 +322,7 @@ public class App {
                        int i = pst1.executeUpdate();
                    }
                    else{
-                       //code for invalid link
+                       //MCAdd - code for invalid link
                    }
                    map.put("errorPassMatch", "");
                    map.put("success", "true");
