@@ -24,6 +24,13 @@
     </div>
 </#if>
 
+<#if errorLink??>
+    <div class="alert alert-dismissible alert-danger">
+        <strong>Error!</strong> Incorrect link, please try clicking the link again or
+        <a href="/forgot-password/email">send yourself another email to reset your password</a>
+    </div>
+</#if>
+
 <div style="display: flex;justify-content: center">
     <div class="card text-black border-primary mb-3" style="width:35%; margin-top:5%">
         <h2 class="card-header text-white bg-primary mb-3" style="padding:10pt">

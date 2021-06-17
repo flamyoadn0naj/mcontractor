@@ -107,19 +107,18 @@ public class App {
                         }
                         else
                         {
-                            //MCAdd - passwords do not match
+                            map.put("loginErr", "display:list-item;margin-left:5%");
+                            map.put("errorEmail", "");
+                            map.put("emailVal",emVal);
                         }
 
                     }
                     else{
-                        //MCAdd - add error message for email not found
+                        map.put("loginErr", "display:list-item;margin-left:5%");
+                        map.put("errorEmail", "");
+                        map.put("emailVal",emVal);
                     }
                     //Cyril end
-
-                    map.put("loginErr", "display:list-item;margin-left:5%");
-                    map.put("errorEmail", "");
-
-                    map.put("emailVal",emVal);
                 }
             } else {
                 map.put("loginErr", "");
@@ -322,7 +321,7 @@ public class App {
                        int i = pst1.executeUpdate();
                    }
                    else{
-                       //MCAdd - code for invalid link
+                       map.put("errorLink","true");
                    }
                    map.put("errorPassMatch", "");
                    map.put("success", "true");
