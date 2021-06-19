@@ -9,10 +9,10 @@
 </head>
 <body>
     <#include  "navbar.ftl">
-    <#if notAuthorized == "true">
+    <#if notAuthorized??>
         <div class="alert alert-dismissible alert-danger">
-            <strong>Not Authorized! </strong>
-            You have been redirected to the home page as you were not authorized to view the page you selected.
+            <strong>Error! </strong>
+            ${notAuthorized}
         </div>
     </#if>
     <div style="display: flex;justify-content: center">

@@ -2,6 +2,7 @@ package com.my_pls.demo;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import spark.ModelAndView;
+import spark.Route;
 import spark.TemplateEngine;
 import spark.template.freemarker.FreeMarkerEngine;
 
@@ -43,28 +44,40 @@ public class App {
         port(8080);
 
         final TemplateEngine engine = new FreeMarkerEngine();
-        internalServerError("<html><body>Something went wrong!</body></html>");
         staticFileLocation("/public"); //So that it has access to the pubic resources(stylesheets, etc.)
+        internalServerError((request, response) -> {
+            response.redirect("/err");
+            return "{\"message\":\"Server Error\"}";
+        });
+        notFound((request, response) -> {
+            response.redirect("/err");
+            return "{\"message\":\"Custom 404\"}";
+        });
 
         Connection conn = MySqlConnection.getConnection();
         securePassword pwd_manager = new securePassword();
         CurrUser user_current = new CurrUser();
 
-        post("/sub", ((request, response) -> {
-
-            Map<String,String> map = extractFields(request.body());
-            return map;
-        }
-        ));
+//        post("/sub", ((request, response) -> {
+//
+//            Map<String,String> map = extractFields(request.body());
+//            return map;
+//        }
+//        ));
 
         // Setting any route (or filter) in Spark triggers initialization of the embedded Jetty web server.
-        get("/", (request, response) -> {return new ModelAndView(new HashMap<>(),"sub.ftl");},engine);
-        get("/hello/:name",(request, response) -> {
-            String name = request.params(":name");
-            Map<String,Object> map = new HashMap<>();
-            map.put("title",name);
-            return new ModelAndView(map,"home.ftl");
-        },engine);
+//        get("/", (request, response) -> {return new ModelAndView(new HashMap<>(),"sub.ftl");},engine);
+//        get("/hello/:name",(request, response) -> {
+//            String name = request.params(":name");
+//            Map<String,Object> map = new HashMap<>();
+//            map.put("title",name);
+//            return new ModelAndView(map,"home.ftl");
+//        },engine);
+//       Route serverError = get("/server-error",(request, response) -> {
+//            Map<String,Object> map = new HashMap<>();
+//            map.put("notAuthorized", "Something went wrong. Please email mypls@rit.edu for support");
+//            return new ModelAndView(map,"homePage.ftl");
+//        });
 
         get("/login",(request, response) -> {
             Map<String,Object> map = new HashMap<>();
@@ -337,18 +350,17 @@ public class App {
             return new ModelAndView(map,"forgotPassword.ftl");
         }),engine);
 
-        get("/first/*/last/*",(request, response) -> {
+//        get("/first/*/last/*",(request, response) -> {
+//
+//            String firstName = request.splat()[0];
+//            String lastName = request.splat()[1];
+//            Map<String,Object> map = new HashMap<>();
+//            map.put("title",String.format("%s %s",firstName,lastName));
+//            return new ModelAndView(map,"home.ftl");
+//        },engine);
 
-            String firstName = request.splat()[0];
-            String lastName = request.splat()[1];
-            Map<String,Object> map = new HashMap<>();
-            map.put("title",String.format("%s %s",firstName,lastName));
-            return new ModelAndView(map,"home.ftl");
-        },engine);
-
-        get("/home",((request, response) -> {
+        get("/",((request, response) -> {
             Map<String,String> map = new HashMap<>();
-            map.put("notAuthorized", "true");
             return new ModelAndView(map,"homePage.ftl");
         }),engine);
 
@@ -417,15 +429,15 @@ public class App {
             return new ModelAndView(map,"createQuiz.ftl");
         }),engine);
 
-        path("/user",()->{
-            get("/",(req,res)-> req.session().attribute("name"));
-            get("/update/:name",(req,res)->{
-                String name = req.params(":name");
-                req.session().attribute("name",name);
-                return String.format("Value updated with %s",name);
-            });
-
-        });
+//        path("/user",()->{
+//            get("/",(req,res)-> req.session().attribute("name"));
+//            get("/update/:name",(req,res)->{
+//                String name = req.params(":name");
+//                req.session().attribute("name",name);
+//                return String.format("Value updated with %s",name);
+//            });
+//
+//        });
 
         get("/enroll",((request, response) -> {
             Map<String,String> map = new HashMap<>();
@@ -468,6 +480,15 @@ public class App {
         get("/rating/individual",((request, response) -> {
             Map<String,String> map = new HashMap<>();
             return new ModelAndView(map,"ratingsIndividual.ftl");
+        }),engine);
+
+        get("/err",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            map.put("notAuthorized", "You have been redirected to the " +
+                    "home page as you were not authorized to view the page" +
+                    " you selected or something went wrong. Please email " +
+                    "mypls@rit.edu for support");
+            return new ModelAndView(map,"homePage.ftl");
         }),engine);
 
     }
