@@ -223,12 +223,16 @@ public class App {
 
                             sendEmail se = new sendEmail();
                             se.sendEmail_content(email,"Verify Email at MyPLS",body);
-
+                            response.redirect("/verify-register/send");
                         }
                     } catch (Exception e) {
                         System.out.println("Error at Registration: " + e);
+                        map.put("dbErr", "true");
+                        map.put("fname",formFields.get("firstName"));
+                        map.put("lname",formFields.get("lastName"));
+                        map.put("emailVal",email);
                     }
-                    response.redirect("/verify-register/send");
+
 
                 } else {
                     map.put("fname",formFields.get("firstName"));
@@ -332,25 +336,30 @@ public class App {
                String email = formFields.get("email");
                email = URLDecoder.decode(email,"UTF-8");
                if (formFields.get("pass").equals(formFields.get("retPass")) && formFields.get("pass").length() >= 6 && confirmCode.length() == 4) {
-                   PreparedStatement pst = conn.prepareStatement("select * from user_details where Hash=? and email=? and Active='0'");
-                   pst.setString(1, confirmCode);
-                   pst.setString(2, email);
-                   ResultSet rs = pst.executeQuery();
-                   if(rs.next()) {
-                       String newPassword = formFields.get("pass");
-                       newPassword = pwd_manager.hashPassword(newPassword);
-                       PreparedStatement pst1 = conn.prepareStatement("update user_details set Active='1',Password=? where Hash=? and email=?");
-                       pst1.setString(1, newPassword);
-                       pst1.setString(2, confirmCode);
-                       pst1.setString(3, email);
-                       int i = pst1.executeUpdate();
-                   }
-                   else{
+                   try {
+                       PreparedStatement pst = conn.prepareStatement("select * from user_details where Hash=? and email=? and Active='0'");
+                       pst.setString(1, confirmCode);
+                       pst.setString(2, email);
+                       ResultSet rs = pst.executeQuery();
+                       if(rs.next()) {
+                           String newPassword = formFields.get("pass");
+                           newPassword = pwd_manager.hashPassword(newPassword);
+                           PreparedStatement pst1 = conn.prepareStatement("update user_details set Active='1',Password=? where Hash=? and email=?");
+                           pst1.setString(1, newPassword);
+                           pst1.setString(2, confirmCode);
+                           pst1.setString(3, email);
+                           int i = pst1.executeUpdate();
+                           map.put("errorPassMatch", "");
+                           map.put("success", "true");
+                           map.put("succMsg", "Your password has been changed. Please log in again.");
+                       }
+                   } catch(Exception e){
+                       System.out.println("Error at Forget Password " + e);
                        map.put("errorLink","true");
+                       map.put("success", "false");
+                       map.put("succMsg", "");
                    }
                    map.put("errorPassMatch", "");
-                   map.put("success", "true");
-                   map.put("succMsg", "Your password has been changed. Please log in again.");
                } else {
                    map.put("errorPassMatch", "display:block;margin-left:5%; width:90%");
                    map.put("success", "false");
