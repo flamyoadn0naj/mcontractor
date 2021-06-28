@@ -78,6 +78,18 @@ public class App {
 //            map.put("notAuthorized", "Something went wrong. Please email mypls@rit.edu for support");
 //            return new ModelAndView(map,"homePage.ftl");
 //        });
+        get("/login/errAuth",(request, response) -> {
+            Map<String,Object> map = new HashMap<>();
+            map.put("actionLink", "/login");
+            map.put("errorEmail", "");
+            map.put("errAuth","true");
+            map.put("errorPassMatch", "");
+            map.put("loginErr", "");
+            map.put("emailVal","");
+            map.put("pageType","Login");
+            map.put("styleVal", "margin-top:12%; width:45%");
+            return new ModelAndView(map,"login.ftl");
+        },engine);
 
         get("/login",(request, response) -> {
             Map<String,Object> map = new HashMap<>();
@@ -361,6 +373,9 @@ public class App {
 
         get("/",((request, response) -> {
             Map<String,String> map = new HashMap<>();
+            if (user_current.firstName.length() == 0) {
+                response.redirect("/login/errAuth");
+            }
             return new ModelAndView(map,"homePage.ftl");
         }),engine);
 
@@ -484,6 +499,9 @@ public class App {
 
         get("/err",((request, response) -> {
             Map<String,String> map = new HashMap<>();
+            if (user_current.firstName.length() == 0) {
+                response.redirect("/login/errAuth");
+            }
             map.put("notAuthorized", "You have been redirected to the " +
                     "home page as you were not authorized to view the page" +
                     " you selected or something went wrong. Please email " +
@@ -494,9 +512,9 @@ public class App {
     }
 
     public static class CurrUser {
-        String firstName;
-        String lastName;
-        String password;
-        String email;
+        String firstName = "";
+        String lastName = "";
+        String password = "";
+        String email = "";
     }
 }

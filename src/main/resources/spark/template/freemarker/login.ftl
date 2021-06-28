@@ -20,6 +20,12 @@
         </li>
     </ul>
 </nav>
+<#if errAuth??>
+    <div class="alert alert-dismissible alert-danger">
+        <strong>Error! </strong>
+        You must log in before you can use myPLS
+    </div>
+</#if>
 <div style="display: flex;justify-content: center">
     <div class="card text-black border-primary mb-3" style="${styleVal}"!"width:45%; margin-top:5%">
     <h2 class="card-header text-white bg-primary mb-3" style="padding:10pt">
