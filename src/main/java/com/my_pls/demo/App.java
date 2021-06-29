@@ -38,7 +38,6 @@ public class App {
 
     }
 
-
     public static void main(String[] args) throws IOException {
 
         port(8080);
@@ -57,13 +56,6 @@ public class App {
         Connection conn = MySqlConnection.getConnection();
         securePassword pwd_manager = new securePassword();
         CurrUser user_current = new CurrUser();
-
-//        post("/sub", ((request, response) -> {
-//
-//            Map<String,String> map = extractFields(request.body());
-//            return map;
-//        }
-//        ));
 
         // Setting any route (or filter) in Spark triggers initialization of the embedded Jetty web server.
 //        get("/", (request, response) -> {return new ModelAndView(new HashMap<>(),"sub.ftl");},engine);
