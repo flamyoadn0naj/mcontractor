@@ -121,6 +121,7 @@ public class App {
                             user_current.firstName = rs.getString("First_Name");
                             user_current.lastName = rs.getString("Last_Name");
                             user_current.password = db_password;
+                            response.redirect("/");
                         }
                         else
                         {
