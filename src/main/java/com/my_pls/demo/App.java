@@ -53,7 +53,7 @@ public class App {
             return "{\"message\":\"Custom 404\"}";
         });
 
-        Connection conn = MySqlConnection.getConnection();
+
         securePassword pwd_manager = new securePassword();
         CurrUser user_current = new CurrUser();
 
@@ -109,6 +109,7 @@ public class App {
 
                     //Cyril Added
                     emVal = URLDecoder.decode(emVal, "UTF-8");
+                    Connection conn = MySqlConnection.getConnection();
                     PreparedStatement pst = conn.prepareStatement("select * from user_details where Email=?");
                     pst.setString(1, emVal);
                     ResultSet rs = pst.executeQuery();
@@ -203,6 +204,7 @@ public class App {
                     try {
 
                         String sqlQuery = "insert into user_details (First_Name,Last_Name,Email,Password,Hash,Active) values(?,?,?,?,?,?)";
+                        Connection conn = MySqlConnection.getConnection();
                         PreparedStatement pst = conn.prepareStatement(sqlQuery);
                         pst.setString(1, fName);
                         pst.setString(2, lName);
@@ -246,7 +248,7 @@ public class App {
                 String email = request.queryParams("key1");
                 email = URLDecoder.decode(email,"UTF-8");
                 String hash = request.queryParams("key2");
-
+                Connection conn = MySqlConnection.getConnection();
                 PreparedStatement pst = conn.prepareStatement("select Email, Hash, Active from user_details where Email=? and Hash=? and Active='0'");
                 pst.setString(1, email);
                 pst.setString(2, hash);
@@ -288,7 +290,7 @@ public class App {
                    map.put("succMsg", "");
                } else {
                    email = URLDecoder.decode(email,"UTF-8");
-
+                   Connection conn = MySqlConnection.getConnection();
                    PreparedStatement pst = conn.prepareStatement("select Email, Hash, Active from user_details where Email=?");
                    pst.setString(1, email);
                    ResultSet rs = pst.executeQuery();
@@ -330,6 +332,7 @@ public class App {
                email = URLDecoder.decode(email,"UTF-8");
                if (formFields.get("pass").equals(formFields.get("retPass")) && formFields.get("pass").length() >= 6 && confirmCode.length() == 4) {
                    try {
+                       Connection conn = MySqlConnection.getConnection();
                        PreparedStatement pst = conn.prepareStatement("select * from user_details where Hash=? and email=? and Active='0'");
                        pst.setString(1, confirmCode);
                        pst.setString(2, email);
