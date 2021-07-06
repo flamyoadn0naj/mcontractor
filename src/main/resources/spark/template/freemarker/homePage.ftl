@@ -17,9 +17,15 @@
     </#if>
     <div style="display: flex;justify-content: center">
         <div class="card text-black mb-3" style="width:100%; border: none">
-            <h2 class="card-header text-black-50 mb-3" style="padding:10pt">
-                Welcome, Maheen Contractor!
-            </h2>
+            <#if name??>
+                <h2 class="card-header text-black-50 mb-3" style="padding:10pt">
+                    Welcome, ${name}
+                </h2>
+            <#else>
+                <h2 class="card-header text-black-50 mb-3" style="padding:10pt">
+                    Welcome!
+                </h2>
+            </#if>
             <div style="display: flex; justify-content: space-evenly">
                 <div class="card text-black border-primary mb-3" style="width:30%; margin-top:5%">
                     <h2 class="card-header text-white bg-primary mb-3" style="padding:10pt">

@@ -381,6 +381,7 @@ public class App {
             if (user_current.firstName.length() == 0) {
                 response.redirect("/login/errAuth");
             }
+            map.put("name", user_current.firstName + user_current.lastName);
             return new ModelAndView(map,"homePage.ftl");
         }),engine);
 
@@ -507,6 +508,7 @@ public class App {
             if (user_current.firstName.length() == 0) {
                 response.redirect("/login/errAuth");
             }
+            map.put("name", user_current.firstName + " " + user_current.lastName);
             map.put("notAuthorized", "You have been redirected to the " +
                     "home page as you were not authorized to view the page" +
                     " you selected or something went wrong. Please email " +

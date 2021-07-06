@@ -20,7 +20,7 @@
 <#if success??>
     <#if success == "true">
         <div class="alert alert-dismissible alert-success">
-            <strong>Well done!</strong> ${succMsg}
+           ${succMsg}
         </div>
     </#if>
 </#if>
