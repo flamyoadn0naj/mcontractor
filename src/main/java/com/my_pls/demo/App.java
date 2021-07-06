@@ -381,19 +381,19 @@ public class App {
             if (user_current.firstName.length() == 0) {
                 response.redirect("/login/errAuth");
             }
-            map.put("name", user_current.firstName + user_current.lastName);
+            map.put("name", user_current.firstName +" " + user_current.lastName);
             return new ModelAndView(map,"homePage.ftl");
         }),engine);
 
         get("/course/about",((request, response) -> {
             Map<String,String> map = new HashMap<>();
-            map.put("role", "prof");
+            map.put("role", "student");
             return new ModelAndView(map,"courseAbout.ftl");
         }),engine);
 
         get("/course/learnMat",((request, response) -> {
             Map<String,String> map = new HashMap<>();
-            map.put("role", "prof");
+            map.put("role", "student");
             return new ModelAndView(map,"courseLearnMat.ftl");
         }),engine);
 
@@ -417,7 +417,7 @@ public class App {
 
         get("/course/classlist",((request, response) -> {
             Map<String,String> map = new HashMap<>();
-            map.put("role", "prof");
+            map.put("role", "student");
             return new ModelAndView(map,"courseClasslist.ftl");
         }),engine);
 
@@ -479,7 +479,7 @@ public class App {
 
         get("/ratings",((request, response) -> {
             Map<String,String> map = new HashMap<>();
-            map.put("role","student");
+            map.put("role","prof");
             return new ModelAndView(map,"ratings.ftl");
         }),engine);
 
