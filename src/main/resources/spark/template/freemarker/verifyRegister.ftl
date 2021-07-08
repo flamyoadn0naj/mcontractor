@@ -28,11 +28,13 @@
                 Please click on the link to verify your email address
             </h2>
         </div>
-        <div style="display:flex; justify-content:center">
-            <button type="submit" class="btn btn-primary" style="width:20rem">
-                Resend Email
-            </button>
-        </div>
+        <form action="/verify-register/send" method="post">
+            <div style="display:flex; justify-content:center">
+                <button type="submit" class="btn btn-primary" style="width:20rem" name="resend" value="true">
+                    Resend Email
+                </button>
+            </div>
+        </form>
     <#else>
         <div class="text-black border-primary mb-3" style="display:flex; justify-content:center; text-align:center; margin:15%">
             <h2 style="max-width:40rem; margin-bottom:2%">
