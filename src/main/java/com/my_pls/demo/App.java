@@ -1,5 +1,6 @@
 package com.my_pls.demo;
 
+import com.my_pls.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import spark.ModelAndView;
 import spark.Route;
@@ -8,9 +9,6 @@ import spark.template.freemarker.FreeMarkerEngine;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import com.my_pls.MySqlConnection;
-import com.my_pls.sendEmail;
-import com.my_pls.securePassword;
 
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -21,7 +19,6 @@ import static spark.Spark.*;
 
 public class App {
 
-
     private static Map<String,String> extractFields(String body){
         try{
             Map<String,String> map = new HashMap<>(0);
@@ -30,12 +27,10 @@ public class App {
                 String[] keyAndValue = pair.split("=");
                 map.put(keyAndValue[0],keyAndValue[1]);
             }
-
             return map;
         }catch (Exception ex){
             return null;
         }
-
     }
 
     public static void main(String[] args) throws IOException {
@@ -71,171 +66,47 @@ public class App {
 //            return new ModelAndView(map,"homePage.ftl");
 //        });
         get("/login/errAuth",(request, response) -> {
-            Map<String,Object> map = new HashMap<>();
-            map.put("actionLink", "/login");
-            map.put("errorEmail", "");
+            Map<String,Object> map = Login.getMethodDefaults();
+            map.forEach((k,v)->map.put(k,v));
             map.put("errAuth","true");
-            map.put("errorPassMatch", "");
-            map.put("loginErr", "");
-            map.put("emailVal","");
-            map.put("pageType","Login");
-            map.put("styleVal", "margin-top:12%; width:45%");
             return new ModelAndView(map,"login.ftl");
         },engine);
 
         get("/login",(request, response) -> {
-            Map<String,Object> map = new HashMap<>();
-            map.put("actionLink", "/login");
-            map.put("errorEmail", "");
-            map.put("errorPassMatch", "");
-            map.put("loginErr", "");
-            map.put("emailVal","");
-            map.put("pageType","Login");
-            map.put("styleVal", "margin-top:12%; width:45%");
+            Map<String,Object> map = Login.getMethodDefaults();
+            map.forEach((k,v)->map.put(k,v));
             return new ModelAndView(map,"login.ftl");
         },engine);
 
         post("/login",(request, response) -> {
-            Map<String,Object> map = new HashMap<>();
             Map<String,String> formFields = extractFields(request.body());
-
-            if (formFields.size() > 0) {
-                if (!formFields.get("email").contains("rit.edu")) {
-                    map.put("errorEmail", "display:list-item;margin-left:5%");
-                    map.put("emailVal","");
-                    map.put("loginErr", "");
-                } else {
-                    String emVal = formFields.get("email");
-
-                    //Cyril Added
-                    emVal = URLDecoder.decode(emVal, "UTF-8");
-                    Connection conn = MySqlConnection.getConnection();
-                    PreparedStatement pst = conn.prepareStatement("select * from user_details where Email=?");
-                    pst.setString(1, emVal);
-                    ResultSet rs = pst.executeQuery();
-                    if(rs.next()) {
-                        String db_password = rs.getString("Password");
-                        String input_password = formFields.get("pass");
-                        if (pwd_manager.comparePassword(db_password,input_password)){
-                            //everything good password matches with db
-                            user_current.email = emVal;
-                            user_current.firstName = rs.getString("First_Name");
-                            user_current.lastName = rs.getString("Last_Name");
-                            user_current.password = db_password;
-                            response.redirect("/");
-                        }
-                        else
-                        {
-                            map.put("loginErr", "display:list-item;margin-left:5%");
-                            map.put("errorEmail", "");
-                            map.put("emailVal",emVal);
-                        }
-
-                    }
-                    else{
-                        map.put("loginErr", "display:list-item;margin-left:5%");
-                        map.put("errorEmail", "");
-                        map.put("emailVal",emVal);
-                    }
-                    //Cyril end
-                }
-            } else {
-                map.put("loginErr", "");
-                map.put("emailVal", "");
+            Pair p = Login.postMethodDefaults(formFields, user_current, pwd_manager);
+            Map<String,Object> map = p.fst();
+            CurrUser logUser = p.snd();
+            user_current.setAll(logUser.firstName, logUser.lastName, logUser.password, logUser.email);
+            map.forEach((k,v)->map.put(k,v));
+            if (logUser.firstName.length() > 0) {
+                response.redirect("/");
             }
-            map.put("actionLink", "/login");
-            map.put("errorPassMatch", "");
-            map.put("pageType","Login");
-            map.put("styleVal", "margin-top:12%; width:45%");
             return new ModelAndView(map,"login.ftl");
         },engine);
 
         get("/register",(request, response) -> {
-            Map<String,Object> map = new HashMap<>();
-            map.put("actionLink", "/register");
-            map.put("loginErr", "");
-            map.put("errorEmail", "");
-            map.put("errorPassMatch", "");
-            map.put("fname","");
-            map.put("lname","");
-            map.put("emailVal","");
-            map.put("pageType","Register");
-            map.put("styleVal", "margin-top:5%; width:45%");
+            Map<String,Object> map = Register.getMethodDefaults();
+            map.forEach((k,v)->map.put(k,v));
             return new ModelAndView(map,"login.ftl");
         },engine);
 
         post("/register",(request, response) -> {
-            Map<String,Object> map = new HashMap<>();
             Map<String,String> formFields = extractFields(request.body());
-            map.put("actionLink", "/register");
-            map.put("loginErr", "");
-            if (formFields.size() > 0) {
-                Boolean flag = true;
-                if (!formFields.get("email").contains("rit.edu")) {
-                    map.put("errorEmail", "display:list-item;margin-left:5%");
-                    map.put("emailVal","");
-                    flag = false;
-                } else {
-                    map.put("errorEmail", "");
-                    String emVal = formFields.get("email");
-                    try {
-                        emVal = URLDecoder.decode(emVal, "UTF-8");
-                    } catch (Exception e) {}
-                    map.put("emailVal",emVal);
-                }
-                if (formFields.get("pass").equals(formFields.get("retPass")) && formFields.get("pass").length() >= 6) {
-                    map.put("errorPassMatch", "");
-                } else {
-                    flag = false;
-                    map.put("errorPassMatch", "display:list-item;margin-left:5%");
-                }
-                if (flag) {
-
-                    String email = formFields.get("email");
-                    email = URLDecoder.decode(email,"UTF-8");
-                    String password = formFields.get("pass");
-                    password = pwd_manager.hashPassword(password);
-                    String fName = formFields.get("firstName");
-                    String lName = formFields.get("lastName");
-                    Random theRandom = new Random();
-                    theRandom.nextInt(999999);
-                    String myHash = DigestUtils.md5Hex("" +	theRandom);
-
-                    try {
-
-                        String sqlQuery = "insert into user_details (First_Name,Last_Name,Email,Password,Hash,Active) values(?,?,?,?,?,?)";
-                        Connection conn = MySqlConnection.getConnection();
-                        PreparedStatement pst = conn.prepareStatement(sqlQuery);
-                        pst.setString(1, fName);
-                        pst.setString(2, lName);
-                        pst.setString(3, email);
-                        pst.setString(4, password);
-                        pst.setString(5, myHash);
-                        pst.setInt(6, 0);
-                        int i = pst.executeUpdate();
-                        String body =  "Click this link to confirm your email address and complete setup for your account." + "\n\nVerification Link: " + "http://localhost:8080/verify-register/confirm?key1=" + email + "&key2=" + myHash;
-                        if (i != 0) {
-
-                            sendEmail se = new sendEmail();
-                            se.sendEmail_content(email,"Verify Email at MyPLS",body);
-                            response.redirect("/verify-register/send");
-                        }
-                    } catch (Exception e) {
-                        System.out.println("Error at Registration: " + e);
-                        map.put("dbErr", "true");
-                        map.put("fname",formFields.get("firstName"));
-                        map.put("lname",formFields.get("lastName"));
-                        map.put("emailVal",email);
-                    }
-
-
-                } else {
-                    map.put("fname",formFields.get("firstName"));
-                    map.put("lname",formFields.get("lastName"));
-                }
+            Pair p = Register.postMethodDefaults(formFields, user_current, pwd_manager);
+            Map<String,Object> map = p.fst();
+            map.forEach((k,v)->map.put(k,v));
+            CurrUser logUser = p.snd();
+            user_current.setAll(logUser.firstName, logUser.lastName, logUser.password, logUser.email);
+            if (logUser.firstName.length() > 0) {
+                response.redirect("/verify-register/send");
             }
-            map.put("pageType","Register");
-            map.put("styleVal", "margin-top:5%; width:45%");
             return new ModelAndView(map,"login.ftl");
         },engine);
 
@@ -523,5 +394,24 @@ public class App {
         String lastName = "";
         String password = "";
         String email = "";
+
+        public CurrUser(String firstName, String lastName, String password, String email) {
+            this.email = email;
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.password = password;
+        }
+        public CurrUser() {
+            this.email = "";
+            this.firstName = "";
+            this.lastName = "";
+            this.password = "";
+        }
+        public void setAll(String firstName, String lastName, String password, String email) {
+            this.email = email;
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.password = password;
+        }
     }
 }
