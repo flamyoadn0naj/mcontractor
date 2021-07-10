@@ -264,38 +264,6 @@ public class App {
             return new ModelAndView(map,"verifyRegister.ftl");
         }),engine);
 
-        post("/verify-register/:type",((request, response) -> {
-            String type = request.params(":type");
-            Map<String,String> map = new HashMap<>();
-            map.put("type", type);
-            if(type.equals("send")) {
-                Map<String,String> formFields = extractFields(request.body());
-                if (formFields.get("resend").equals("true")) {
-                    // Cyril add code here
-                    response.redirect("/verify-register/send");
-                }
-            }
-
-            if(type.equals("confirm")) {
-                String email = request.queryParams("key1");
-                email = URLDecoder.decode(email,"UTF-8");
-                String hash = request.queryParams("key2");
-                Connection conn = MySqlConnection.getConnection();
-                PreparedStatement pst = conn.prepareStatement("select Email, Hash, Active from user_details where Email=? and Hash=? and Active='0'");
-                pst.setString(1, email);
-                pst.setString(2, hash);
-                ResultSet rs = pst.executeQuery();
-                if(rs.next()) {
-                    PreparedStatement pst1 = conn.prepareStatement("update user_details set Active='1' where Email=? and Hash=?");
-                    pst1.setString(1, email);
-                    pst1.setString(2, hash);
-
-                    int i = pst1.executeUpdate();
-                }
-            }
-            return new ModelAndView(map,"verifyRegister.ftl");
-        }),engine);
-
         get("/forgot-password/:type",((request, response) -> {
             String pageType = request.params(":type");
             Map<String,String> map = new HashMap<>();
