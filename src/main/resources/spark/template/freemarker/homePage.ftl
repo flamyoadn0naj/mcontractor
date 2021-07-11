@@ -66,5 +66,8 @@
             </div>
         </div>
     </div>
+    <div class="footer bg-primary">
+        Apply to be a Professor
+    </div>
 </body>
 </html>

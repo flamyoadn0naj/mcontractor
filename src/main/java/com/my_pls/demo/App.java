@@ -374,6 +374,18 @@ public class App {
             return new ModelAndView(map,"ratingsIndividual.ftl");
         }),engine);
 
+        get("/applyProf",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            return new ModelAndView(map,"profApply.ftl");
+        }),engine);
+
+        post("/applyProf",((request, response) -> {
+            Map<String,String> map = new HashMap<>();
+            Map<String,String> formFields = extractFields(request.body());
+            System.out.println(formFields);
+            return new ModelAndView(map,"profApply.ftl");
+        }),engine);
+
         get("/err",((request, response) -> {
             Map<String,String> map = new HashMap<>();
             if (user_current.firstName.length() == 0) {
