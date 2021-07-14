@@ -12,6 +12,8 @@ import java.sql.PreparedStatement;
 
 import java.io.IOException;
 import java.sql.ResultSet;
+import java.sql.Time;
+import java.time.LocalTime;
 import java.util.*;
 import java.net.URLDecoder;
 
@@ -79,15 +81,17 @@ public class App {
         },engine);
 
         post("/login",(request, response) -> {
+            Map<String,Object> map = new HashMap<>();
+            map.put("loading","true");
             Map<String,String> formFields = extractFields(request.body());
-            Pair p = Login.postMethodDefaults(formFields, user_current, pwd_manager);
-            Map<String,Object> map = p.fst();
+            Pair p = Login.postMethodDefaults(map, formFields, user_current, pwd_manager);
+            map = p.fst();
             CurrUser logUser = p.snd();
             user_current.setAll(logUser.firstName, logUser.lastName, logUser.password, logUser.email);
-            map.forEach((k,v)->map.put(k,v));
-            if (logUser.firstName.length() > 0) {
-                response.redirect("/");
-            }
+            Map<String, Object> finalMap = map;
+            map.forEach((k, v)-> finalMap.put(k,v));
+            if (logUser.firstName.length() > 0) response.redirect("/");
+            map.put("loading", "false");
             return new ModelAndView(map,"login.ftl");
         },engine);
 
@@ -104,9 +108,7 @@ public class App {
             map.forEach((k,v)->map.put(k,v));
             CurrUser logUser = p.snd();
             user_current.setAll(logUser.firstName, logUser.lastName, logUser.password, logUser.email);
-            if (logUser.firstName.length() > 0) {
-                response.redirect("/verify-register/send");
-            }
+            if (logUser.firstName.length() > 0) response.redirect("/verify-register/send");
             return new ModelAndView(map,"login.ftl");
         },engine);
 
@@ -144,7 +146,9 @@ public class App {
         post("/forgot-password/:type",((request, response) -> {
             String pageType = request.params(":type");
             Map<String,String> formFields = extractFields(request.body());
-            Map<String,Object> map = ForgetPassword.postMethodDefaults(pageType, formFields, pwd_manager);
+            Map<String,Object> map = ForgetPassword.postMethodDefaults(pageType,
+                    formFields,
+                    pwd_manager);
             return new ModelAndView(map,"forgotPassword.ftl");
         }),engine);
 
@@ -223,6 +227,15 @@ public class App {
 
         get("/courses/create-course",((request, response) -> {
             Map<String,String> map = new HashMap<>();
+            map.put("name","");
+            map.put("obj","");
+            return new ModelAndView(map,"createCourse.ftl");
+        }),engine);
+
+        post("/courses/create-course",((request, response) -> {
+            Map<String,String> formFields = extractFields(request.body());
+            Map<String,String> map = CreateCourse.postMethodDefaults(formFields);
+            map.forEach((k,v)->map.put(k,v));
             return new ModelAndView(map,"createCourse.ftl");
         }),engine);
 

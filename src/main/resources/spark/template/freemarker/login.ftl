@@ -89,9 +89,16 @@
                     <a href="/login" class="form-text"> Already a member? Login </a>
                 </small>
             </#if>
-            <button type="submit" name="action" value="submit" class="btn btn-primary" style="width:10rem; float:right;">
-                Submit
-            </button>
+            <#if loading == "true">
+                <button button type="submit" name="action" value="submit" class="btn btn-primary" style="width:10rem; float:right;" disabled>
+                    <span class="spinner-border spinner-border-lg padding2right"></span>
+                    Loading..
+                </button>
+            <#else>
+                <button type="submit" name="action" value="submit" class="btn btn-primary" style="width:10rem; float:right;">
+                    Submit
+                </button>
+            </#if>
         </div>
     </fieldset>
 </form>

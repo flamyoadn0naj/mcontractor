@@ -20,12 +20,12 @@ public class Login {
         map.put("loginErr", "");
         map.put("emailVal","");
         map.put("pageType","Login");
+        map.put("loading","false");
         map.put("styleVal", "margin-top:12%; width:45%");
         return map;
     }
 
-    public static Pair postMethodDefaults(Map<String,String> formFields, App.CurrUser user,securePassword pwd_manager) {
-        Map<String,Object> map = new HashMap<>();
+    public static Pair postMethodDefaults(Map<String, Object> map, Map<String,String> formFields, App.CurrUser user,securePassword pwd_manager) {
         if (formFields.size() > 0) {
             if (!formFields.get("email").contains("rit.edu")) {
                 map.put("errorEmail", "display:list-item;margin-left:5%");

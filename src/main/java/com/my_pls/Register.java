@@ -23,6 +23,7 @@ public class Register {
         map.put("lname","");
         map.put("emailVal","");
         map.put("pageType","Register");
+        map.put("loading","false");
         map.put("styleVal", "margin-top:5%; width:45%");
         return map;
     }
@@ -53,7 +54,7 @@ public class Register {
                 map.put("errorPassMatch", "display:list-item;margin-left:5%");
             }
             if (flag) {
-
+                map.put("loading","true");
                 String email = formFields.get("email");
                 email = URLDecoder.decode(email,"UTF-8");
                 String password = formFields.get("pass");
@@ -97,6 +98,7 @@ public class Register {
                 map.put("lname",formFields.get("lastName"));
             }
         }
+        map.put("loading","false");
         map.put("pageType","Register");
         map.put("styleVal", "margin-top:5%; width:45%");
 

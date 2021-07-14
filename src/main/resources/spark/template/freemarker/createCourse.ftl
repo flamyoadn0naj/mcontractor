@@ -17,12 +17,12 @@
         <h4 class="card-header border-primary text-black-50 mb-3" style="margin-top: -1.5%">
             Create Course
         </h4>
-        <form style="display:flex; justify-content:center;">
+        <form style="display:flex; justify-content:center;" method="post" action="/courses/create-course">
             <div class="card" style="width: 80%">
                 <div class="card-header" id="headingOne">
                     <div class="form-group space-between mb-3">
                         <label class="padding2right col-3" for="1a">Name:</label>
-                        <input required type="text" name="Q1A" class="form-control col-9" id="1a"  value=${a!""}>
+                        <input required type="text" name="name" class="form-control col-9" id="name"  value="${name}">
                     </div>
                     <div class="form-group mb-3" style="display: flex">
                         <label class="col-3" for="1b">Professor</label>
@@ -34,33 +34,81 @@
                     </div>
                     <div class="form-group mb-3" style="display: flex">
                         <label class="col-3" for="1c">Learning Objectives</label>
-                        <input required type="text" name="Q1c" class="form-control col-9" id="1c"  value=${c!""}>
+                        <input required type="text" name="obj" class="form-control col-9" id="obj"  value="${obj}">
                     </div>
-                    <div class="form-group mb-3" style="display: flex">
-                        <label class="col-3" for="exampleSelect2">Meeting Days</label>
-                        <select multiple="" class="form-control col-9" id="exampleSelect2">
-                            <option>Monday</option>
-                            <option>Tuesday</option>
-                            <option>Wednesday</option>
-                            <option>Thursday</option>
-                            <option>Friday</option>
-                        </select>
+                    <div class="form-group" style="display: flex">
+                        <label class="col-3">Meeting Days</label>
+                        <div class="col-9 space-between">
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input name="mon" id="mon" class="form-check-input" type="checkbox" value="mon">
+                                    Monday
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input name="tue" id="tues" class="form-check-input" type="checkbox" value="tue">
+                                    Tuesday
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input name="wed" id="wed" class="form-check-input" type="checkbox" value="wed">
+                                    Wednesday
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input name="thr" id="thr" class="form-check-input" type="checkbox" value="thr">
+                                    Thursday
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input name="fri" id="fri" class="form-check-input" type="checkbox" value="fri">
+                                    Friday
+                                </label>
+                            </div>
+                        </div>
                     </div>
+                    <#if errTime??>
+                        <div class="invalid-feedback" style="display:block;margin-left:1%">
+                            The class ending time can not be before the starting time.
+                        </div>
+                    </#if>
                     <div class="form-group mb-3" style="display: flex">
                         <label class="col-3" for="exampleSelect2">Meeting Time</label>
                         <div class="col-9" style="display: flex">
-                            <input min="09:00" max="18:00" required type="time" name="Q1D" class="form-control col-4" id="1d"  value=${d!""}>
+                            <input min="09:00" max="18:00" required type="time" name="start_time"
+                                   class="form-control col-4" id="start_time" value=${start_time!""}>
                             <div class="col-4 text-center"> to </div>
-                            <input min="09:00" max="18:00" required type="time" name="Q1D" class="form-control col-4" id="1d"  value=${d!""}>
+                            <input min="09:00" max="18:00" required type="time" name="end_time"
+                                   class="form-control col-4" id="end_time" value=${end_Time!""}>
+                        </div>
+                    </div>
+                    <#if errDate??>
+                        <div class="invalid-feedback" style="display:block;margin-left:1%">
+                            The course ending date can not be before the starting date and
+                            the course start date must be in the future.
+                        </div>
+                    </#if>
+                    <div class="form-group mb-3" style="display: flex">
+                        <label class="col-3" for="exampleSelect2">Starts</label>
+                        <div class="col-9" style="display: flex">
+                            <input required type="date" name="start_date" class="form-control col-4"
+                                   id="start_date" value=${start_date!""}>
+                            <div class="col-4 text-center"> Ends </div>
+                            <input required type="date" name="end_date" class="form-control col-4"
+                                   id="end_date" value=${end_date!""}>
                         </div>
                     </div>
                     <div class="form-group mb-3" style="display: flex">
                         <label class="col-3" for="1d">Credits</label>
-                        <input required type="number" name="Q1D" class="form-control col-9" id="1d"  value=${d!""}>
+                        <input required type="number" name="credits" class="form-control col-9" id="1d" value=${credits!3}>
                     </div>
                     <div class="form-group mb-3" style="display: flex;">
                         <label class="col-3" for="ans1">Total Capacity</label>
-                        <input required type="number" name="ans1" class="form-control col-9" id="ans1"  value=${ans1!""}>
+                        <input required type="number" name="capacity" class="form-control col-9" id="capacity" value=${cap!""}>
                     </div>
 
                     <button type="submit" name="action" value="Save" class="btn btn-primary" style="width:10rem; float:right;">
