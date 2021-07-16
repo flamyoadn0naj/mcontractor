@@ -17,7 +17,7 @@
         <h4 class="card-header border-primary text-black-50 mb-3" style="margin-top: -1.5%">
             Create Course
         </h4>
-        <form style="display:flex; justify-content:center;" method="post" action="/courses/create-course">
+        <form style="display:flex; justify-content:center;" method="post" action="/courses/create-course?e=${e}">
             <div class="card" style="width: 80%">
                 <div class="card-header" id="headingOne">
                     <div class="form-group space-between mb-3">
@@ -27,9 +27,12 @@
                     <div class="form-group mb-3" style="display: flex">
                         <label class="col-3" for="1b">Professor</label>
                         <select class="form-control col-9" name="prof" id="exampleSelect1" style="margin-right: 2%">
-                            <option>Test1</option>
-                            <option>Test2</option>
-                            <option>Test3</option>
+                            <#list profList as p>
+                                <option>${p}</option>
+                            </#list>
+                            <#if currProf??>
+                                <option selected>${currProf}</option>
+                            </#if>
                         </select>
                     </div>
                     <div class="form-group mb-3" style="display: flex">
@@ -38,38 +41,56 @@
                     </div>
                     <div class="form-group" style="display: flex">
                         <label class="col-3">Meeting Days</label>
+                        <#if days??>
                         <div class="col-9 space-between">
-                            <div class="form-check">
-                                <label class="form-check-label">
-                                    <input name="mon" id="mon" class="form-check-input" type="checkbox" value="mon">
-                                    Monday
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <label class="form-check-label">
-                                    <input name="tue" id="tues" class="form-check-input" type="checkbox" value="tue">
-                                    Tuesday
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <label class="form-check-label">
-                                    <input name="wed" id="wed" class="form-check-input" type="checkbox" value="wed">
-                                    Wednesday
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <label class="form-check-label">
-                                    <input name="thr" id="thr" class="form-check-input" type="checkbox" value="thr">
-                                    Thursday
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <label class="form-check-label">
-                                    <input name="fri" id="fri" class="form-check-input" type="checkbox" value="fri">
-                                    Friday
-                                </label>
-                            </div>
+                            <#list days as k, v>
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <#if v == true>
+                                            <input name="${k}" id="${k}" class="form-check-input" type="checkbox" checked value="${k}">
+                                        <#else>
+                                            <input name="${k}" id="${k}" class="form-check-input" type="checkbox" value="${k}">
+                                        </#if>
+                                        ${k}
+                                    </label>
+                                </div>
+                            </#list>
                         </div>
+<#--                        <#else>-->
+<#--                            <div class="col-9 space-between">-->
+<#--                                <div class="form-check">-->
+<#--                                    <label class="form-check-label">-->
+<#--                                        <input name="Monday" id="Monday" class="form-check-input" type="checkbox" value="Monday">-->
+<#--                                        Monday-->
+<#--                                    </label>-->
+<#--                                </div>-->
+<#--                                <div class="form-check">-->
+<#--                                    <label class="form-check-label">-->
+<#--                                        <input name="Tuesday" id="Tuesday" class="form-check-input" type="checkbox" value="Tuesday">-->
+<#--                                        Tuesday-->
+<#--                                    </label>-->
+<#--                                </div>-->
+<#--                                <div class="form-check">-->
+<#--                                    <label class="form-check-label">-->
+<#--                                        <input name="Wednesday" id="Wednesday" class="form-check-input" type="checkbox" value="Wednesday">-->
+<#--                                        Wednesday-->
+<#--                                    </label>-->
+<#--                                </div>-->
+<#--                                <div class="form-check">-->
+<#--                                    <label class="form-check-label">-->
+<#--                                        <input name="Thursday" id="Thursday" class="form-check-input" type="checkbox" value="Thursday">-->
+<#--                                        Thursday-->
+<#--                                    </label>-->
+<#--                                </div>-->
+<#--                                <div class="form-check">-->
+<#--                                    <label class="form-check-label">-->
+<#--                                        <input name="Friday" id="Friday" class="form-check-input" type="checkbox" value="Friday">-->
+<#--                                        Friday-->
+<#--                                    </label>-->
+<#--                                </div>-->
+<#--                            </div>-->
+<#--                        -->
+                        </#if>
                     </div>
                     <#if errTime??>
                         <div class="invalid-feedback" style="display:block;margin-left:1%">
@@ -83,7 +104,7 @@
                                    class="form-control col-4" id="start_time" value=${start_time!""}>
                             <div class="col-4 text-center"> to </div>
                             <input min="09:00" max="18:00" required type="time" name="end_time"
-                                   class="form-control col-4" id="end_time" value=${end_Time!""}>
+                                   class="form-control col-4" id="end_time" value=${end_time!""}>
                         </div>
                     </div>
                     <#if errDate??>

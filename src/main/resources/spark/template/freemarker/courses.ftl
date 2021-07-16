@@ -15,6 +15,16 @@
             Courses
         </h2>
         <div style="width: 90%; margin-left: 2%">
+            <#if role == "admin">
+                <ul class="nav nav-tabs mb-3">
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="/courses/all">All Courses</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="/courses">My Courses</a>
+                    </li>
+                </ul>
+            </#if>
             <form method="post" action="/courses">
                 <div class="space-between">
                     <div>
@@ -28,6 +38,7 @@
                         <b style="margin-right: 2%" class="col-5">Filter By:</b>
                         <select class="form-control col-5" name="filterBy" id="exampleSelect1" style="margin-right: 2%">
                             <option>All</option>
+                            <option>Upcoming</option>
                             <option>Current</option>
                             <option>Completed</option>
                         </select>

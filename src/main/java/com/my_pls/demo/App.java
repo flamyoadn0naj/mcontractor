@@ -140,6 +140,7 @@ public class App {
         get("/forgot-password/:type",((request, response) -> {
             String pageType = request.params(":type");
             Map<String, Object> map = ForgetPassword.getMethodDefaults(pageType);
+            map.forEach((k,v)->map.put(k,v));
             return new ModelAndView(map,"forgotPassword.ftl");
         }),engine);
 
@@ -149,6 +150,7 @@ public class App {
             Map<String,Object> map = ForgetPassword.postMethodDefaults(pageType,
                     formFields,
                     pwd_manager);
+            map.forEach((k,v)->map.put(k,v));
             return new ModelAndView(map,"forgotPassword.ftl");
         }),engine);
 
@@ -211,9 +213,29 @@ public class App {
             return new ModelAndView(map,"courseRate.ftl");
         }),engine);
 
+        get("/courses/all", (request, response) -> {
+            Map<String,Object> map = Courses.getMethodDefaults("");
+            String e_id = request.queryParams("edit");
+            String d_id = request.queryParams("del");
+            boolean done = false;
+            if (d_id != null) done = Courses.deleteCourse(d_id);
+            if (e_id != null) response.redirect("/courses/create-course?e="+e_id);
+            if(done) response.redirect("/courses/all");
+            map.forEach((k,v)->map.put(k,v));
+            return new ModelAndView(map,"coursesAll.ftl");
+        },engine);
+
+        post("/courses/all",((request, response) -> {
+            Map<String,String> formFields = extractFields(request.body());
+            Map<String,Object> map = Courses.getMethodDefaults(formFields.get("filterBy"));
+            map.forEach((k,v)->map.put(k,v));
+            map.put("role","admin");
+            return new ModelAndView(map,"coursesAll.ftl");
+        }),engine);
+
         get("/courses",((request, response) -> {
-            Map<String,String> map = new HashMap<>();
-            map.put("role","prof");
+            Map<String,Object> map = new HashMap<>();
+            map.put("role","admin");
             return new ModelAndView(map,"courses.ftl");
         }),engine);
 
@@ -222,22 +244,45 @@ public class App {
             Map<String,String> formFields = extractFields(request.body());
             System.out.println(formFields);
             map.put("role","admin");
+
             return new ModelAndView(map,"courses.ftl");
         }),engine);
 
+
         get("/courses/create-course",((request, response) -> {
-            Map<String,String> map = new HashMap<>();
+            Map<String,Object> map = new HashMap<>();
             map.put("name","");
             map.put("obj","");
+            ArrayList<String> profs = new ArrayList<String>();
+            profs.addAll(Arrays.asList("Cyril","Test2","Test1","Test3","AbdulMutalib Wahaishi","Tim Fossum"));
+            map.put("profList",profs);
+            map.put("e",-1);
+            String e_id = request.queryParams("e");
+            if (e_id != null) {
+                map = CreateCourse.editCourse(map,e_id.replaceAll(" ",""));
+                Map<String, Object> finalMap = map;
+                map.forEach((k, v)-> finalMap.put(k,v));
+                map.put("e",e_id);
+            } else {
+                LinkedHashMap<String, Boolean> days = new LinkedHashMap<String, Boolean>();
+                days.put("Monday",false);
+                days.put("Tuesday",false);
+                days.put("Wednesday",false);
+                days.put("Thursday",false);
+                days.put("Friday",false);
+                map.put("days",days);
+            };
             return new ModelAndView(map,"createCourse.ftl");
         }),engine);
 
-        post("/courses/create-course",((request, response) -> {
+        post("/courses/create-course", (request, response) -> {
             Map<String,String> formFields = extractFields(request.body());
-            Map<String,String> map = CreateCourse.postMethodDefaults(formFields);
+            String edit = request.queryParams("e");
+            Map<String,Object> map = CreateCourse.postMethodDefaults(formFields, edit);
+            if((boolean)map.get("created") == true) response.redirect("/courses/all");
             map.forEach((k,v)->map.put(k,v));
             return new ModelAndView(map,"createCourse.ftl");
-        }),engine);
+        },engine);
 
         get("/course/create-quiz",((request, response) -> {
             Map<String,String> map = new HashMap<>();
