@@ -27,11 +27,11 @@
                     <div class="form-group mb-3" style="display: flex">
                         <label class="col-3" for="1b">Professor</label>
                         <select class="form-control col-9" name="prof" id="exampleSelect1" style="margin-right: 2%">
-                            <#list profList as p>
-                                <option>${p}</option>
+                            <#list profList as k, v>
+                                <option value=${k}>${v}</option>
                             </#list>
                             <#if currProf??>
-                                <option selected>${currProf}</option>
+                                <option selected value=${prof_id}>${currProf}</option>
                             </#if>
                         </select>
                     </div>

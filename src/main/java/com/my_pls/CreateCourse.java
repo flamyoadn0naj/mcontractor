@@ -1,29 +1,49 @@
 package com.my_pls;
 
 import java.net.URLDecoder;
-import java.sql.Array;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 
 
 public class CreateCourse {
-    public static Map<String,Object> postMethodDefaults(Map<String, String> formFields, String edit) {
-        System.out.println(edit);
-        Map<String,Object> map = new HashMap<>();
-        boolean flag = true;
-        String currProf = "Test1";
-        ArrayList<String> profs = new ArrayList<String>();
-        profs.addAll(Arrays.asList("Cyril","Test2","Test1","Test3","AbdulMutalib Wahaishi","Tim Fossum"));
+
+    private static Connection conn = MySqlConnection.getConnection();
+
+    public static LinkedHashMap<String,Boolean> findAllDays() {
         LinkedHashMap<String, Boolean> allDays = new LinkedHashMap<String, Boolean>();
         allDays.put("Monday",false);
         allDays.put("Tuesday",false);
         allDays.put("Wednesday",false);
         allDays.put("Thursday",false);
         allDays.put("Friday",false);
+        return allDays;
+    }
+
+    public static Map<Integer, String> findAllProfs(){
+        Map<Integer,String> profs = new HashMap<Integer,String>();
+        try {
+            PreparedStatement pst = conn.prepareStatement("select profId from courses");
+            ResultSet rs = pst.executeQuery();
+            while(rs.next()) {
+                int id = rs.getInt("profId");
+                String name = Courses.findProfName(id);
+                profs.put(id,name);
+            }
+        } catch (SQLException throwables) {
+            System.out.println("Exception at get prof name "+ throwables);
+        }
+        return profs;
+    }
+
+    public static Map<String,Object> postMethodDefaults(Map<String, String> formFields, String edit) {
+        Map<String,Object> map = new HashMap<>();
+        boolean flag = true;
+        Map<Integer,String> profs = findAllProfs();
+        Map.Entry<Integer,String> entry = profs.entrySet().iterator().next();
+        int prof_id = entry.getKey();
+        LinkedHashMap<String, Boolean> allDays = findAllDays();
         map.put("e",edit);
         try {
             String startTime = URLDecoder.decode(formFields.get("start_time"), "UTF-8");
@@ -31,7 +51,7 @@ public class CreateCourse {
             String startDate = formFields.get("start_date");
             String endDate = formFields.get("end_date");
             String name = URLDecoder.decode(formFields.get("name"), "UTF-8");
-            String prof = URLDecoder.decode(formFields.get("prof"), "UTF-8");
+            prof_id = Integer.parseInt(formFields.get("prof"));
             String obj = URLDecoder.decode(formFields.get("obj"), "UTF-8");
             ArrayList<String> days = new ArrayList<String>();
             if (formFields.containsKey("Monday")) days.add("Monday");
@@ -51,7 +71,7 @@ public class CreateCourse {
             map.put("end_time",endTime);
             map.put("credits",String.valueOf(credits));
             map.put("cap",String.valueOf(capacity));
-            currProf = prof;
+
             allDays.forEach((k, v)-> {
                 if (days.contains(k)) allDays.put(k,true);
             });
@@ -79,21 +99,19 @@ public class CreateCourse {
             }
 
             if(flag) {
-                String sqlQuery = "insert into courses (course_name, professor, meeting_days, " +
+                String sqlQuery = "insert into courses (course_name, profId, meeting_days, " +
                         "start_time, end_time, start_date, end_date, credits, total_capacity, enrolled, " +
                         "status, obj) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
                 if(!edit.contentEquals("-1")) {
                     int id = Integer.parseInt(edit.replaceAll(" ",""));
 
-                    sqlQuery = "update courses set course_name=?, professor=?, meeting_days=?, " +
+                    sqlQuery = "update courses set course_name=?, profId=?, meeting_days=?, " +
                             "start_time=?, end_time=?, start_date=?, end_date=?, credits=?, " +
                             "total_capacity=?, enrolled=?, status=?, obj=? where id=" + id;
                 }
-                System.out.println(sqlQuery);
-                Connection conn = MySqlConnection.getConnection();
                 PreparedStatement pst = conn.prepareStatement(sqlQuery);
                 pst.setString(1, name);
-                pst.setString(2, prof);
+                pst.setInt(2, prof_id);
                 pst.setString(3, daysString);
                 pst.setString(4, startTime);
                 pst.setString(5, endTime);
@@ -117,25 +135,20 @@ public class CreateCourse {
             flag = false;
         }
         map.put("days",allDays);
-        profs.remove(new String(currProf));
+        map.put("currProf",profs.get(prof_id));
+        map.put("prof_id",prof_id);
+        profs.remove(prof_id);
         map.put("profList",profs);
-        map.put("currProf",currProf);
         map.put("created",flag);
         return map;
     }
 
     public static Map<String,Object> editCourse(Map<String,Object> map,String id) {
-        String currProf = "Test1";
-        ArrayList<String> profs = new ArrayList<String>();
-        profs.addAll(Arrays.asList("Cyril","Test2","Test1","Test3","AbdulMutalib Wahaishi","Tim Fossum"));
-        LinkedHashMap<String, Boolean> days = new LinkedHashMap<String, Boolean>();
-        days.put("Monday",false);
-        days.put("Tuesday",false);
-        days.put("Wednesday",false);
-        days.put("Thursday",false);
-        days.put("Friday",false);
+        Map<Integer,String> profs = findAllProfs();
+        Map.Entry<Integer,String> entry = profs.entrySet().iterator().next();
+        int prof_id = entry.getKey();
+        LinkedHashMap<String, Boolean> days = findAllDays();
         try {
-            Connection conn = MySqlConnection.getConnection();
             PreparedStatement pst = conn.prepareStatement("select * from courses where id=?");
             pst.setInt(1, Integer.parseInt(id));
             ResultSet rs = pst.executeQuery();
@@ -148,7 +161,7 @@ public class CreateCourse {
                 map.put("end_time",rs.getString("end_time"));
                 map.put("credits",rs.getInt("credits"));
                 map.put("cap",rs.getInt("total_capacity"));
-                currProf = rs.getString("professor");
+                prof_id = rs.getInt("profId");
                 String meeting_days = rs.getString("meeting_days");
                 days.forEach((k, v)-> {
                     if (meeting_days.contains(k)) days.put(k,true);
@@ -157,10 +170,11 @@ public class CreateCourse {
         } catch (Exception e) {
             System.out.println("Exception at edit course " + e);
         }
+        map.put("currProf",profs.get(prof_id));
+        map.put("prof_id",prof_id);
+        profs.remove(prof_id);
         map.put("days",days);
-        profs.remove(new String(currProf));
         map.put("profList",profs);
-        map.put("currProf",currProf);
         return map;
     }
 }

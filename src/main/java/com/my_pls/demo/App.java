@@ -253,9 +253,7 @@ public class App {
             Map<String,Object> map = new HashMap<>();
             map.put("name","");
             map.put("obj","");
-            ArrayList<String> profs = new ArrayList<String>();
-            profs.addAll(Arrays.asList("Cyril","Test2","Test1","Test3","AbdulMutalib Wahaishi","Tim Fossum"));
-            map.put("profList",profs);
+            map.put("profList",CreateCourse.findAllProfs());
             map.put("e",-1);
             String e_id = request.queryParams("e");
             if (e_id != null) {
@@ -264,12 +262,8 @@ public class App {
                 map.forEach((k, v)-> finalMap.put(k,v));
                 map.put("e",e_id);
             } else {
-                LinkedHashMap<String, Boolean> days = new LinkedHashMap<String, Boolean>();
-                days.put("Monday",false);
-                days.put("Tuesday",false);
-                days.put("Wednesday",false);
-                days.put("Thursday",false);
-                days.put("Friday",false);
+                LinkedHashMap<String, Boolean> days = CreateCourse.findAllDays();
+                System.out.println(days);
                 map.put("days",days);
             };
             return new ModelAndView(map,"createCourse.ftl");
