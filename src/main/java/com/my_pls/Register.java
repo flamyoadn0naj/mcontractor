@@ -55,12 +55,11 @@ public class Register {
             }
             if (flag) {
                 map.put("loading","true");
-                String email = formFields.get("email");
-                email = URLDecoder.decode(email,"UTF-8");
+                String email = URLDecoder.decode(formFields.get("email"),"UTF-8");
                 String password = formFields.get("pass");
                 password = pwd_manager.hashPassword(password);
-                String fName = formFields.get("firstName");
-                String lName = formFields.get("lastName");
+                String fName = URLDecoder.decode(formFields.get("firstName"),"UTF-8");
+                String lName = URLDecoder.decode(formFields.get("lastName"), "UTF-8");
                 Random theRandom = new Random();
                 theRandom.nextInt(999999);
                 String myHash = DigestUtils.md5Hex("" +	theRandom);

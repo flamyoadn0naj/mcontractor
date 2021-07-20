@@ -29,7 +29,7 @@ public class Courses {
         map.put("role","admin");
         map.put("filterStatus", "All");
         map.put("courses",new ArrayList<>());
-        ArrayList<String> filterOptions = new ArrayList<String>();
+        ArrayList<String> filterOptions = new ArrayList<>();
         filterOptions.add("All");
         filterOptions.add("Current");
         filterOptions.add("Upcoming");
@@ -65,9 +65,9 @@ public class Courses {
             System.out.println("Exception at courses "+e);
             filterstatus = "All";
         }
+        map.put("filterStatus",filterstatus);
         filterOptions.remove(new String(filterstatus));
         map.put("filterOptions",filterOptions);
-        map.put("filterStatus",filterstatus);
         return map;
     }
 
