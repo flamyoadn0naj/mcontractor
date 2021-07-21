@@ -21,7 +21,7 @@ public class Login {
         map.put("emailVal","");
         map.put("pageType","Login");
         map.put("loading","false");
-        map.put("styleVal", "margin-top:12%; width:45%");
+        map.put("styleVal", "margin-top:5%; width:45%");
         return map;
     }
 
@@ -70,7 +70,7 @@ public class Login {
         map.put("actionLink", "/login");
         map.put("errorPassMatch", "");
         map.put("pageType","Login");
-        map.put("styleVal", "margin-top:12%; width:45%");
+        map.put("styleVal", "margin-top:5%; width:45%");
         return new Pair(map,user);
     }
 }

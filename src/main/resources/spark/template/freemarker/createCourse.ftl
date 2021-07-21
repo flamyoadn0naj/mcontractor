@@ -56,40 +56,6 @@
                                 </div>
                             </#list>
                         </div>
-<#--                        <#else>-->
-<#--                            <div class="col-9 space-between">-->
-<#--                                <div class="form-check">-->
-<#--                                    <label class="form-check-label">-->
-<#--                                        <input name="Monday" id="Monday" class="form-check-input" type="checkbox" value="Monday">-->
-<#--                                        Monday-->
-<#--                                    </label>-->
-<#--                                </div>-->
-<#--                                <div class="form-check">-->
-<#--                                    <label class="form-check-label">-->
-<#--                                        <input name="Tuesday" id="Tuesday" class="form-check-input" type="checkbox" value="Tuesday">-->
-<#--                                        Tuesday-->
-<#--                                    </label>-->
-<#--                                </div>-->
-<#--                                <div class="form-check">-->
-<#--                                    <label class="form-check-label">-->
-<#--                                        <input name="Wednesday" id="Wednesday" class="form-check-input" type="checkbox" value="Wednesday">-->
-<#--                                        Wednesday-->
-<#--                                    </label>-->
-<#--                                </div>-->
-<#--                                <div class="form-check">-->
-<#--                                    <label class="form-check-label">-->
-<#--                                        <input name="Thursday" id="Thursday" class="form-check-input" type="checkbox" value="Thursday">-->
-<#--                                        Thursday-->
-<#--                                    </label>-->
-<#--                                </div>-->
-<#--                                <div class="form-check">-->
-<#--                                    <label class="form-check-label">-->
-<#--                                        <input name="Friday" id="Friday" class="form-check-input" type="checkbox" value="Friday">-->
-<#--                                        Friday-->
-<#--                                    </label>-->
-<#--                                </div>-->
-<#--                            </div>-->
-<#--                        -->
                         </#if>
                     </div>
                     <#if errTime??>

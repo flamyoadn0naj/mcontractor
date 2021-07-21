@@ -336,20 +336,36 @@ public class App {
             return new ModelAndView(map,"ratingsIndividual.ftl");
         }),engine);
 
-        get("/applyProf",((request, response) -> {
+        get("/apply-prof",((request, response) -> {
             Map<String,String> map = new HashMap<>();
             return new ModelAndView(map,"profApply.ftl");
         }),engine);
 
-        post("/applyProf",((request, response) -> {
-            Map<String,String> map = new HashMap<>();
+        post("/apply-prof", (request, response) -> {
+            Map<String,Object> map = new HashMap<>();
             Map<String,String> formFields = extractFields(request.body());
-            System.out.println(formFields);
+            map = ApplyForProfessor.checkForErrors(user_current.firstName,
+                    user_current.lastName, formFields, map);
+            boolean err = (boolean) map.get("applyProfErr");
+            if (!err) {
+                String applied = ApplyForProfessor.apply(user_current.email);
+                if (applied.equals("true")) {
+                    map.put("success", true);
+                    map.put("disable",true);
+                }
+                else if (applied.equals("false")) map.put("errMsg", "Something went wrong, please try again.");
+                else {
+                    map.put("errMsg", "You have already applied to be a professor");
+                    map.put("disable",true);
+                }
+            }
+            Map<String, Object> finalMap = map;
+            map.forEach((k, v)-> finalMap.put(k,v));
             return new ModelAndView(map,"profApply.ftl");
-        }),engine);
+        },engine);
 
         get("/err",((request, response) -> {
-            Map<String,String> map = new HashMap<>();
+            Map<String,Object> map = new HashMap<>();
             if (user_current.firstName.length() == 0) {
                 response.redirect("/login/errAuth");
             }

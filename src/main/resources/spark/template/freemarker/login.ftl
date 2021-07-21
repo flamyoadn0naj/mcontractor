@@ -33,7 +33,7 @@
     </div>
 </#if>
 <div style="display: flex;justify-content: center">
-    <div class="card text-black border-primary mb-3" style="${styleVal}"!"width:45%; margin-top:5%">
+    <div class="card text-black border-primary mb-3" style="${styleVal}"!"width:45%; margin-top:3%">
     <h2 class="card-header text-white bg-primary mb-3" style="padding:10pt">
         <#if pageType == "Login">
             Login

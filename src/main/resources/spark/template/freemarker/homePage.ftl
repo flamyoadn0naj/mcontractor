@@ -66,8 +66,8 @@
             </div>
         </div>
     </div>
-    <div class="footer bg-primary">
-        Apply to be a Professor
+    <div class="footer bg-primary text-white">
+        <a class="text-white" href="/apply-prof"> Apply to be a Professor </a>
     </div>
 </body>
 </html>
