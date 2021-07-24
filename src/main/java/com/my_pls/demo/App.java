@@ -336,8 +336,27 @@ public class App {
             return new ModelAndView(map,"ratingsIndividual.ftl");
         }),engine);
 
+        get("/approval",((request, response) -> {
+            Map<String,Object> map = new HashMap<>();
+            Map<Integer,String> profs = Admin.viewAllRequests();
+            map.put("profs",profs);
+            map.put("role", "admin");
+            Map<String,String> searchOptions = Admin.getSearchOptions("");
+            map.put("searchOptions",searchOptions);
+            map.put("users",new HashMap<Integer,String>());
+            return new ModelAndView(map,"approval.ftl");
+        }),engine);
+
+        post("/approval", (request, response) -> {
+            Map<String,String> formFields = extractFields(request.body());
+            Map<String, Object> map = Admin.postMethodFunctionality(formFields);
+            if (map.containsKey("redirect") && (boolean) map.get(redirect)) response.redirect("/approval");
+            map.forEach((k, v)-> map.put(k,v));
+            return new ModelAndView(map,"approval.ftl");
+        },engine);
+
         get("/apply-prof",((request, response) -> {
-            Map<String,String> map = new HashMap<>();
+            Map<String,Object> map = new HashMap<>();
             return new ModelAndView(map,"profApply.ftl");
         }),engine);
 

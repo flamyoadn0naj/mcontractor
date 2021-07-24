@@ -22,6 +22,13 @@
                 <li class="nav-item active" >
                     <a class="nav-link" href="/ratings">Ratings <span class="sr-only">(current)</span></a>
                 </li>
+                <#if role??>
+                    <#if role== "admin">
+                        <li class="nav-item active" >
+                            <a class="nav-link" href="/approval">Approvals <span class="sr-only">(current)</span></a>
+                        </li>
+                    </#if>
+                </#if>
             </ul>
         </nav>
     </body>

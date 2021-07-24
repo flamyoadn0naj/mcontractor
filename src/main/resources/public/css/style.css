@@ -54,3 +54,7 @@
     font-weight: normal;
     padding: 5pt;
 }
+
+.font-size-larger {
+    font-size: larger;
+}
