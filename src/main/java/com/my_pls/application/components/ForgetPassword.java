@@ -1,4 +1,8 @@
-package com.my_pls;
+package com.my_pls.application.components;
+
+import com.my_pls.MySqlConnection;
+import com.my_pls.securePassword;
+import com.my_pls.sendEmail;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;

@@ -1,9 +1,9 @@
-package com.my_pls;
+package com.my_pls.application.components;
 
-import com.my_pls.demo.App;
-import com.my_pls.Pair;
+import com.my_pls.MySqlConnection;
+import com.my_pls.application.App;
+import com.my_pls.securePassword;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -25,7 +25,7 @@ public class Login {
         return map;
     }
 
-    public static Pair postMethodDefaults(Map<String, Object> map, Map<String,String> formFields, App.CurrUser user,securePassword pwd_manager) {
+    public static Pair postMethodDefaults(Map<String, Object> map, Map<String,String> formFields, App.CurrUser user, securePassword pwd_manager) {
         if (formFields.size() > 0) {
             if (!formFields.get("email").contains("rit.edu")) {
                 map.put("errorEmail", "display:list-item;margin-left:5%");

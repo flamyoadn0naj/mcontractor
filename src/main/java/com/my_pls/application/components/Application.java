@@ -1,4 +1,4 @@
-package com.my_pls;
+package com.my_pls.application.components;
 
 import java.util.logging.Logger;
 

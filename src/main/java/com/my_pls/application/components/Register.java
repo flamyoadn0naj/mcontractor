@@ -1,13 +1,15 @@
-package com.my_pls;
+package com.my_pls.application.components;
 
-import com.my_pls.demo.App;
+import com.my_pls.MySqlConnection;
+import com.my_pls.application.App;
+import com.my_pls.securePassword;
+import com.my_pls.sendEmail;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
