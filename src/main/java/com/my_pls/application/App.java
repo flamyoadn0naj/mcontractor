@@ -1,9 +1,8 @@
-package com.my_pls.demo;
+package com.my_pls.application;
 
 import com.my_pls.*;
-import org.apache.commons.codec.digest.DigestUtils;
+import com.my_pls.application.components.*;
 import spark.ModelAndView;
-import spark.Route;
 import spark.TemplateEngine;
 import spark.template.freemarker.FreeMarkerEngine;
 
@@ -12,8 +11,6 @@ import java.sql.PreparedStatement;
 
 import java.io.IOException;
 import java.sql.ResultSet;
-import java.sql.Time;
-import java.time.LocalTime;
 import java.util.*;
 import java.net.URLDecoder;
 
@@ -253,7 +250,7 @@ public class App {
             Map<String,Object> map = new HashMap<>();
             map.put("name","");
             map.put("obj","");
-            map.put("profList",CreateCourse.findAllProfs());
+            map.put("profList", CreateCourse.findAllProfs());
             map.put("e",-1);
             String e_id = request.queryParams("e");
             if (e_id != null) {

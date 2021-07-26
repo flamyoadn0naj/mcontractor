@@ -1,4 +1,6 @@
-package com.my_pls;
+package com.my_pls.application.components;
+
+import com.my_pls.MySqlConnection;
 
 import java.sql.*;
 import java.time.LocalDate;

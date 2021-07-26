@@ -1,6 +1,6 @@
-package com.my_pls;
+package com.my_pls.application.components;
 
-import com.mysql.cj.protocol.Resultset;
+import com.my_pls.MySqlConnection;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
