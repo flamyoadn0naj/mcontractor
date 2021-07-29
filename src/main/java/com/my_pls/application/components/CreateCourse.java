@@ -9,6 +9,7 @@ import java.time.LocalTime;
 import java.util.*;
 
 
+
 public class CreateCourse {
 
     private static Connection conn = MySqlConnection.getConnection();
@@ -124,11 +125,11 @@ public class CreateCourse {
                 pst.setInt(10, 0);
                 pst.setString(11, "Upcoming");
                 pst.setString(12, obj);
-                System.out.println(pst);
                 int i = pst.executeUpdate();
                 if(i != 0) {
-                    System.out.println("done");
-                    flag = true;
+                    if (edit.contentEquals("-1"))
+                        flag = addDiscussionGroupForCourse(name, prof_id, daysString,
+                                startTime, endTime, startDate, endDate, credits, capacity, obj);
                 }
             }
 
@@ -178,5 +179,54 @@ public class CreateCourse {
         map.put("days",days);
         map.put("profList",profs);
         return map;
+    }
+
+    public static boolean addDiscussionGroupForCourse(String name, int prof_id, String daysString,
+                                                      String startTime, String endTime, String startDate,
+                                                      String endDate, int credits, int capacity, String obj) {
+        boolean flag = false;
+        try {
+            int id = 0;
+            PreparedStatement pst = conn.prepareStatement(
+                    "select id from courses where course_name=? and profId=? and meeting_days=? and " +
+                            "start_time=? and end_time=? and start_date=? and end_date=? and credits=? and " +
+                            "total_capacity=? and obj=?");
+            pst.setString(1, name);
+            pst.setInt(2, prof_id);
+            pst.setString(3, daysString);
+            pst.setString(4, startTime);
+            pst.setString(5, endTime);
+            pst.setString(6, startDate);
+            pst.setString(7, endDate);
+            pst.setInt(8, credits);
+            pst.setInt(9, capacity);
+            pst.setString(10, obj);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                id = rs.getInt("id");
+                PreparedStatement pst2 = conn.prepareStatement(
+                        "insert into discussion_groups (name, course_id, privacy) VALUES (?,?,?)");
+                pst2.setString(1, name);
+                pst2.setInt(2, id);
+                pst2.setInt(3, 1);
+                int i = pst2.executeUpdate();
+                if (i != 0) {
+                    PreparedStatement pst3 = conn.prepareStatement("select id from discussion_groups where course_id=?");
+                    pst3.setInt(1,id);
+                    ResultSet rs2 = pst3.executeQuery();
+                    if (rs2.next()) {
+                        int d_id = rs2.getInt("id");
+                        PreparedStatement pst4 = conn.prepareStatement("insert into dg_members (user_id, dg_id) VALUES (?,?)");
+                        pst4.setInt(1,prof_id);
+                        pst4.setInt(2,d_id);
+                        int j = pst4.executeUpdate();
+                        if (j != 0) flag = true;
+                    }
+                }
+            }
+        } catch (SQLException throwables) {
+            System.out.println("Exception at addDiscussionGroupForCourse "+ throwables);
+        }
+        return  flag;
     }
 }

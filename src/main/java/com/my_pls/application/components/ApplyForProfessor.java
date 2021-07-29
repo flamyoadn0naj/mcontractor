@@ -1,17 +1,20 @@
 package com.my_pls.application.components;
 
 import com.my_pls.MySqlConnection;
+import com.my_pls.application.App;
 
 import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ApplyForProfessor {
     public static Map<String,Object> checkForErrors(String fname, String lname,
-                                        Map<String,String> formfields, Map<String, Object> map) {
+                                        Map<String,String> formfields) {
+        Map <String,Object> map = new HashMap<String, Object>();
         try {
             map.put("applyProfErr",false);
             String name = URLDecoder.decode(formfields.get("name"), "UTF-8");
@@ -57,5 +60,24 @@ public class ApplyForProfessor {
             System.out.println("Exception in apply prof in apply "+e);
         }
         return flag;
+    }
+
+    public static Map<String, Object> postMethodFunctionality(Map<String,String> formFields,
+                                                              String fname, String lname, String email) {
+        Map<String,Object> map = checkForErrors(fname, lname, formFields);
+        boolean err = (boolean) map.get("applyProfErr");
+        if (!err) {
+            String applied = apply(email);
+            if (applied.equals("true")) {
+                map.put("success", true);
+                map.put("disable",true);
+            }
+            else if (applied.equals("false")) map.put("errMsg", "Something went wrong, please try again.");
+            else {
+                map.put("errMsg", "You have already applied to be a professor");
+                map.put("disable",true);
+            }
+        }
+        return map;
     }
 }

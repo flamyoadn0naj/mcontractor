@@ -24,17 +24,27 @@
                     <table class="table">
                         <tr class="table-primary justify-content-between">
                         </tr>
-                        <tr>
-                            <th scope="row">
-                                <a class="text-muted" href="/discussion/group-desc">Introduction to Software Engineering</a>
-                                <button type="button" class="btn-download" style="margin-left: 2%">
-                                    <i class="fa fa-lock"></i>
-                                </button>
-                            </th>
-                            <td>
-                                <button style="float: right" class="btn btn-primary" type="submit">Leave</button>
-                            </td>
-                        </tr>
+                        <#if groups??>
+                            <#list groups as g>
+                                <tr>
+                                    <th scope="row">
+                                        <a class="text-muted" href="/discussion/group-desc">${g.name}</a>
+                                        <#if g.privacy??>
+                                            <button type="button" class="btn-download" style="margin-left: 2%">
+                                                <i class="fa fa-lock"></i>
+                                            </button>
+                                        </#if>
+                                        <#if g.course??>
+                                            <span class="badge badge-primary" style="margin-left: 2%">Course</span>
+                                        </#if>
+                                    </th>
+                                    <td>
+                                        <button style="float: right" class="btn btn-primary" type="submit">Leave</button>
+                                    </td>
+                                </tr>
+                            </#list>
+                        </#if>
+
                         <tr>
                             <th scope="row">
                                 <a class="text-muted" href="">Added Value</a>

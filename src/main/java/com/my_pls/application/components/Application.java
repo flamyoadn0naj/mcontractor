@@ -67,7 +67,7 @@ public final class Application {
   //
 
   private void initialize() {
-    LOG.fine("WebCheckers is initializing.");
+    LOG.fine("MyPLS is initializing.");
 
     // configure Spark and startup the Jetty web server
     webServer.initialize();

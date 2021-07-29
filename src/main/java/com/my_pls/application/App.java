@@ -314,12 +314,14 @@ public class App {
         }),engine);
 
         get("/discussion-groups",((request, response) -> {
-            Map<String,String> map = new HashMap<>();
+            Map<String,Object> map = new HashMap<>();
+            ArrayList<Map<String,Object>> groups = DiscussionGroups.getMyDiscussionGroups(141);
+            map.put("groups", groups);
             return new ModelAndView(map,"discussionGroups.ftl");
         }),engine);
 
         get("/discussion/group-desc",((request, response) -> {
-            Map<String,String> map = new HashMap<>();
+            Map<String,Object> map = new HashMap<>();
             return new ModelAndView(map,"groupDesc.ftl");
         }),engine);
 
@@ -358,25 +360,10 @@ public class App {
         }),engine);
 
         post("/apply-prof", (request, response) -> {
-            Map<String,Object> map = new HashMap<>();
             Map<String,String> formFields = extractFields(request.body());
-            map = ApplyForProfessor.checkForErrors(user_current.firstName,
-                    user_current.lastName, formFields, map);
-            boolean err = (boolean) map.get("applyProfErr");
-            if (!err) {
-                String applied = ApplyForProfessor.apply(user_current.email);
-                if (applied.equals("true")) {
-                    map.put("success", true);
-                    map.put("disable",true);
-                }
-                else if (applied.equals("false")) map.put("errMsg", "Something went wrong, please try again.");
-                else {
-                    map.put("errMsg", "You have already applied to be a professor");
-                    map.put("disable",true);
-                }
-            }
-            Map<String, Object> finalMap = map;
-            map.forEach((k, v)-> finalMap.put(k,v));
+            Map<String, Object> map = ApplyForProfessor.postMethodFunctionality(formFields,
+                    user_current.firstName, user_current.lastName, user_current.email);
+            map.forEach((k, v)-> map.put(k,v));
             return new ModelAndView(map,"profApply.ftl");
         },engine);
 
