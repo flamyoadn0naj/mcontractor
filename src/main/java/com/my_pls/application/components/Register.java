@@ -34,6 +34,12 @@ public class Register {
         Map<String,Object> map = new HashMap<>();
         map.put("actionLink", "/register");
         map.put("loginErr", "");
+        String email = URLDecoder.decode(formFields.get("email"),"UTF-8");
+        String password = formFields.get("pass");
+        password = pwd_manager.hashPassword(password);
+        String fName = URLDecoder.decode(formFields.get("firstName"),"UTF-8");
+        String lName = URLDecoder.decode(formFields.get("lastName"), "UTF-8");
+
 
         if (formFields.size() > 0) {
             Boolean flag = true;
@@ -57,42 +63,14 @@ public class Register {
             }
             if (flag) {
                 map.put("loading","true");
-                String email = URLDecoder.decode(formFields.get("email"),"UTF-8");
-                String password = formFields.get("pass");
-                password = pwd_manager.hashPassword(password);
-                String fName = URLDecoder.decode(formFields.get("firstName"),"UTF-8");
-                String lName = URLDecoder.decode(formFields.get("lastName"), "UTF-8");
-                Random theRandom = new Random();
-                theRandom.nextInt(999999);
-                String myHash = DigestUtils.md5Hex("" +	theRandom);
-
-                try {
-
-                    String sqlQuery = "insert into user_details (First_Name,Last_Name,Email,Password,Hash,Active) values(?,?,?,?,?,?)";
-                    Connection conn = MySqlConnection.getConnection();
-                    PreparedStatement pst = conn.prepareStatement(sqlQuery);
-                    pst.setString(1, fName);
-                    pst.setString(2, lName);
-                    pst.setString(3, email);
-                    pst.setString(4, password);
-                    pst.setString(5, myHash);
-                    pst.setInt(6, 0);
-                    int i = pst.executeUpdate();
-                    String body =  "Click this link to confirm your email address and complete setup for your account." + "\n\nVerification Link: " + "http://localhost:8080/verify-register/confirm?key1=" + email + "&key2=" + myHash;
-                    if (i != 0) {
-
-                        sendEmail se = new sendEmail();
-                        se.sendEmail_content(email,"Verify Email at MyPLS",body);
-                        user.setAll(fName, lName, email, password);
-                    }
-                } catch (Exception e) {
-                    System.out.println("Error at Registration: " + e);
+                if (!register(fName, lName, email, password)) {
                     map.put("dbErr", "true");
                     map.put("fname",formFields.get("firstName"));
                     map.put("lname",formFields.get("lastName"));
                     map.put("emailVal",email);
+                } else {
+                    user.setAll(fName, lName, email, password);
                 }
-
 
             } else {
                 map.put("fname",formFields.get("firstName"));
@@ -104,6 +82,36 @@ public class Register {
         map.put("styleVal", "margin-top:5%; width:45%");
 
         return new Pair(map,user);
+    }
+
+    private static boolean register(String fName, String lName, String email, String password) {
+        Random theRandom = new Random();
+        theRandom.nextInt(999999);
+        String myHash = DigestUtils.md5Hex("" +	theRandom);
+        boolean flag = false;
+        try {
+            String sqlQuery = "insert into user_details (First_Name,Last_Name,Email,Password,Hash,Active) values(?,?,?,?,?,?)";
+            Connection conn = MySqlConnection.getConnection();
+            PreparedStatement pst = conn.prepareStatement(sqlQuery);
+            pst.setString(1, fName);
+            pst.setString(2, lName);
+            pst.setString(3, email);
+            pst.setString(4, password);
+            pst.setString(5, myHash);
+            pst.setInt(6, 0);
+            int i = pst.executeUpdate();
+            String body =  "Click this link to confirm your email address and complete setup for your account."
+                    + "\n\nVerification Link: " + "http://localhost:8080/verify-register/confirm?key1=" + email
+                    + "&key2=" + myHash;
+            if (i != 0) {
+                sendEmail se = new sendEmail();
+                se.sendEmail_content(email,"Verify Email at MyPLS",body);
+                flag = true;
+            }
+        } catch (Exception e) {
+            System.out.println("Error at Registration: " + e);
+        }
+        return flag;
     }
 
 }
