@@ -250,7 +250,7 @@ public class App {
             Map<String,Object> map = new HashMap<>();
             map.put("name","");
             map.put("obj","");
-            map.put("profList", CreateCourse.findAllProfs());
+            map.put("profList", DataMapper.findAllProfs());
             map.put("e",-1);
             String e_id = request.queryParams("e");
             if (e_id != null) {
@@ -315,7 +315,7 @@ public class App {
 
         get("/discussion-groups",((request, response) -> {
             Map<String,Object> map = new HashMap<>();
-            ArrayList<Map<String,Object>> groups = DiscussionGroups.getMyDiscussionGroups(141);
+            ArrayList<Map<String,Object>> groups = DataMapper.getMyDiscussionGroups(141);
             map.put("groups", groups);
             return new ModelAndView(map,"discussionGroups.ftl");
         }),engine);
