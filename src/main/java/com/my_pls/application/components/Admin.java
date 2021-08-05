@@ -119,6 +119,9 @@ public class Admin {
             case "learner":
                 val = "Learner";
                 break;
+            case "admin":
+                val = "Administrator";
+                break;
             default:
                 throw new IllegalArgumentException("Invalid filter val admin mapKeyFilter");
         }

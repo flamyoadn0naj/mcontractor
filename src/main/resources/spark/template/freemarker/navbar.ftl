@@ -20,7 +20,7 @@
                     <a class="nav-link" href="/discussion-groups">Discussion Groups <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item active" >
-                    <a class="nav-link" href="/ratings">Ratings <span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="/ratings">Ratings & Feedback <span class="sr-only">(current)</span></a>
                 </li>
                 <#if role??>
                     <#if role== "admin">

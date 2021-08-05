@@ -9,7 +9,6 @@ import spark.template.freemarker.FreeMarkerEngine;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 
-import java.io.IOException;
 import java.sql.ResultSet;
 import java.util.*;
 import java.net.URLDecoder;
@@ -32,7 +31,7 @@ public class App {
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
         port(8080);
 
@@ -308,8 +307,20 @@ public class App {
         }),engine);
 
         get("/ratings",((request, response) -> {
-            Map<String,String> map = new HashMap<>();
-            map.put("role","prof");
+            Map<String,Object> map = new HashMap<>();
+            map.put("role","admin");
+            map.put("users", Rating.getAllUserRatings());
+            map.put("courses", Rating.getAllCourseRatings());
+            return new ModelAndView(map,"ratings.ftl");
+        }),engine);
+
+        post("/ratings",((request, response) -> {
+            Map<String,Object> map = new HashMap<>();
+            Map<String,String> formFields = extractFields(request.body());
+            System.out.println(formFields);
+            map.put("role","admin");
+            map.put("users", Rating.getAllUserRatings());
+            map.put("courses", Rating.getAllCourseRatings());
             return new ModelAndView(map,"ratings.ftl");
         }),engine);
 

@@ -2,6 +2,7 @@ package com.my_pls.application.components;
 
 import com.my_pls.MySqlConnection;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -196,4 +197,91 @@ public class DataMapper {
 
         return allGroups;
     }
+
+    public static ArrayList<Integer> getAllCourseIDsFromRating() {
+        ArrayList<Integer> course_ids = new ArrayList<>();
+        try {
+            PreparedStatement pst = conn.prepareStatement("select course_id from course_ratings GROUP BY course_id");
+            ResultSet rs = pst.executeQuery();
+            while(rs.next()) {
+                course_ids.add(rs.getInt("course_id"));
+            }
+        } catch (Exception e) {
+            System.out.println("Exception in getAllCourseIDsFromRating" + e );
+        }
+        return course_ids;
+    }
+
+    public static Map<String,Object> getRatingAndFeedbackOfCourseGivenCourseId(int id) {
+        Map<String,Object> ratingsObj = new HashMap<>();
+        try {
+            PreparedStatement pst = conn.prepareStatement("select course_name, score, feedback from course_ratings, courses where course_id=? and id=?");
+            pst.setInt(1, id);
+            pst.setInt(2, id);
+            ResultSet rs = pst.executeQuery();
+            int rating = 0;
+            ArrayList<String> feedback = new ArrayList<>();
+            String name = "";
+            while(rs.next()) {
+                name = rs.getString("course_name");
+                rating += rs.getInt("score");
+                feedback.add(rs.getString("feedback"));
+            }
+            rating = rating / feedback.size();
+            int unchecked = 5 - rating;
+            ratingsObj.put("rating", rating);
+            ratingsObj.put("feedback", feedback);
+            ratingsObj.put("name", name);
+            ratingsObj.put("unchecked", unchecked);
+        } catch (Exception e) {
+            System.out.println("Exception in getRatingAndFeedbackOfCourseGivenCourseId");
+        }
+        return ratingsObj;
+    }
+
+    public static ArrayList<Integer> getAllUserIDsFromRating() {
+        ArrayList<Integer> user_ids = new ArrayList<>();
+        try {
+            PreparedStatement pst = conn.prepareStatement("select userId from user_ratings GROUP BY userId");
+            ResultSet rs = pst.executeQuery();
+            while(rs.next()) {
+                user_ids.add(rs.getInt("userId"));
+            }
+        } catch (Exception e) {
+            System.out.println("Exception in getAllUserIDsFromRating" + e );
+        }
+        return user_ids;
+    }
+
+    public static Map<String,Object> getRatingAndFeedbackOfUserGivenUserId(int id) {
+        Map<String,Object> ratingsObj = new HashMap<>();
+        try {
+            PreparedStatement pst = conn.prepareStatement(
+                    "select score, feedback, First_Name, Last_Name, role from user_ratings, user_details where userId=? and Id=?");
+            pst.setInt(1, id);
+            pst.setInt(2, id);
+            ResultSet rs = pst.executeQuery();
+            int rating = 0;
+            ArrayList<String> feedback = new ArrayList<>();
+            String name = "";
+            String role = "";
+            while(rs.next()) {
+                name = rs.getString("First_Name") + " " + rs.getString("Last_Name");
+                role = Admin.mapFilterKey(rs.getString("role"));
+                rating += rs.getInt("score");
+                feedback.add(rs.getString("feedback"));
+            }
+            rating = rating / feedback.size();
+            int unchecked = 5 - rating;
+            ratingsObj.put("rating", rating);
+            ratingsObj.put("feedback", feedback);
+            ratingsObj.put("name", name);
+            ratingsObj.put("unchecked", unchecked);
+            ratingsObj.put("role", role);
+        } catch (Exception e) {
+            System.out.println("Exception in getRatingAndFeedbackOfUser");
+        }
+        return ratingsObj;
+    }
+
 }
