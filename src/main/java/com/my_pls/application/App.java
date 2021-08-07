@@ -307,20 +307,15 @@ public class App {
         }),engine);
 
         get("/ratings",((request, response) -> {
-            Map<String,Object> map = new HashMap<>();
-            map.put("role","admin");
-            map.put("users", Rating.getAllUserRatings());
-            map.put("courses", Rating.getAllCourseRatings());
+            Map<String, Object> map = Rating.getMethodFunctionality();
+            map.forEach((k,v)->map.put(k,v));
             return new ModelAndView(map,"ratings.ftl");
         }),engine);
 
         post("/ratings",((request, response) -> {
-            Map<String,Object> map = new HashMap<>();
             Map<String,String> formFields = extractFields(request.body());
-            System.out.println(formFields);
-            map.put("role","admin");
-            map.put("users", Rating.getAllUserRatings());
-            map.put("courses", Rating.getAllCourseRatings());
+            Map<String,Object> map = Rating.postMethodFunctionality(formFields);
+            map.forEach((k,v)->map.put(k,v));
             return new ModelAndView(map,"ratings.ftl");
         }),engine);
 

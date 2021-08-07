@@ -11,21 +11,6 @@ import java.util.*;
 public class Courses {
     private static Connection conn = MySqlConnection.getConnection();
 
-    public static String findProfName(int id) {
-        String name = "";
-        try {
-            PreparedStatement pst = conn.prepareStatement(
-                    "select First_Name,Last_Name from user_details where Id="+id);
-            ResultSet rs = pst.executeQuery();
-            if(rs.next()) {
-                name = name + rs.getString("First_Name") + " " + rs.getString("Last_Name");
-            }
-        } catch (SQLException throwables) {
-            System.out.println("Exception at get prof name "+ throwables);
-        }
-        return name;
-    }
-
     public static Map<String,Object> getMethodDefaults(String filterstatus) {
         Map<String,Object> map = new HashMap<>();
         map.put("role","admin");
@@ -50,7 +35,7 @@ public class Courses {
             while(rs.next()) {
                 Map<String,String> details = new HashMap<>();
                 details.put("name",rs.getString("course_name"));
-                String prof = findProfName(rs.getInt("profId"));
+                String prof = DataMapper.findProfName(rs.getInt("profId"));
                 details.put("prof",prof);
                 LocalDate startDate = LocalDate.parse(rs.getString("start_date"));
                 String s = startDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));

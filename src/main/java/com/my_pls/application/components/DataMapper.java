@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 public class DataMapper {
     private static Connection conn = MySqlConnection.getConnection();
@@ -56,7 +57,7 @@ public class DataMapper {
             ResultSet rs = pst.executeQuery();
             while(rs.next()) {
                 int id = rs.getInt("profId");
-                String name = Courses.findProfName(id);
+                String name = findProfName(id);
                 profs.put(id,name);
             }
         } catch (SQLException throwables) {
@@ -212,20 +213,31 @@ public class DataMapper {
         return course_ids;
     }
 
-    public static Map<String,Object> getRatingAndFeedbackOfCourseGivenCourseId(int id) {
+    public static Map<String,Object> getRatingAndFeedbackOfCourseGivenCourseId(int id, String searchText) {
         Map<String,Object> ratingsObj = new HashMap<>();
+        String sqlQuery = "select course_name, profId, score, feedback from course_ratings, courses where course_id=? and id=?";
+        if (searchText.length() > 0) {
+            Function<String,String> addQuotes = s -> "\"" + s + "\"";
+            searchText = "%" + searchText + "%";
+            searchText = addQuotes.apply(searchText);
+            sqlQuery = "select course_name, profId, score, feedback from course_ratings, courses " +
+                    "where course_id=? and id=? and courses.course_name like " + searchText;
+        }
         try {
-            PreparedStatement pst = conn.prepareStatement("select course_name, score, feedback from course_ratings, courses where course_id=? and id=?");
+            PreparedStatement pst = conn.prepareStatement(sqlQuery);
             pst.setInt(1, id);
             pst.setInt(2, id);
             ResultSet rs = pst.executeQuery();
             int rating = 0;
             ArrayList<String> feedback = new ArrayList<>();
             String name = "";
+            int prof = -1;
             while(rs.next()) {
                 name = rs.getString("course_name");
                 rating += rs.getInt("score");
                 feedback.add(rs.getString("feedback"));
+                prof = rs.getInt("profId");
+
             }
             rating = rating / feedback.size();
             int unchecked = 5 - rating;
@@ -233,6 +245,7 @@ public class DataMapper {
             ratingsObj.put("feedback", feedback);
             ratingsObj.put("name", name);
             ratingsObj.put("unchecked", unchecked);
+            ratingsObj.put("prof_id", prof);
         } catch (Exception e) {
             System.out.println("Exception in getRatingAndFeedbackOfCourseGivenCourseId");
         }
@@ -253,13 +266,30 @@ public class DataMapper {
         return user_ids;
     }
 
-    public static Map<String,Object> getRatingAndFeedbackOfUserGivenUserId(int id) {
+    public static Map<String,Object> getRatingAndFeedbackOfUserGivenUserId(int id, String searchText, String filter) {
         Map<String,Object> ratingsObj = new HashMap<>();
+        String sqlQuery = "select score, feedback, First_Name, Last_Name, role from user_ratings, user_details where userId="
+        + id + " and Id=" + id;
+        Function<String,String> addQuotes = s -> "\"" + s + "\"";
+        if (filter.contentEquals("all")) {
+            if (searchText.length() > 0) {
+                searchText = "%" + searchText + "%";
+                searchText = addQuotes.apply(searchText);
+                sqlQuery = "select score, feedback, First_Name, Last_Name, role from user_ratings, user_details " +
+                        "where userId=" + id + " and Id=" + id + " and user_details.First_Name like " + searchText +
+                        "or userId=" + id + " and Id=" + id +" and user_details.Last_Name like " + searchText;
+            }
+        } else if (filter.length() > 0) {
+            searchText = "%" + searchText + "%";
+            searchText = addQuotes.apply(searchText);
+            filter = addQuotes.apply(filter);
+            sqlQuery = "select score, feedback, First_Name, Last_Name, role from user_ratings, user_details " +
+                    "where userId=" + id + " and Id=" + id +" and role=" + filter + " and user_details.First_Name like "
+                    + searchText + "or userId=" + id + " and Id=" + id + " and user_details.Last_Name like "
+                    + searchText + "and role=" + filter;
+        }
         try {
-            PreparedStatement pst = conn.prepareStatement(
-                    "select score, feedback, First_Name, Last_Name, role from user_ratings, user_details where userId=? and Id=?");
-            pst.setInt(1, id);
-            pst.setInt(2, id);
+            PreparedStatement pst = conn.prepareStatement(sqlQuery);
             ResultSet rs = pst.executeQuery();
             int rating = 0;
             ArrayList<String> feedback = new ArrayList<>();
@@ -282,6 +312,21 @@ public class DataMapper {
             System.out.println("Exception in getRatingAndFeedbackOfUser");
         }
         return ratingsObj;
+    }
+
+    public static String findProfName(int id) {
+        String name = "";
+        try {
+            PreparedStatement pst = conn.prepareStatement(
+                    "select First_Name,Last_Name from user_details where Id="+id);
+            ResultSet rs = pst.executeQuery();
+            if(rs.next()) {
+                name = name + rs.getString("First_Name") + " " + rs.getString("Last_Name");
+            }
+        } catch (SQLException throwables) {
+            System.out.println("Exception at get prof name "+ throwables);
+        }
+        return name;
     }
 
 }
