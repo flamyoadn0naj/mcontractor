@@ -386,6 +386,12 @@ public class App {
             return new ModelAndView(map,"homePage.ftl");
         }),engine);
 
+        get("/logout",((request, response) -> {
+            Map<String,Object> map = new HashMap<>();
+            System.out.println("logout");
+            return new ModelAndView(map,"homePage.ftl");
+        }),engine);
+
     }
 
     public static class CurrUser {

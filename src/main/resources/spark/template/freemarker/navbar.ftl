@@ -29,6 +29,9 @@
                         </li>
                     </#if>
                 </#if>
+                <li class="nav-item active" >
+                    <a class="nav-link" href="/logout">Logout <span class="sr-only">(current)</span></a>
+                </li>
             </ul>
         </nav>
     </body>
