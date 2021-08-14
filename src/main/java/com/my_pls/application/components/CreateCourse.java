@@ -1,8 +1,6 @@
 package com.my_pls.application.components;
 
-import javax.xml.crypto.Data;
 import java.net.URLDecoder;
-import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
@@ -121,11 +119,11 @@ public class CreateCourse {
 
     public static boolean addDiscussionGroupForCourse(String name, int prof_id) {
         boolean flag = false;
-        int id = DataMapper.findLastInsertedId();
+        int id = DataMapper.findLastInsertedId("courses");
         if (id != -1) {
             int i = DataMapper.addDiscussionGroup(name, id, 1);
             if (i != 0) {
-                int d_id = DataMapper.findLastInsertedId();
+                int d_id = DataMapper.findLastInsertedId("discussion_groups");
                 if (d_id != -1) {
                     flag = DataMapper.addDGmember(prof_id, d_id);
                 }

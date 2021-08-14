@@ -1,15 +1,21 @@
 package com.my_pls.application.components;
 
 import com.my_pls.MySqlConnection;
+import com.my_pls.sendEmail;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.function.Function;
 
 public class DataMapper {
@@ -110,14 +116,14 @@ public class DataMapper {
         return i;
     }
 
-    public static int findLastInsertedId() {
+    public static int findLastInsertedId(String table) {
         int i = -1;
         try {
             PreparedStatement pst = conn.prepareStatement(
-                    "SELECT LAST_INSERT_ID();");
+                    "SELECT MAX(id) AS LastID FROM " + table);
             ResultSet rs = pst.executeQuery();
             if (rs.next()) {
-                i = rs.getInt("id");
+                i = rs.getInt("LastID");
             }
         } catch (Exception e) {
             System.out.println("Exception at addDiscussionGroup " + e);
@@ -329,4 +335,228 @@ public class DataMapper {
         return name;
     }
 
+    public static boolean deleteDisscussionGroupAndmembers (int courseId) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("select id from discussion_groups where course_id=" + courseId);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                int d_id = rs.getInt("id");
+                PreparedStatement pst2 = conn.prepareStatement("delete from dg_members where dg_id=" + d_id);
+                int i = pst2.executeUpdate();
+                if (i != 0) {
+                    PreparedStatement pst3 = conn.prepareStatement("delete from discussion_groups where id=" + d_id);
+                    int j = pst3.executeUpdate();
+                    if (j != 0) flag = true;
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error at delete Discussion group " + e);
+        }
+        return flag;
+    }
+
+    public static boolean deleteCourse(int id) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("delete from courses where id=?");
+            pst.setInt(1, id);
+            int i = pst.executeUpdate();
+            if(i != 0) flag = true;
+        } catch (Exception e) {
+            System.out.println("Exception at delete courses " + e);
+        }
+        return flag;
+    }
+
+    public static Map<Integer, String> viewUsers(String searchText, String filterBy) {
+        Map<Integer,String> users = new HashMap<>();
+        Function<String,String> addQuotes = s -> "\"" + s + "\"";
+        searchText = "%" + searchText + "%";
+        searchText = addQuotes.apply(searchText);
+        String admin = addQuotes.apply("admin");
+        try {
+            String sqlQuery = "";
+            if (!filterBy.equals("all")) {
+                filterBy = addQuotes.apply(filterBy);
+                sqlQuery = "select Id, First_Name, Last_Name from user_details where role=" + filterBy +
+                        " and First_Name like " + searchText + " or role=" + filterBy + "and Last_Name like " + searchText;
+            }
+            else sqlQuery = "select Id, First_Name, Last_Name from user_details where role!=" + admin +" and First_Name like "
+                    + searchText + " or role!=" + admin +" and Last_Name like " + searchText;
+
+            PreparedStatement pst = conn.prepareStatement(sqlQuery);
+            ResultSet rs = pst.executeQuery();
+            while(rs.next()) {
+                int id = rs.getInt("Id");
+                String name = rs.getString("First_Name") + " " + rs.getString("Last_Name");
+                users.put(id,name);
+            }
+        } catch(Exception e) {
+            System.out.println("Exception at get all requests prof "+ e);
+        }
+        return users;
+    }
+
+    public static boolean authorize(String uid) {
+        boolean flag = false;
+        int id = Integer.parseInt(uid);
+        try {
+            PreparedStatement pst = conn.prepareStatement("update user_details set role=? where id=?");
+            pst.setString(1,"admin");
+            pst.setInt(2, id);
+            int j = pst.executeUpdate();
+            if (j != 0) {
+                flag = true;
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at assign admin " + e);
+        }
+        return flag;
+    }
+
+    public static boolean approveProf(String pid) {
+        boolean flag = false;
+        int id = Integer.parseInt(pid);
+        try {
+            PreparedStatement pst = conn.prepareStatement("update user_details set role=? where id=?");
+            pst.setString(1,"prof");
+            pst.setInt(2, id);
+            int i = pst.executeUpdate();
+            if (i != 0) {
+                PreparedStatement pst2 = conn.prepareStatement("delete from prof_requests where id=?");
+                pst2.setInt(1, id);
+                int j = pst2.executeUpdate();
+                if (j != 0) {
+                    flag = true;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Exception in approve prof " + e);
+        }
+        return flag;
+    }
+
+    public static boolean deleteReq(String pid) {
+        boolean flag = false;
+        int id = Integer.parseInt(pid);
+        try {
+            PreparedStatement pst = conn.prepareStatement("delete from prof_requests where id=?");
+            pst.setInt(1, id);
+            int j = pst.executeUpdate();
+            if (j != 0) {
+                flag = true;
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at delete request " + e);
+        }
+        return flag;
+    }
+
+    public static Map<Integer,String> viewAllRequests() {
+        Map<Integer,String> profs = new HashMap<>();
+        try {
+            PreparedStatement pst = conn.prepareStatement("select * from prof_requests");
+            ResultSet rs = pst.executeQuery();
+            while(rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                profs.put(id,name);
+            }
+        } catch(Exception e) {
+            System.out.println("Exception at get all requests prof "+ e);
+        }
+        return profs;
+    }
+
+    public static ArrayList<Map<String,String>> viewCourses(String filterstatus) {
+        ArrayList<Map<String,String>> courses = new ArrayList<Map<String, String>>();
+
+        try {
+            PreparedStatement pst;
+            if(filterstatus.isEmpty() || filterstatus.contentEquals("All")) {
+                pst = conn.prepareStatement("select * from courses");
+            } else {
+                pst = conn.prepareStatement("select * from courses where status=?");
+                pst.setString(1, filterstatus);
+            }
+            ResultSet rs = pst.executeQuery();
+
+            while(rs.next()) {
+                Map<String,String> details = new HashMap<>();
+                details.put("name",rs.getString("course_name"));
+                String prof = DataMapper.findProfName(rs.getInt("profId"));
+                details.put("prof",prof);
+                LocalDate startDate = LocalDate.parse(rs.getString("start_date"));
+                String s = startDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+                LocalDate endDate = LocalDate.parse(rs.getString("end_date"));
+                String e = endDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+                details.put("startDate",s);
+                details.put("endDate",e);
+                details.put("status",rs.getString("status"));
+                details.put("id",String.valueOf(rs.getInt("id")));
+                courses.add(details);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at courses "+e);
+            filterstatus = "All";
+        }
+        return courses;
+    }
+
+    public static boolean register(String fName, String lName, String email, String password) {
+        Random theRandom = new Random();
+        theRandom.nextInt(999999);
+        String myHash = DigestUtils.md5Hex("" +	theRandom);
+        boolean flag = false;
+        try {
+            String sqlQuery = "insert into user_details (First_Name,Last_Name,Email,Password,Hash,Active) values(?,?,?,?,?,?)";
+            PreparedStatement pst = conn.prepareStatement(sqlQuery);
+            pst.setString(1, fName);
+            pst.setString(2, lName);
+            pst.setString(3, email);
+            pst.setString(4, password);
+            pst.setString(5, myHash);
+            pst.setInt(6, 0);
+            int i = pst.executeUpdate();
+            String body =  "Click this link to confirm your email address and complete setup for your account."
+                    + "\n\nVerification Link: " + "http://localhost:8080/verify-register/confirm?key1=" + email
+                    + "&key2=" + myHash;
+            if (i != 0) {
+                sendEmail se = new sendEmail();
+                se.sendEmail_content(email,"Verify Email at MyPLS",body);
+                flag = true;
+            }
+        } catch (Exception e) {
+            System.out.println("Error at Registration: " + e);
+        }
+        return flag;
+    }
+
+    public static String applyProf(String email) {
+        String flag = "false";
+        try {
+            PreparedStatement pst = conn.prepareStatement(
+                    "select Id, First_Name, Last_Name from user_details where Email=?");
+            pst.setString(1, email);
+            ResultSet rs = pst.executeQuery();
+            if(rs.next()) {
+                int id = rs.getInt("Id");
+                String name = rs.getString("First_Name") + " " + rs.getString("Last_Name");
+                PreparedStatement pst2 = conn.prepareStatement("select * from prof_requests where id="+ id);
+                ResultSet rs2 = pst2.executeQuery();
+                if (!rs2.next()) {
+                    PreparedStatement pst3 = conn.prepareStatement("insert into prof_requests (id, name) VALUES (?,?)");
+                    pst3.setInt(1, id);
+                    pst3.setString(2, name);
+                    int i = pst3.executeUpdate();
+                    if (i != 0) flag = "true";
+                } else flag = "exists";
+            }
+        } catch (Exception e) {
+            System.out.println("Exception in apply prof in apply "+e);
+        }
+        return flag;
+    }
 }

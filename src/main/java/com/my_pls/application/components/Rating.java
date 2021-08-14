@@ -1,7 +1,6 @@
 package com.my_pls.application.components;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;

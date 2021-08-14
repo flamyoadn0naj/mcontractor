@@ -35,39 +35,12 @@ public class ApplyForProfessor {
         return map;
     }
 
-    public static String apply(String email) {
-        String flag = "false";
-        try {
-            Connection conn = MySqlConnection.getConnection();
-            PreparedStatement pst = conn.prepareStatement(
-                    "select Id, First_Name, Last_Name from user_details where Email=?");
-            pst.setString(1, email);
-            ResultSet rs = pst.executeQuery();
-            if(rs.next()) {
-                int id = rs.getInt("Id");
-                String name = rs.getString("First_Name") + " " + rs.getString("Last_Name");
-                PreparedStatement pst2 = conn.prepareStatement("select * from prof_requests where id="+ id);
-                ResultSet rs2 = pst2.executeQuery();
-                if (!rs2.next()) {
-                    PreparedStatement pst3 = conn.prepareStatement("insert into prof_requests (id, name) VALUES (?,?)");
-                    pst3.setInt(1, id);
-                    pst3.setString(2, name);
-                    int i = pst3.executeUpdate();
-                    if (i != 0) flag = "true";
-                } else flag = "exists";
-            }
-        } catch (Exception e) {
-            System.out.println("Exception in apply prof in apply "+e);
-        }
-        return flag;
-    }
-
     public static Map<String, Object> postMethodFunctionality(Map<String,String> formFields,
                                                               String fname, String lname, String email) {
         Map<String,Object> map = checkForErrors(fname, lname, formFields);
         boolean err = (boolean) map.get("applyProfErr");
         if (!err) {
-            String applied = apply(email);
+            String applied = DataMapper.applyProf(email);
             if (applied.equals("true")) {
                 map.put("success", true);
                 map.put("disable",true);

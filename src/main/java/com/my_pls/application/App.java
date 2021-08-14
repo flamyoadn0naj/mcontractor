@@ -343,7 +343,7 @@ public class App {
 
         get("/approval",((request, response) -> {
             Map<String,Object> map = new HashMap<>();
-            Map<Integer,String> profs = Admin.viewAllRequests();
+            Map<Integer,String> profs = DataMapper.viewAllRequests();
             map.put("profs",profs);
             map.put("role", "admin");
             Map<String,String> searchOptions = Admin.getSearchOptions("");
