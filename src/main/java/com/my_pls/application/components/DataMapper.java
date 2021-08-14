@@ -1,10 +1,13 @@
 package com.my_pls.application.components;
 
 import com.my_pls.MySqlConnection;
+import com.my_pls.application.App;
+import com.my_pls.securePassword;
 import com.my_pls.sendEmail;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.persistence.criteria.CriteriaBuilder;
+import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -558,5 +561,79 @@ public class DataMapper {
             System.out.println("Exception in apply prof in apply "+e);
         }
         return flag;
+    }
+
+    public static boolean forgetPasswordSendEmail(String email) {
+        boolean flag = false;
+        try {
+            email = URLDecoder.decode(email, "UTF-8");
+            Connection conn = MySqlConnection.getConnection();
+            PreparedStatement pst = conn.prepareStatement("select Email, Hash, Active from user_details where Email=?");
+            pst.setString(1, email);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                Random theRandom = new Random();
+                String code = String.format("%04d", theRandom.nextInt(10000));
+                PreparedStatement pst1 = conn.prepareStatement("update user_details set Active='0',Hash=? where Email=?");
+                pst1.setString(1, code);
+                pst1.setString(2, email);
+                int i = pst1.executeUpdate();
+                String body = "Here is the confirmation code to reset your password at MyPLS. Confirmation code is " + code + "\n\nVisit: " + "http://localhost:8080/forgot-password/password to reset your password";
+                if (i != 0) {
+                    sendEmail se = new sendEmail();
+                    se.sendEmail_content(email, "Reset Password Email at MyPLS - Confirmation Code " + code, body);
+                    flag = true;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at Forget Passoword " + e);
+        }
+        return flag;
+    }
+
+    public static boolean changePassword(String confirmCode, String email, String newPassword ) {
+        boolean flag = false;
+        try {
+            Connection conn = MySqlConnection.getConnection();
+            PreparedStatement pst = conn.prepareStatement("select * from user_details where Hash=? and email=? and Active='0'");
+            pst.setString(1, confirmCode);
+            pst.setString(2, email);
+            ResultSet rs = pst.executeQuery();
+            if(rs.next()) {
+                PreparedStatement pst1 = conn.prepareStatement("update user_details set Active='1',Password=? where Hash=? and email=?");
+                pst1.setString(1, newPassword);
+                pst1.setString(2, confirmCode);
+                pst1.setString(3, email);
+                int i = pst1.executeUpdate();
+                flag = true;
+            }
+        } catch(Exception e){
+            System.out.println("Error at Forget Password " + e);
+        }
+        return flag;
+    }
+
+    public static Pair login(String input_password, String emVal, securePassword pwd_manager) {
+        Pair p = new Pair();
+        App.CurrUser user = new App.CurrUser();
+        try {
+            emVal = URLDecoder.decode(emVal, "UTF-8");
+            PreparedStatement pst = conn.prepareStatement("select * from user_details where Email=?");
+            pst.setString(1, emVal);
+            ResultSet rs = pst.executeQuery();
+            if(rs.next()) {
+                String db_password = rs.getString("Password");
+
+                if (pwd_manager.comparePassword(db_password, input_password)) {
+                    //everything good password matches with db
+                    user.setAll(rs.getString("First_Name"),
+                            rs.getString("Last_Name"), db_password, emVal);
+                    p = new Pair(null, user);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error at Login post");
+        }
+        return p;
     }
 }
