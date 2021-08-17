@@ -38,9 +38,12 @@
                                             <span class="badge badge-primary" style="margin-left: 2%">Course</span>
                                         </#if>
                                     </th>
-                                    <td>
-                                        <button style="float: right" class="btn btn-primary" type="submit">Leave</button>
-                                    </td>
+                                    <#if g.course??>
+                                    <#else>
+                                        <td>
+                                            <button style="float: right" class="btn btn-primary" type="submit">Leave</button>
+                                        </td>
+                                    </#if>
                                 </tr>
                             </#list>
                         </#if>

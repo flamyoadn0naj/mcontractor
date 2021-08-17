@@ -47,38 +47,40 @@
                 </div>
             </form>
             <table class="table table-bordered">
-                    <tr class="table-primary">
-                        <th scope="col">Name</th>
-                        <th scope="col">Professor</th>
-                        <th scope="col">Start Date</th>
-                        <th scope="col">End Date</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Actions</th>
-                    </tr>
-                    <#if courses??>
-                        <#list courses as c>
-                            <tr>
-                                <th scope="row"><a class="text-muted" href="">${c.name}</a></th>
-                                <td>${c.prof}</td>
-                                <td>${c.startDate}</td>
-                                <td>${c.endDate}</td>
-                                <td>${c.status}</td>
-                                <#if c.status == "Upcoming">
-                                    <td>
-                                        <a class="btn-download padding2right" href="/courses/all?edit=${c.id}"><i class="fa fa-edit"></i></a>
-                                        <a class="btn-download" href="/courses/all?del=${c.id}"><i class="fa fa-trash"></i></a>
-                                    </td>
-                                <#elseif c.status == "Current">
-                                    <td>
-                                        <a class="btn-download padding2right" href="/courses/all?edit=+${c.id}"><i class="fa fa-edit"></i></a>
-                                    </td>
-                                <#else >
-                                    <td></td>
-                                </#if>
-                            </tr>
-                        </#list>
-                    </#if>
-                </table>
+                <tr class="table-primary">
+                    <th scope="col">Name</th>
+                    <th scope="col">Professor</th>
+                    <th scope="col">Prerequisites</th>
+                    <th scope="col">Start Date</th>
+                    <th scope="col">End Date</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Actions</th>
+                </tr>
+                <#if courses??>
+                    <#list courses as c>
+                        <tr>
+                            <th scope="row"><a class="text-muted" href="">${c.name}</a></th>
+                            <td>${c.prof}</td>
+                            <td style="text-align: center">${c.prereq}</td>
+                            <td>${c.startDate}</td>
+                            <td>${c.endDate}</td>
+                            <td>${c.status}</td>
+                            <#if c.status == "Upcoming">
+                                <td>
+                                    <a class="btn-download padding2right" href="/courses/all?edit=${c.id}"><i class="fa fa-edit"></i></a>
+                                    <a class="btn-download" href="/courses/all?del=${c.id}"><i class="fa fa-trash"></i></a>
+                                </td>
+                            <#elseif c.status == "Current">
+                                <td>
+                                    <a class="btn-download padding2right" href="/courses/all?edit=+${c.id}"><i class="fa fa-edit"></i></a>
+                                </td>
+                            <#else >
+                                <td></td>
+                            </#if>
+                        </tr>
+                    </#list>
+                </#if>
+            </table>
         </div>
     </div>
 </div>

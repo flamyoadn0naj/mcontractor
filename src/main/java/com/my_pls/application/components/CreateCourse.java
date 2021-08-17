@@ -41,6 +41,10 @@ public class CreateCourse {
             String daysString = String.join(", ", days);
             int credits = Integer.parseInt(formFields.get("credits"));
             int capacity = Integer.parseInt(formFields.get("capacity"));
+            Integer prereq = Integer.parseInt(formFields.get("reqs"));
+            if (prereq == -1) prereq = null;
+            else map.put("prereq_course", prereq);
+            int old_profId = -1;
 
             map.put("name",name);
             map.put("obj",obj);
@@ -68,6 +72,7 @@ public class CreateCourse {
                     map.put("end_date","");
                     flag = false;
                 }
+                old_profId = (int) DataMapper.findCourseByCourseId(edit).get("prof_id");
             } else {
                 if(LocalDate.parse(endDate).isBefore(LocalDate.parse(startDate))
                         || LocalDate.parse(startDate).isBefore(LocalDate.now())) {
@@ -80,10 +85,11 @@ public class CreateCourse {
 
             if(flag) {
                 boolean flag2 = DataMapper.createOrUpdateCourse(edit, name, prof_id, daysString, startTime, endTime,
-                        startDate, endDate, credits, capacity, obj);
+                        startDate, endDate, credits, capacity, obj, prereq);
                 if(flag2) {
                     if (edit.contentEquals("-1"))
                         flag = addDiscussionGroupForCourse(name, prof_id);
+                    else flag = editDiscussionGroupForCourse(name, prof_id, Integer.parseInt(edit), old_profId);
                 }
             }
         } catch (Exception e) {
@@ -99,7 +105,7 @@ public class CreateCourse {
         return map;
     }
 
-    public static Map<String,Object> editCourse(Map<String,Object> map,String id) {
+    public static Map<String,Object> editCourse(Map<String,Object> map,String id, Map<Integer, String> allCourses) {
         Map<Integer,String> profs = DataMapper.findAllProfs();
         Map.Entry<Integer,String> entry = profs.entrySet().iterator().next();
         int prof_id = entry.getKey();
@@ -130,6 +136,25 @@ public class CreateCourse {
             }
         }
         return  flag;
+    }
+
+    private static boolean editDiscussionGroupForCourse(String name, int prof_id, int course_id, int old_profId) {
+        boolean flag = false;
+        int d_id = DataMapper.findDiscussionGroupIdByCourseId(course_id);
+        boolean flag2 = DataMapper.updateDGMembers(old_profId, prof_id, d_id);
+        if (flag2) flag = DataMapper.updateDiscussionGroup(d_id, name);
+        return flag;
+    }
+
+    public static Map<Integer, String> allCourses() {
+        Map<Integer, String> all_Courses = new HashMap<>();
+        ArrayList<Map<String, String>> courses = DataMapper.viewCourses("Completed");
+        for (Map<String, String> c: courses) {
+            int id = Integer.parseInt(c.get("id"));
+            String name = c.get("name");
+            all_Courses.put(id, name);
+        }
+        return all_Courses;
     }
 
 }

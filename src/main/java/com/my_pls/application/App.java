@@ -223,8 +223,15 @@ public class App {
 
         post("/courses/all",((request, response) -> {
             Map<String,String> formFields = extractFields(request.body());
-            Map<String,Object> map = Courses.getMethodDefaults(formFields.get("filterBy"));
-            map.forEach((k,v)->map.put(k,v));
+            Map<String,Object> map = new HashMap<>();
+            if (formFields.containsKey("filterBy")) map = Courses.getMethodDefaults(formFields.get("filterBy"));
+            else map = Courses.getMethodDefaults("");
+            if (formFields.containsKey("pre-reqs")) {
+                System.out.println(formFields);
+                map.put("prereq", true);
+            }
+            Map<String, Object> finalMap = map;
+            map.forEach((k, v)-> finalMap.put(k,v));
             map.put("role","admin");
             return new ModelAndView(map,"coursesAll.ftl");
         }),engine);
@@ -251,16 +258,23 @@ public class App {
             map.put("obj","");
             map.put("profList", DataMapper.findAllProfs());
             map.put("e",-1);
+            Map<Integer, String> allCourses = CreateCourse.allCourses();
             String e_id = request.queryParams("e");
             if (e_id != null) {
-                map = CreateCourse.editCourse(map,e_id.replaceAll(" ",""));
+                map = CreateCourse.editCourse(map,e_id.replaceAll(" ",""), allCourses);
                 Map<String, Object> finalMap = map;
                 map.forEach((k, v)-> finalMap.put(k,v));
                 map.put("e",e_id);
+                allCourses.remove(e_id);
+                map.put("currPreq", allCourses.get(map.get("prereq_course")));
+                allCourses.remove(map.get("prereq_course"));
+                map.put("course_id", map.get("prereq_course"));
+                map.put("prereqs", allCourses);
             } else {
                 LinkedHashMap<String, Boolean> days = CreateCourse.findAllDays();
                 System.out.println(days);
                 map.put("days",days);
+                map.put("prereqs", allCourses);
             };
             return new ModelAndView(map,"createCourse.ftl");
         }),engine);
@@ -268,8 +282,16 @@ public class App {
         post("/courses/create-course", (request, response) -> {
             Map<String,String> formFields = extractFields(request.body());
             String edit = request.queryParams("e");
+            Map<Integer, String> allCourses = CreateCourse.allCourses();
             Map<String,Object> map = CreateCourse.postMethodDefaults(formFields, edit);
             if((boolean)map.get("created") == true) response.redirect("/courses/all");
+            if (map.containsKey("prereq_course")) {
+                allCourses.remove(Integer.parseInt(edit));
+                map.put("currPreq", allCourses.get(map.get("prereq_course")));
+                allCourses.remove(map.get("prereq_course"));
+                map.put("course_id", map.get("prereq_course"));
+            }
+            map.put("prereqs", allCourses);
             map.forEach((k,v)->map.put(k,v));
             return new ModelAndView(map,"createCourse.ftl");
         },engine);

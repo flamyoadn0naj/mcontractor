@@ -36,6 +36,18 @@
                         </select>
                     </div>
                     <div class="form-group mb-3" style="display: flex">
+                        <label class="col-3" for="1b">Prerequisite</label>
+                        <select class="form-control col-9" name="reqs" id="exampleSelect1" style="margin-right: 2%">
+                            <option value=-1>None</option>
+                            <#list prereqs as k, v>
+                                <option value=${k}>${v}</option>
+                            </#list>
+                            <#if currPreq??>
+                                <option selected value=${course_id}>${currPreq}</option>
+                            </#if>
+                        </select>
+                    </div>
+                    <div class="form-group mb-3" style="display: flex">
                         <label class="col-3" for="1c">Learning Objectives</label>
                         <input required type="text" name="obj" class="form-control col-9" id="obj"  value="${obj}">
                     </div>

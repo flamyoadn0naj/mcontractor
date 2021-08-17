@@ -6,7 +6,6 @@ import com.my_pls.securePassword;
 import com.my_pls.sendEmail;
 import org.apache.commons.codec.digest.DigestUtils;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,10 +14,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Function;
 
 public class DataMapper {
@@ -26,18 +22,34 @@ public class DataMapper {
 
     public static boolean createOrUpdateCourse(String edit, String name, int prof_id, String daysString,
                                                String startTime, String endTime, String startDate,
-                                               String endDate, int credits, int capacity, String obj) {
+                                               String endDate, int credits, int capacity, String obj,
+                                               Integer prereq) {
         boolean flag = false;
-        String sqlQuery = "insert into courses (course_name, profId, meeting_days, " +
-                "start_time, end_time, start_date, end_date, credits, total_capacity, enrolled, " +
-                "status, obj) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
-        if(!edit.contentEquals("-1")) {
-            int id = Integer.parseInt(edit.replaceAll(" ",""));
+        String sqlQuery = "";
+        if (prereq != null) {
+            sqlQuery = "insert into courses (course_name, profId, meeting_days, " +
+                    "start_time, end_time, start_date, end_date, credits, total_capacity, enrolled, " +
+                    "status, obj, prereq) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            if(!edit.contentEquals("-1")) {
+                int id = Integer.parseInt(edit.replaceAll(" ",""));
 
-            sqlQuery = "update courses set course_name=?, profId=?, meeting_days=?, " +
-                    "start_time=?, end_time=?, start_date=?, end_date=?, credits=?, " +
-                    "total_capacity=?, enrolled=?, status=?, obj=? where id=" + id;
+                sqlQuery = "update courses set course_name=?, profId=?, meeting_days=?, " +
+                        "start_time=?, end_time=?, start_date=?, end_date=?, credits=?, " +
+                        "total_capacity=?, enrolled=?, status=?, obj=?, prereq=? where id=" + id;
+            }
+        } else {
+            sqlQuery = "insert into courses (course_name, profId, meeting_days, " +
+                    "start_time, end_time, start_date, end_date, credits, total_capacity, enrolled, " +
+                    "status, obj) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+            if(!edit.contentEquals("-1")) {
+                int id = Integer.parseInt(edit.replaceAll(" ",""));
+
+                sqlQuery = "update courses set course_name=?, profId=?, meeting_days=?, " +
+                        "start_time=?, end_time=?, start_date=?, end_date=?, credits=?, " +
+                        "total_capacity=?, enrolled=?, status=?, obj=? where id=" + id;
+            }
         }
+
         try {
             PreparedStatement pst = conn.prepareStatement(sqlQuery);
             pst.setString(1, name);
@@ -52,6 +64,7 @@ public class DataMapper {
             pst.setInt(10, 0);
             pst.setString(11, "Upcoming");
             pst.setString(12, obj);
+            if (prereq != null) pst.setInt(13, prereq);
             int i = pst.executeUpdate();
             if (i != 0) flag = true;
         } catch (Exception e) {
@@ -167,6 +180,7 @@ public class DataMapper {
                 map.put("prof_id", prof_id);
                 String meeting_days = rs.getString("meeting_days");
                 map.put("meeting_days", meeting_days);
+                map.put("prereq_course", rs.getInt("prereq"));
             }
         } catch (Exception e) {
             System.out.println("Exception at findCourseByCourseId " + e);
@@ -499,6 +513,10 @@ public class DataMapper {
                 details.put("endDate",e);
                 details.put("status",rs.getString("status"));
                 details.put("id",String.valueOf(rs.getInt("id")));
+                String prereq = "None";
+                Integer p = rs.getInt("prereq");
+                if (p != null && p != 0) prereq = String.valueOf(findCourseByCourseId(String.valueOf(p)).get("name"));
+                details.put("prereq", prereq);
                 courses.add(details);
             }
         } catch (Exception e) {
@@ -636,4 +654,46 @@ public class DataMapper {
         }
         return p;
     }
+
+    public static int findDiscussionGroupIdByCourseId(int course_id) {
+        int dg_id = -1;
+        try {
+            PreparedStatement pst = conn.prepareStatement("select id from discussion_groups where course_id=" + course_id);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) dg_id = rs.getInt("id");
+        } catch (Exception e) {
+            System.out.println("Exception at findDiscussionGroupIdByCourseId " + e);
+        }
+        return dg_id;
+    }
+
+    public static boolean updateDiscussionGroup(int id, String name) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("update discussion_groups set name=? where id=?");
+            pst.setString(1, name);
+            pst.setInt(2, id);
+            int i = pst.executeUpdate();
+            if (i != 0) flag = true;
+        } catch(Exception e) {
+            System.out.println("Exception at updateDiscussionGroup " + e);
+        }
+        return flag;
+    }
+
+    public static boolean updateDGMembers(int old_prof_id, int new_prof_id, int d_id) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("update dg_members set user_id=? where dg_id=? and user_id=?");
+            pst.setInt(1, new_prof_id);
+            pst.setInt(2, d_id);
+            pst.setInt(3, old_prof_id);
+            int i = pst.executeUpdate();
+            if (i != 0) flag = true;
+        } catch(Exception e) {
+            System.out.println("Exception at updateDGMembers " + e);
+        }
+        return flag;
+    }
+
 }
