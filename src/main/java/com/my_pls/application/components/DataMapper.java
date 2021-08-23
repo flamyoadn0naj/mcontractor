@@ -7,14 +7,14 @@ import com.my_pls.sendEmail;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.net.URLDecoder;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.*;
+import java.util.Date;
 import java.util.function.Function;
 
 public class DataMapper {
@@ -493,9 +493,9 @@ public class DataMapper {
         try {
             PreparedStatement pst;
             if(filterstatus.isEmpty() || filterstatus.contentEquals("All")) {
-                pst = conn.prepareStatement("select * from courses");
+                pst = conn.prepareStatement("select * from courses order by start_date");
             } else {
-                pst = conn.prepareStatement("select * from courses where status=?");
+                pst = conn.prepareStatement("select * from courses where status=? order by start_date");
                 pst.setString(1, filterstatus);
             }
             ResultSet rs = pst.executeQuery();
@@ -643,10 +643,11 @@ public class DataMapper {
                 String db_password = rs.getString("Password");
 
                 if (pwd_manager.comparePassword(db_password, input_password)) {
-                    //everything good password matches with db
                     user.setAll(rs.getString("First_Name"),
                             rs.getString("Last_Name"), db_password, emVal);
                     p = new Pair(null, user);
+                } else {
+                    p = new Pair(null, null);
                 }
             }
         } catch (Exception e) {
@@ -694,6 +695,40 @@ public class DataMapper {
             System.out.println("Exception at updateDGMembers " + e);
         }
         return flag;
+    }
+
+    public static void updateCourses(Connection sqlconnection){
+        String sql_statement = "Select * from courses where status<>'Completed'";
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+        Date today_date = new Date();
+        try{
+            Statement pst = sqlconnection.createStatement();
+            ResultSet dbrs = pst.executeQuery(sql_statement);
+            while (dbrs.next()){
+                int course_id = dbrs.getInt("id");
+                String endDate_str = dbrs.getString("end_date");
+                Date end_date = formatter.parse(endDate_str);
+                Date start_date = formatter.parse(dbrs.getString("start_date"));
+                if (today_date.compareTo(end_date)>0){
+//                    Update course status
+                    sql_statement = "UPDATE courses SET status = 'Completed' WHERE id ="+course_id;
+                    Statement stmt2 = sqlconnection.createStatement();
+                    stmt2.executeUpdate(sql_statement);
+                    stmt2.close();
+                }else if(today_date.compareTo(start_date)>=0){
+                    sql_statement = "UPDATE courses SET status = 'Current' WHERE id ="+course_id;
+                    Statement stmt2 = sqlconnection.createStatement();
+                    stmt2.executeUpdate(sql_statement);
+                    stmt2.close();
+                }
+            }
+            dbrs.close();
+            sqlconnection.close();
+        } catch (SQLException | ParseException throwables) {
+            throwables.printStackTrace();
+        }
+
+        System.out.println("Updates");
     }
 
 }

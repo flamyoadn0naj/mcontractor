@@ -3,6 +3,7 @@ package com.my_pls.application;
 import com.my_pls.*;
 import com.my_pls.application.components.*;
 import spark.ModelAndView;
+import spark.Session;
 import spark.TemplateEngine;
 import spark.template.freemarker.FreeMarkerEngine;
 
@@ -86,7 +87,10 @@ public class App {
             user_current.setAll(logUser.firstName, logUser.lastName, logUser.password, logUser.email);
             Map<String, Object> finalMap = map;
             map.forEach((k, v)-> finalMap.put(k,v));
-            if (logUser.firstName.length() > 0) response.redirect("/");
+            if (logUser.firstName.length() > 0) {
+                Session session = request.session(true);
+                response.redirect("/");
+            }
             map.put("loading", "false");
             return new ModelAndView(map,"login.ftl");
         },engine);
@@ -410,7 +414,7 @@ public class App {
 
         get("/logout",((request, response) -> {
             Map<String,Object> map = new HashMap<>();
-            System.out.println("logout");
+            request.session().invalidate();
             return new ModelAndView(map,"homePage.ftl");
         }),engine);
 

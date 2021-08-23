@@ -5,11 +5,15 @@ import com.my_pls.application.App;
 import com.my_pls.securePassword;
 
 import java.net.URLDecoder;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Date;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
 public class Login {
     public static Map<String,Object> getMethodDefaults() {
@@ -25,6 +29,7 @@ public class Login {
         return map;
     }
 
+
     public static Pair postMethodDefaults(Map<String, Object> map, Map<String,String> formFields, App.CurrUser user, securePassword pwd_manager) {
         if (formFields.size() > 0) {
             if (!formFields.get("email").contains("rit.edu")) {
@@ -35,12 +40,15 @@ public class Login {
                 String emVal = formFields.get("email");
                 String input_password = formFields.get("pass");
                 Pair p2 = DataMapper.login(input_password, emVal, pwd_manager);
-                if (p2.fst() == null) {
+                if (p2.snd() == null) {
                     map.put("loginErr", "display:list-item;margin-left:5%");
                     map.put("errorEmail", "");
-                    map.put("emailVal",emVal);
+                    map.put("emailVal", emVal);
+                } else {
+                    Connection conn = MySqlConnection.getConnection();
+                    DataMapper.updateCourses(conn);
+                    user = p2.snd();
                 }
-                user = p2.snd();
             }
         } else {
             map.put("loginErr", "");
@@ -50,6 +58,7 @@ public class Login {
         map.put("errorPassMatch", "");
         map.put("pageType","Login");
         map.put("styleVal", "margin-top:5%; width:45%");
+
         return new Pair(map,user);
     }
 }
