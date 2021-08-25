@@ -352,6 +352,20 @@ public class App {
             return new ModelAndView(map,"discussionGroups.ftl");
         }),engine);
 
+        get("/discussion/create",((request, response) -> {
+            Map<String,Object> map = new HashMap<>();
+            return new ModelAndView(map,"createDiscussionGroup.ftl");
+        }),engine);
+
+        post("/discussion/create",((request, response) -> {
+            Map<String,Object> map = new HashMap<>();
+            Map<String,String> formFields = extractFields(request.body());
+            boolean flag = DiscussionGroups.createGroup(formFields, user_current.email);
+            if (flag) response.redirect("/discussion-groups");
+            else map.put("err", true);
+            return new ModelAndView(map,"createDiscussionGroup.ftl");
+        }),engine);
+
         get("/discussion/group-desc",((request, response) -> {
             Map<String,Object> map = new HashMap<>();
             return new ModelAndView(map,"groupDesc.ftl");

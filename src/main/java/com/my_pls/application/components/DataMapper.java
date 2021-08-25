@@ -119,12 +119,17 @@ public class DataMapper {
 
     public static int addDiscussionGroup (String name, int course_id, int privacy) {
         int i = -1;
+        String sqlQuery = "insert into discussion_groups (name, course_id, privacy) VALUES (?,?,?)";
         try {
-            PreparedStatement pst2 = conn.prepareStatement(
-                    "insert into discussion_groups (name, course_id, privacy) VALUES (?,?,?)");
+            if (course_id == -1) {
+                sqlQuery = "insert into discussion_groups (name,course_id, privacy) VALUES (?,null,?)";
+            }
+            PreparedStatement pst2 = conn.prepareStatement(sqlQuery);
             pst2.setString(1, name);
-            pst2.setInt(2, course_id);
-            pst2.setInt(3, privacy);
+            if (course_id != -1) {
+                pst2.setInt(2, course_id);
+                pst2.setInt(3, privacy);
+            } else pst2.setInt(2, privacy);
             i = pst2.executeUpdate();
         } catch (Exception e) {
             System.out.println("Exception at addDiscussionGroup " + e);
@@ -197,7 +202,7 @@ public class DataMapper {
                 details.put("name", rs.getString("name"));
                 if (rs.getInt("privacy") == 1) details.put("privacy", true);
                 Integer course = rs.getInt("course_id");
-                if (course != null) details.put("course", true);
+                if (course != 0) details.put("course", true);
                 details.put("id", dg_id);
             }
         } catch (Exception e) {
@@ -731,4 +736,18 @@ public class DataMapper {
         System.out.println("Updates");
     }
 
+    public static int getUserIdFromEmail(String email) {
+        int id = -1;
+        try {
+            PreparedStatement pst = conn.prepareStatement("select * from user_details where Email=?");
+            pst.setString(1, email);
+            ResultSet rs = pst.executeQuery();
+            if(rs.next()) {
+                id = rs.getInt("Id");
+            }
+        } catch (SQLException throwables) {
+            System.out.println("Exception at getUserIdFromEmail "+ throwables);
+        }
+        return id;
+    }
 }

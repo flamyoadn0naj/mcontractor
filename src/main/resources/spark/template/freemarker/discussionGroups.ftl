@@ -73,7 +73,7 @@
                             <option>Private</option>
                         </select>
                         <button class="btn btn-primary col-2"  type="submit">Search</button>
-                        <button class="btn btn-primary col-3" style="float:right;" type="submit">Create Group</button>
+                        <a class="btn btn-primary col-3" style="float:right;" href="/discussion/create">Create Group</a>
                     </div>
                     <div style="margin-top: 2%">
                         <table class="table">
