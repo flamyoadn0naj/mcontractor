@@ -348,7 +348,17 @@ public class App {
         get("/discussion-groups",((request, response) -> {
             Map<String,Object> map = new HashMap<>();
             ArrayList<Map<String,Object>> groups = DataMapper.getMyDiscussionGroups(141);
+            Map<Integer,Map<String, Object>> allGroups = DiscussionGroups.getGroups("", -1, user_current.email);
             map.put("groups", groups);
+            map.put("allGroups", allGroups);
+            map.put("filterOptions", DiscussionGroups.getSearchOptions(""));
+            return new ModelAndView(map,"discussionGroups.ftl");
+        }),engine);
+
+        post("/discussion-groups",((request, response) -> {
+            Map<String,String> formFields = extractFields(request.body());
+            Map<String, Object> map = DiscussionGroups.postMethodFunctionality(formFields, user_current.email);
+            map.forEach((k,v)->map.put(k,v));
             return new ModelAndView(map,"discussionGroups.ftl");
         }),engine);
 

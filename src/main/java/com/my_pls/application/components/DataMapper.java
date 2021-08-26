@@ -19,6 +19,7 @@ import java.util.function.Function;
 
 public class DataMapper {
     private static Connection conn = MySqlConnection.getConnection();
+    private static Function<String,String> addQuotes = s -> "\"" + s + "\"";
 
     public static boolean createOrUpdateCourse(String edit, String name, int prof_id, String daysString,
                                                String startTime, String endTime, String startDate,
@@ -245,7 +246,6 @@ public class DataMapper {
         Map<String,Object> ratingsObj = new HashMap<>();
         String sqlQuery = "select course_name, profId, score, feedback from course_ratings, courses where course_id=? and id=?";
         if (searchText.length() > 0) {
-            Function<String,String> addQuotes = s -> "\"" + s + "\"";
             searchText = "%" + searchText + "%";
             searchText = addQuotes.apply(searchText);
             sqlQuery = "select course_name, profId, score, feedback from course_ratings, courses " +
@@ -298,7 +298,6 @@ public class DataMapper {
         Map<String,Object> ratingsObj = new HashMap<>();
         String sqlQuery = "select score, feedback, First_Name, Last_Name, role from user_ratings, user_details where userId="
         + id + " and Id=" + id;
-        Function<String,String> addQuotes = s -> "\"" + s + "\"";
         if (filter.contentEquals("all")) {
             if (searchText.length() > 0) {
                 searchText = "%" + searchText + "%";
@@ -394,7 +393,6 @@ public class DataMapper {
 
     public static Map<Integer, String> viewUsers(String searchText, String filterBy) {
         Map<Integer,String> users = new HashMap<>();
-        Function<String,String> addQuotes = s -> "\"" + s + "\"";
         searchText = "%" + searchText + "%";
         searchText = addQuotes.apply(searchText);
         String admin = addQuotes.apply("admin");
@@ -749,5 +747,36 @@ public class DataMapper {
             System.out.println("Exception at getUserIdFromEmail "+ throwables);
         }
         return id;
+    }
+
+    public static Map<Integer, Map<String, Object>> getAllDisscussionGroups(String searchText, int filter) {
+        boolean flag = false;
+        Map<Integer, Map<String, Object>> groups = new HashMap<>();
+        String sqlQuery = "select * from discussion_groups where ISNULL(course_id)";
+        try {
+            if (searchText.length() > 0) {
+                searchText = "%" + searchText + "%";
+                searchText = addQuotes.apply(searchText);
+                if (filter != -1) {
+                    sqlQuery = "select * from discussion_groups where ISNULL(course_id) and name like "+
+                            searchText +" and privacy=" + filter;
+                } else {
+                    sqlQuery = "select * from discussion_groups where ISNULL(course_id) and name like "+
+                            searchText;
+                }
+            }
+            PreparedStatement pst = conn.prepareStatement(sqlQuery);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> details = new HashMap<>();
+                int id = rs.getInt("id");
+                if (rs.getInt("privacy") == 1) details.put("privacy", true);
+                details.put("name",rs.getString("name"));
+                groups.put(id, details);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at getAllDisscussionGroups " + e);
+        }
+        return groups;
     }
 }
