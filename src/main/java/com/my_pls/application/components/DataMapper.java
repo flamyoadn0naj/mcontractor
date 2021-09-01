@@ -731,7 +731,6 @@ public class DataMapper {
             throwables.printStackTrace();
         }
 
-        System.out.println("Updates");
     }
 
     public static int getUserIdFromEmail(String email) {

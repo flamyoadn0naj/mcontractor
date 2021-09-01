@@ -439,6 +439,7 @@ public class App {
         get("/logout",((request, response) -> {
             Map<String,Object> map = new HashMap<>();
             request.session().invalidate();
+            response.redirect("/login/errAuth");
             return new ModelAndView(map,"homePage.ftl");
         }),engine);
 
