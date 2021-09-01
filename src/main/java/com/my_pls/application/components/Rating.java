@@ -100,7 +100,6 @@ public class Rating {
         }
         if (users.isEmpty()) map.put("userEmpty", true);
         if (courses.isEmpty()) map.put("courseEmpty", true);
-        map.put("role","admin");
         return map;
     }
 }

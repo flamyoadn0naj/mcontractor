@@ -66,8 +66,10 @@
             </div>
         </div>
     </div>
-    <div class="footer bg-primary text-white">
-        <a class="text-white" href="/apply-prof"> Apply to be a Professor </a>
-    </div>
+    <#if role == "learner">
+        <div class="footer bg-primary text-white">
+            <a class="text-white" href="/apply-prof"> Apply to be a Professor </a>
+        </div>
+    </#if>
 </body>
 </html>

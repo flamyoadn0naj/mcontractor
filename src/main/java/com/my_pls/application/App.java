@@ -49,7 +49,7 @@ public class App {
 
 
         securePassword pwd_manager = new securePassword();
-        CurrUser user_current = new CurrUser();
+        User user_current = new User();
 
         // Setting any route (or filter) in Spark triggers initialization of the embedded Jetty web server.
 //        get("/", (request, response) -> {return new ModelAndView(new HashMap<>(),"sub.ftl");},engine);
@@ -83,12 +83,17 @@ public class App {
             Map<String,String> formFields = extractFields(request.body());
             Pair p = Login.postMethodDefaults(map, formFields, user_current, pwd_manager);
             map = p.fst();
-            CurrUser logUser = p.snd();
-            user_current.setAll(logUser.firstName, logUser.lastName, logUser.password, logUser.email);
+            User logUser = p.snd();
+            user_current.setAll(logUser.firstName, logUser.lastName, logUser.password, logUser.email, logUser.id, logUser.role);
             Map<String, Object> finalMap = map;
             map.forEach((k, v)-> finalMap.put(k,v));
             if (logUser.firstName.length() > 0) {
                 Session session = request.session(true);
+                session.attribute("firstName", logUser.firstName);
+                session.attribute("lastName", logUser.lastName);
+                session.attribute("email", logUser.email);
+                session.attribute("id", logUser.id);
+                session.attribute("role", logUser.role);
                 response.redirect("/");
             }
             map.put("loading", "false");
@@ -106,8 +111,9 @@ public class App {
             Pair p = Register.postMethodDefaults(formFields, user_current, pwd_manager);
             Map<String,Object> map = p.fst();
             map.forEach((k,v)->map.put(k,v));
-            CurrUser logUser = p.snd();
-            user_current.setAll(logUser.firstName, logUser.lastName, logUser.password, logUser.email);
+            User logUser = p.snd();
+            user_current.setAll(logUser.firstName, logUser.lastName, logUser.password,
+                    logUser.email, -1, "learner");
             if (logUser.firstName.length() > 0) response.redirect("/verify-register/send");
             return new ModelAndView(map,"login.ftl");
         },engine);
@@ -165,46 +171,55 @@ public class App {
 
         get("/",((request, response) -> {
             Map<String,String> map = new HashMap<>();
-            if (user_current.firstName.length() == 0) {
+            Session session = request.session();
+            if (session.attribute("firstName").toString().length() == 0) {
                 response.redirect("/login/errAuth");
             }
-            map.put("name", user_current.firstName +" " + user_current.lastName);
+            map.put("name", session.attribute("firstName").toString() + " "
+                    + session.attribute("lastName").toString());
+            map.put("role", session.attribute("role"));
             return new ModelAndView(map,"homePage.ftl");
         }),engine);
 
         get("/course/about",((request, response) -> {
             Map<String,String> map = new HashMap<>();
-            map.put("role", "student");
+            Session sess = request.session();
+            map.put("role", sess.attribute("role"));
             return new ModelAndView(map,"courseAbout.ftl");
         }),engine);
 
         get("/course/learnMat",((request, response) -> {
             Map<String,String> map = new HashMap<>();
-            map.put("role", "student");
+            Session sess = request.session();
+            map.put("role", sess.attribute("role"));
             return new ModelAndView(map,"courseLearnMat.ftl");
         }),engine);
 
         get("/course/quiz",((request, response) -> {
             Map<String,String> map = new HashMap<>();
-            map.put("role", "prof");
+            Session sess = request.session();
+            map.put("role", sess.attribute("role"));
             return new ModelAndView(map,"courseQuiz.ftl");
         }),engine);
 
         get("/course/grades",((request, response) -> {
             Map<String,String> map = new HashMap<>();
-            map.put("role", "prof");
+            Session sess = request.session();
+            map.put("role", sess.attribute("role"));
             return new ModelAndView(map,"courseGrade.ftl");
         }),engine);
 
         get("/course/grade/individual",((request, response) -> {
             Map<String,String> map = new HashMap<>();
-            map.put("role", "prof");
+            Session sess = request.session();
+            map.put("role", sess.attribute("role"));
             return new ModelAndView(map,"courseGradeIndividual.ftl");
         }),engine);
 
         get("/course/classlist",((request, response) -> {
             Map<String,String> map = new HashMap<>();
-            map.put("role", "student");
+            Session sess = request.session();
+            map.put("role", sess.attribute("role"));
             return new ModelAndView(map,"courseClasslist.ftl");
         }),engine);
 
@@ -214,6 +229,9 @@ public class App {
         }),engine);
 
         get("/courses/all", (request, response) -> {
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
+            if (!role.contentEquals("admin")) response.redirect("/err");
             Map<String,Object> map = Courses.getMethodDefaults("");
             String e_id = request.queryParams("edit");
             String d_id = request.queryParams("del");
@@ -226,6 +244,9 @@ public class App {
         },engine);
 
         post("/courses/all",((request, response) -> {
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
+            if (!role.contentEquals("admin")) response.redirect("/err");
             Map<String,String> formFields = extractFields(request.body());
             Map<String,Object> map = new HashMap<>();
             if (formFields.containsKey("filterBy")) map = Courses.getMethodDefaults(formFields.get("filterBy"));
@@ -242,21 +263,27 @@ public class App {
 
         get("/courses",((request, response) -> {
             Map<String,Object> map = new HashMap<>();
-            map.put("role","admin");
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
+            map.put("role", role);
             return new ModelAndView(map,"courses.ftl");
         }),engine);
 
         post("/courses",((request, response) -> {
             Map<String,String> map = new HashMap<>();
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
+            map.put("role", role);
             Map<String,String> formFields = extractFields(request.body());
-            System.out.println(formFields);
-            map.put("role","admin");
 
             return new ModelAndView(map,"courses.ftl");
         }),engine);
 
 
         get("/courses/create-course",((request, response) -> {
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
+            if (!role.contentEquals("admin")) response.redirect("/err");
             Map<String,Object> map = new HashMap<>();
             map.put("name","");
             map.put("obj","");
@@ -285,6 +312,9 @@ public class App {
 
         post("/courses/create-course", (request, response) -> {
             Map<String,String> formFields = extractFields(request.body());
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
+            if (!role.contentEquals("admin")) response.redirect("/err");
             String edit = request.queryParams("e");
             Map<Integer, String> allCourses = CreateCourse.allCourses();
             Map<String,Object> map = CreateCourse.postMethodDefaults(formFields, edit);
@@ -333,31 +363,41 @@ public class App {
         }),engine);
 
         get("/ratings",((request, response) -> {
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
             Map<String, Object> map = Rating.getMethodFunctionality();
             map.forEach((k,v)->map.put(k,v));
+            map.put("role", role);
             return new ModelAndView(map,"ratings.ftl");
         }),engine);
 
         post("/ratings",((request, response) -> {
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
             Map<String,String> formFields = extractFields(request.body());
             Map<String,Object> map = Rating.postMethodFunctionality(formFields);
             map.forEach((k,v)->map.put(k,v));
+            map.put("role", role);
             return new ModelAndView(map,"ratings.ftl");
         }),engine);
 
-        get("/discussion-groups",((request, response) -> {
+        get("/discussion-groups", (request, response) -> {
+            Session sess = request.session();
+            int id = sess.attribute("id");
             Map<String,Object> map = new HashMap<>();
-            ArrayList<Map<String,Object>> groups = DataMapper.getMyDiscussionGroups(141);
-            Map<Integer,Map<String, Object>> allGroups = DiscussionGroups.getGroups("", -1, user_current.email);
+            ArrayList<Map<String,Object>> groups = DataMapper.getMyDiscussionGroups(id);
+            Map<Integer,Map<String, Object>> allGroups = DiscussionGroups.getGroups("", -1, id);
             map.put("groups", groups);
             map.put("allGroups", allGroups);
             map.put("filterOptions", DiscussionGroups.getSearchOptions(""));
             return new ModelAndView(map,"discussionGroups.ftl");
-        }),engine);
+        },engine);
 
         post("/discussion-groups",((request, response) -> {
+            Session sess = request.session();
+            int id = sess.attribute("id");
             Map<String,String> formFields = extractFields(request.body());
-            Map<String, Object> map = DiscussionGroups.postMethodFunctionality(formFields, user_current.email);
+            Map<String, Object> map = DiscussionGroups.postMethodFunctionality(formFields,id);
             map.forEach((k,v)->map.put(k,v));
             return new ModelAndView(map,"discussionGroups.ftl");
         }),engine);
@@ -368,9 +408,11 @@ public class App {
         }),engine);
 
         post("/discussion/create",((request, response) -> {
+            Session sess = request.session();
+            int id = sess.attribute("id");
             Map<String,Object> map = new HashMap<>();
             Map<String,String> formFields = extractFields(request.body());
-            boolean flag = DiscussionGroups.createGroup(formFields, user_current.email);
+            boolean flag = DiscussionGroups.createGroup(formFields, id);
             if (flag) response.redirect("/discussion-groups");
             else map.put("err", true);
             return new ModelAndView(map,"createDiscussionGroup.ftl");
@@ -392,10 +434,13 @@ public class App {
         }),engine);
 
         get("/approval",((request, response) -> {
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
+            if (!role.contentEquals("admin")) response.redirect("/err");
             Map<String,Object> map = new HashMap<>();
             Map<Integer,String> profs = DataMapper.viewAllRequests();
             map.put("profs",profs);
-            map.put("role", "admin");
+            map.put("role", role);
             Map<String,String> searchOptions = Admin.getSearchOptions("");
             map.put("searchOptions",searchOptions);
             map.put("users",new HashMap<Integer,String>());
@@ -403,71 +448,63 @@ public class App {
         }),engine);
 
         post("/approval", (request, response) -> {
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
+            if (!role.contentEquals("admin")) response.redirect("/err");
             Map<String,String> formFields = extractFields(request.body());
             Map<String, Object> map = Admin.postMethodFunctionality(formFields);
             if (map.containsKey("redirect") && (boolean) map.get(redirect)) response.redirect("/approval");
             map.forEach((k, v)-> map.put(k,v));
+            map.put("role", role);
             return new ModelAndView(map,"approval.ftl");
         },engine);
 
         get("/apply-prof",((request, response) -> {
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
+            if (!role.contentEquals("learner")) response.redirect("/err");
             Map<String,Object> map = new HashMap<>();
             return new ModelAndView(map,"profApply.ftl");
         }),engine);
 
         post("/apply-prof", (request, response) -> {
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
+            if (!role.contentEquals("learner")) response.redirect("/err");
             Map<String,String> formFields = extractFields(request.body());
             Map<String, Object> map = ApplyForProfessor.postMethodFunctionality(formFields,
-                    user_current.firstName, user_current.lastName, user_current.email);
+                    sess.attribute("firstName").toString(),
+                    sess.attribute("lastName").toString(),
+                    sess.attribute("email").toString());
             map.forEach((k, v)-> map.put(k,v));
             return new ModelAndView(map,"profApply.ftl");
         },engine);
 
         get("/err",((request, response) -> {
             Map<String,Object> map = new HashMap<>();
-            if (user_current.firstName.length() == 0) {
+            Session sess = request.session();
+            String firstName = sess.attribute("firstName").toString();
+            String role = sess.attribute("role").toString();
+            String lastName = sess.attribute("lastName").toString();
+            if (firstName.length() == 0) {
                 response.redirect("/login/errAuth");
             }
-            map.put("name", user_current.firstName + " " + user_current.lastName);
+            map.put("name", firstName + " " + lastName);
             map.put("notAuthorized", "You have been redirected to the " +
                     "home page as you were not authorized to view the page" +
                     " you selected or something went wrong. Please email " +
                     "mypls@rit.edu for support");
+            map.put("role", role);
             return new ModelAndView(map,"homePage.ftl");
         }),engine);
 
         get("/logout",((request, response) -> {
             Map<String,Object> map = new HashMap<>();
             request.session().invalidate();
-            response.redirect("/login/errAuth");
+            response.redirect("/login");
             return new ModelAndView(map,"homePage.ftl");
         }),engine);
 
     }
 
-    public static class CurrUser {
-        String firstName = "";
-        String lastName = "";
-        String password = "";
-        String email = "";
-
-        public CurrUser(String firstName, String lastName, String password, String email) {
-            this.email = email;
-            this.firstName = firstName;
-            this.lastName = lastName;
-            this.password = password;
-        }
-        public CurrUser() {
-            this.email = "";
-            this.firstName = "";
-            this.lastName = "";
-            this.password = "";
-        }
-        public void setAll(String firstName, String lastName, String password, String email) {
-            this.email = email;
-            this.firstName = firstName;
-            this.lastName = lastName;
-            this.password = password;
-        }
-    }
 }

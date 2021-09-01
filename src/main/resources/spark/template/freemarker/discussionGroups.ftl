@@ -17,7 +17,7 @@
         <a class="btn btn-primary col-2 mb-3" href="/discussion/create"
            style="margin-top: 1%; float: right; align-self: flex-end; margin-right: 2%;">Create Group</a>
         <div style="display: flex;justify-content: space-evenly">
-            <div class="card" style="width: 40%; border: #78C2AD">
+            <div class="card" style="width: 30%; border: #78C2AD">
                 <h4 class="card-header border-primary text-black-50 mb-3">
                     My Groups
                 </h4>
@@ -62,9 +62,9 @@
                     </table>
                 </div>
             </div>
-            <div class="card" style="width: 55%; border: #78C2AD">
+            <div class="card" style="width: 35%; border: #78C2AD">
                 <h4 class="card-header border-primary text-black-50 mb-3">
-                    Join new Groups
+                    Join New Groups
                 </h4>
                 <form action="/discussion-groups" method="post">
 
@@ -114,6 +114,51 @@
                         </table>
                     </div>
                 </form>
+            </div>
+            <div class="card" style="width: 30%; border: #78C2AD">
+                <h4 class="card-header border-primary text-black-50 mb-3">
+                    Group Requests (Pending Approval)
+                </h4>
+                <div style="margin-top: 2%">
+                    <table class="table">
+                        <tr class="table-primary justify-content-between">
+                        </tr>
+                        <#if groups??>
+                            <form action="/discussion-groups" method="post">
+                                <#list groups as g>
+                                    <tr>
+                                        <th scope="row">
+                                            <a class="text-muted" href="/discussion/group-desc">${g.name}</a>
+                                            <#if g.privacy??>
+                                                <button type="button" class="btn-download" style="margin-left: 2%">
+                                                    <i class="fa fa-lock"></i>
+                                                </button>
+                                            </#if>
+                                            <#if g.course??>
+                                                <span class="badge badge-primary" style="margin-left: 2%">Course</span>
+                                            </#if>
+                                        </th>
+                                        <#if g.course??>
+                                        <#else>
+                                            <td>
+                                                <button name="leave" value="${g.id}" style="float: right" class="btn btn-primary" type="submit">Leave</button>
+                                            </td>
+                                        </#if>
+                                    </tr>
+                                </#list>
+                            </form>
+                        </#if>
+
+                        <tr>
+                            <th scope="row">
+                                <a class="text-muted" href="">Added Value</a>
+                            </th>
+                            <td>
+                                <button style="float: right" class="btn btn-primary" type="submit">Leave</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

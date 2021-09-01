@@ -636,7 +636,7 @@ public class DataMapper {
 
     public static Pair login(String input_password, String emVal, securePassword pwd_manager) {
         Pair p = new Pair();
-        App.CurrUser user = new App.CurrUser();
+        User user = new User();
         try {
             emVal = URLDecoder.decode(emVal, "UTF-8");
             PreparedStatement pst = conn.prepareStatement("select * from user_details where Email=?");
@@ -646,11 +646,11 @@ public class DataMapper {
                 String db_password = rs.getString("Password");
 
                 if (pwd_manager.comparePassword(db_password, input_password)) {
-                    user.setAll(rs.getString("First_Name"),
-                            rs.getString("Last_Name"), db_password, emVal);
+                    user.setAll(rs.getString("First_Name"),rs.getString("Last_Name"),
+                            db_password, emVal, rs.getInt("Id"), rs.getString("role"));
                     p = new Pair(null, user);
                 } else {
-                    p = new Pair(null, null);
+                    p = new Pair(null, new User());
                 }
             }
         } catch (Exception e) {
@@ -775,6 +775,23 @@ public class DataMapper {
             }
         } catch (Exception e) {
             System.out.println("Exception at getAllDisscussionGroups " + e);
+        }
+        return groups;
+    }
+
+    public static Map<Integer, Object> getPendingGroupRequests(int id) {
+        Map<Integer, Object> groups = new HashMap<>();
+        try {
+            PreparedStatement pst = conn.prepareStatement("select dg_id from discussion_group_requests where user_id="+ id);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> details = new HashMap<>();
+                int dg_id = rs.getInt("dg_id");
+                details = getGroupDetailsByGroupId(dg_id);
+                groups.put(dg_id, details);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at getPendingGroupRequests " + e);
         }
         return groups;
     }
