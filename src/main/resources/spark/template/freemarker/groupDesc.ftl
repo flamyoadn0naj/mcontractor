@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
-<#include "navbar.ftl">
 
 <div style="display: flex;justify-content: center">
     <div class="card text-black mb-3" style="width:100%; border: none">

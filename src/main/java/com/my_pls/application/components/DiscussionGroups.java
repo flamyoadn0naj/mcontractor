@@ -40,10 +40,15 @@ public class DiscussionGroups {
     public static Map<Integer,Map<String, Object>> getGroups(String searchText, int filter, int id) {
         Map<Integer,Map<String, Object>> allGroups = DataMapper.getAllDisscussionGroups(searchText, filter);
         ArrayList<Map<String, Object>> myGroups = DataMapper.getMyDiscussionGroups(id);
+        Map<Integer, Object> requestedGroups = DataMapper.getPendingGroupRequests(id);
         for (Map<String, Object> g: myGroups) {
             int g_id = (int) g.get("id");
             if (allGroups.containsKey(g_id)) allGroups.remove(g_id);
         }
+        for (Integer i : requestedGroups.keySet()) {
+            if (allGroups.containsKey(i)) allGroups.remove(i);
+        }
+
         return allGroups;
     }
 
@@ -70,6 +75,7 @@ public class DiscussionGroups {
         ArrayList<Map<String,Object>> groups = DataMapper.getMyDiscussionGroups(141);
         Map<Integer, String> searchOptions = getSearchOptions("");
         Map<Integer,Map<String, Object>> allGroups = getGroups("", -1, id);
+        Map<Integer, Object> requestedGroups = DataMapper.getPendingGroupRequests(id);
 
         if (formFields.containsKey("searchText")) {
             String searchText = formFields.get("searchText");
@@ -82,8 +88,28 @@ public class DiscussionGroups {
         }
         if (!allGroups.isEmpty()) map.put("allGroups", allGroups);
 
+        if (formFields.containsKey("join")) {
+            int groupId = Integer.parseInt(formFields.get("join"));
+            boolean flag = DataMapper.addDGmember(id, groupId);
+            map.put("refresh", flag);
+        }
+
+        if (formFields.containsKey("request")) {
+            int groupId = Integer.parseInt(formFields.get("request"));
+            boolean flag = DataMapper.requestToJoinGroup(id, groupId);
+            map.put("refresh", flag);
+        }
+
+        if (formFields.containsKey("leave")) {
+            int groupId = Integer.parseInt(formFields.get("leave"));
+            boolean flag = DataMapper.deleteRequestForGroup(id, groupId);
+            map.put("refresh", flag);
+        }
+
         map.put("groups", groups);
         map.put("filterOptions", searchOptions);
+        if (requestedGroups.isEmpty()) map.put("emptyReq", true);
+        else map.put("requestedGroups",requestedGroups);
         return map;
     }
 }

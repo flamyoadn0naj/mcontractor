@@ -61,8 +61,8 @@
                 </h4>
                 <form action="/approval" method="post">
                     <div class="space-between">
-                        <input required class="form-control col-6" name="searchText" type="text" placeholder="Search" value="${searchText!""}">
-                        <select class="form-control col-3" name="filterBy" id="exampleSelect1">
+                        <input required class="form-control col-5" name="searchText" type="text" placeholder="Search" value="${searchText!""}">
+                        <select class="form-control col-2" name="filterBy" id="exampleSelect1">
                             <#list searchOptions as k,v>
                                 <option value=${k}>${v}</option>
                             </#list>
@@ -71,6 +71,7 @@
                             </#if>
                         </select>
                         <button class="btn btn-primary col-2" type="submit">Search</button>
+                        <a class="btn btn-primary col-2"  href="/approval">Clear</a>
                     </div>
                     <div style="margin-top: 2%">
                         <table class="table">

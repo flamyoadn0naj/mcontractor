@@ -795,4 +795,36 @@ public class DataMapper {
         }
         return groups;
     }
+
+    public static boolean requestToJoinGroup(int id, int dg_id) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("insert into discussion_group_requests (user_id, dg_id) VALUES (?,?)");
+            pst.setInt(1, id);
+            pst.setInt(2, dg_id);
+            int i = pst.executeUpdate();
+            if (i != 0) {
+                flag = true;
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at getPendingGroupRequests " + e);
+        }
+        return flag;
+    }
+
+    public static boolean deleteRequestForGroup(int id, int dg_id) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("delete from discussion_group_requests where user_id=? and dg_id=?");
+            pst.setInt(1, id);
+            pst.setInt(2, dg_id);
+            int i = pst.executeUpdate();
+            if (i != 0) {
+                flag = true;
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at deleteRequestForGroup " + e);
+        }
+        return flag;
+    }
 }

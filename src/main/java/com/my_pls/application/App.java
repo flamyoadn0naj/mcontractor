@@ -172,12 +172,13 @@ public class App {
         get("/",((request, response) -> {
             Map<String,String> map = new HashMap<>();
             Session session = request.session();
-            if (session.attribute("firstName").toString().length() == 0) {
+            if (session.attribute("firstName") == null) {
                 response.redirect("/login/errAuth");
+            } else {
+                map.put("name", session.attribute("firstName").toString() + " "
+                        + session.attribute("lastName").toString());
+                map.put("role", session.attribute("role"));
             }
-            map.put("name", session.attribute("firstName").toString() + " "
-                    + session.attribute("lastName").toString());
-            map.put("role", session.attribute("role"));
             return new ModelAndView(map,"homePage.ftl");
         }),engine);
 
@@ -224,7 +225,10 @@ public class App {
         }),engine);
 
         get("/course/rate",((request, response) -> {
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
             Map<String,String> map = new HashMap<>();
+            map.put("role", role);
             return new ModelAndView(map,"courseRate.ftl");
         }),engine);
 
@@ -240,6 +244,7 @@ public class App {
             if (e_id != null) response.redirect("/courses/create-course?e="+e_id);
             if(done) response.redirect("/courses/all");
             map.forEach((k,v)->map.put(k,v));
+            map.put("role", role);
             return new ModelAndView(map,"coursesAll.ftl");
         },engine);
 
@@ -257,7 +262,7 @@ public class App {
             }
             Map<String, Object> finalMap = map;
             map.forEach((k, v)-> finalMap.put(k,v));
-            map.put("role","admin");
+            map.put("role",role);
             return new ModelAndView(map,"coursesAll.ftl");
         }),engine);
 
@@ -331,7 +336,10 @@ public class App {
         },engine);
 
         get("/course/create-quiz",((request, response) -> {
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
             Map<String,String> map = new HashMap<>();
+            map.put("role", role);
             return new ModelAndView(map,"createQuiz.ftl");
         }),engine);
 
@@ -346,19 +354,28 @@ public class App {
 //        });
 
         get("/enroll",((request, response) -> {
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
             Map<String,String> map = new HashMap<>();
+            map.put("role", role);
             return new ModelAndView(map,"enroll.ftl");
         }),engine);
 
         post("/enroll",((request, response) -> {
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
             Map<String,String> map = new HashMap<>();
             Map<String,String> formFields = extractFields(request.body());
             System.out.println(formFields);
+            map.put("role", role);
             return new ModelAndView(map,"enroll.ftl");
         }),engine);
 
         get("/enroll/about",((request, response) -> {
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
             Map<String,String> map = new HashMap<>();
+            map.put("role", role);
             return new ModelAndView(map,"enrollAbout.ftl");
         }),engine);
 
@@ -384,26 +401,37 @@ public class App {
         get("/discussion-groups", (request, response) -> {
             Session sess = request.session();
             int id = sess.attribute("id");
+            String role = sess.attribute("role").toString();
             Map<String,Object> map = new HashMap<>();
             ArrayList<Map<String,Object>> groups = DataMapper.getMyDiscussionGroups(id);
             Map<Integer,Map<String, Object>> allGroups = DiscussionGroups.getGroups("", -1, id);
+            Map<Integer, Object> requestedGroups = DataMapper.getPendingGroupRequests(id);
             map.put("groups", groups);
             map.put("allGroups", allGroups);
+            map.put("role", role);
             map.put("filterOptions", DiscussionGroups.getSearchOptions(""));
+            if (requestedGroups.isEmpty()) map.put("emptyReq", true);
+            else map.put("requestedGroups",requestedGroups);
             return new ModelAndView(map,"discussionGroups.ftl");
         },engine);
 
         post("/discussion-groups",((request, response) -> {
             Session sess = request.session();
             int id = sess.attribute("id");
+            String role = sess.attribute("role").toString();
             Map<String,String> formFields = extractFields(request.body());
             Map<String, Object> map = DiscussionGroups.postMethodFunctionality(formFields,id);
             map.forEach((k,v)->map.put(k,v));
+            if (map.containsKey("refresh")) response.redirect("/discussion-groups");
+            map.put("role", role);
             return new ModelAndView(map,"discussionGroups.ftl");
         }),engine);
 
         get("/discussion/create",((request, response) -> {
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
             Map<String,Object> map = new HashMap<>();
+            map.put("role", role);
             return new ModelAndView(map,"createDiscussionGroup.ftl");
         }),engine);
 
@@ -419,17 +447,26 @@ public class App {
         }),engine);
 
         get("/discussion/group-desc",((request, response) -> {
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
             Map<String,Object> map = new HashMap<>();
+            map.put("role", role);
             return new ModelAndView(map,"groupDesc.ftl");
         }),engine);
 
         get("/discussion/create-post",((request, response) -> {
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
             Map<String,String> map = new HashMap<>();
+            map.put("role", role);
             return new ModelAndView(map,"discussionPost.ftl");
         }),engine);
 
         get("/rating/individual",((request, response) -> {
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
             Map<String,String> map = new HashMap<>();
+            map.put("role",role);
             return new ModelAndView(map,"ratingsIndividual.ftl");
         }),engine);
 
@@ -483,18 +520,19 @@ public class App {
         get("/err",((request, response) -> {
             Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
-            String firstName = sess.attribute("firstName").toString();
-            String role = sess.attribute("role").toString();
-            String lastName = sess.attribute("lastName").toString();
-            if (firstName.length() == 0) {
+            if (sess.attribute("firstName") == null) {
                 response.redirect("/login/errAuth");
+            } else {
+                String role = sess.attribute("role").toString();
+                String firstName = sess.attribute("firstName").toString();
+                String lastName = sess.attribute("lastName").toString();
+                map.put("name", firstName + " " + lastName);
+                map.put("notAuthorized", "You have been redirected to the " +
+                        "home page as you were not authorized to view the page" +
+                        " you selected or something went wrong. Please email " +
+                        "mypls@rit.edu for support");
+                map.put("role", role);
             }
-            map.put("name", firstName + " " + lastName);
-            map.put("notAuthorized", "You have been redirected to the " +
-                    "home page as you were not authorized to view the page" +
-                    " you selected or something went wrong. Please email " +
-                    "mypls@rit.edu for support");
-            map.put("role", role);
             return new ModelAndView(map,"homePage.ftl");
         }),engine);
 
