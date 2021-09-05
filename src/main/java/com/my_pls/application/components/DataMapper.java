@@ -1,7 +1,6 @@
 package com.my_pls.application.components;
 
 import com.my_pls.MySqlConnection;
-import com.my_pls.application.App;
 import com.my_pls.securePassword;
 import com.my_pls.sendEmail;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -824,6 +823,27 @@ public class DataMapper {
             }
         } catch (Exception e) {
             System.out.println("Exception at deleteRequestForGroup " + e);
+        }
+        return flag;
+    }
+
+    public static boolean verifyEmailofUser(String email, String hash) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("select Email, Hash, Active from user_details where Email=? and Hash=? and Active='0'");
+            pst.setString(1, email);
+            pst.setString(2, hash);
+            ResultSet rs = pst.executeQuery();
+            if(rs.next()) {
+                PreparedStatement pst1 = conn.prepareStatement("update user_details set Active='1' where Email=? and Hash=?");
+                pst1.setString(1, email);
+                pst1.setString(2, hash);
+
+                int i = pst1.executeUpdate();
+                if (i != 0) flag = true;
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at verifyEmailofUser " + e);
         }
         return flag;
     }

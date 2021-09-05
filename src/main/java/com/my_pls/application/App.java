@@ -7,10 +7,6 @@ import spark.Session;
 import spark.TemplateEngine;
 import spark.template.freemarker.FreeMarkerEngine;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-
-import java.sql.ResultSet;
 import java.util.*;
 import java.net.URLDecoder;
 
@@ -47,23 +43,9 @@ public class App {
             return "{\"message\":\"Custom 404\"}";
         });
 
-
         securePassword pwd_manager = new securePassword();
         User user_current = new User();
 
-        // Setting any route (or filter) in Spark triggers initialization of the embedded Jetty web server.
-//        get("/", (request, response) -> {return new ModelAndView(new HashMap<>(),"sub.ftl");},engine);
-//        get("/hello/:name",(request, response) -> {
-//            String name = request.params(":name");
-//            Map<String,Object> map = new HashMap<>();
-//            map.put("title",name);
-//            return new ModelAndView(map,"home.ftl");
-//        },engine);
-//       Route serverError = get("/server-error",(request, response) -> {
-//            Map<String,Object> map = new HashMap<>();
-//            map.put("notAuthorized", "Something went wrong. Please email mypls@rit.edu for support");
-//            return new ModelAndView(map,"homePage.ftl");
-//        });
         get("/login/errAuth",(request, response) -> {
             Map<String,Object> map = Login.getMethodDefaults();
             map.forEach((k,v)->map.put(k,v));
@@ -127,18 +109,7 @@ public class App {
                 String email = request.queryParams("key1");
                 email = URLDecoder.decode(email,"UTF-8");
                 String hash = request.queryParams("key2");
-                Connection conn = MySqlConnection.getConnection();
-                PreparedStatement pst = conn.prepareStatement("select Email, Hash, Active from user_details where Email=? and Hash=? and Active='0'");
-                pst.setString(1, email);
-                pst.setString(2, hash);
-                ResultSet rs = pst.executeQuery();
-                if(rs.next()) {
-                    PreparedStatement pst1 = conn.prepareStatement("update user_details set Active='1' where Email=? and Hash=?");
-                    pst1.setString(1, email);
-                    pst1.setString(2, hash);
-
-                    int i = pst1.executeUpdate();
-                }
+                boolean flag = DataMapper.verifyEmailofUser(email, hash);
             }
             return new ModelAndView(map,"verifyRegister.ftl");
         },engine);
@@ -159,15 +130,6 @@ public class App {
             map.forEach((k,v)->map.put(k,v));
             return new ModelAndView(map,"forgotPassword.ftl");
         }),engine);
-
-//        get("/first/*/last/*",(request, response) -> {
-//
-//            String firstName = request.splat()[0];
-//            String lastName = request.splat()[1];
-//            Map<String,Object> map = new HashMap<>();
-//            map.put("title",String.format("%s %s",firstName,lastName));
-//            return new ModelAndView(map,"home.ftl");
-//        },engine);
 
         get("/",((request, response) -> {
             Map<String,String> map = new HashMap<>();
@@ -280,10 +242,8 @@ public class App {
             String role = sess.attribute("role").toString();
             map.put("role", role);
             Map<String,String> formFields = extractFields(request.body());
-
             return new ModelAndView(map,"courses.ftl");
         }),engine);
-
 
         get("/courses/create-course",((request, response) -> {
             Session sess = request.session();
@@ -342,16 +302,6 @@ public class App {
             map.put("role", role);
             return new ModelAndView(map,"createQuiz.ftl");
         }),engine);
-
-//        path("/user",()->{
-//            get("/",(req,res)-> req.session().attribute("name"));
-//            get("/update/:name",(req,res)->{
-//                String name = req.params(":name");
-//                req.session().attribute("name",name);
-//                return String.format("Value updated with %s",name);
-//            });
-//
-//        });
 
         get("/enroll",((request, response) -> {
             Session sess = request.session();
