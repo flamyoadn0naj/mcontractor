@@ -611,6 +611,29 @@ public class DataMapper {
         return flag;
     }
 
+    public static boolean resendEmailConfirm(String email) {
+        boolean flag = false;
+        try {
+            email = URLDecoder.decode(email, "UTF-8");
+            Connection conn = MySqlConnection.getConnection();
+            PreparedStatement pst = conn.prepareStatement("select Email, Hash from user_details where Email=?");
+            pst.setString(1, email);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                String myHash = rs.getString("Hash");
+                String body =  "Click this link to confirm your email address and complete setup for your account."
+                        + "\n\nVerification Link: " + "http://localhost:8080/verify-register/confirm?key1=" + email
+                        + "&key2=" + myHash;
+                sendEmail se = new sendEmail();
+                se.sendEmail_content(email,"Verify Email at MyPLS",body);
+                flag = true;
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at Resend Email " + e);
+        }
+        return flag;
+    }
+
     public static boolean changePassword(String confirmCode, String email, String newPassword ) {
         boolean flag = false;
         try {
