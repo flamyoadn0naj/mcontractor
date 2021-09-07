@@ -120,13 +120,14 @@ public class App {
         },engine);
 
         post("/verify-register/:type",((request, response) -> {
-            String pageType = request.params(":type");
             Map<String,String> formFields = extractFields(request.body());
-            Pair p = Register.postMethodDefaults(formFields, user_current, pwd_manager);
-            String email = request.session().attribute("email");
-            Map<String,Object> map = p.fst();
-            map.forEach((k,v)->map.put(k,v));
-            return new ModelAndView(map,"forgotPassword.ftl");
+            Map<String, Object> map = new HashMap<>();
+            if (formFields.containsKey("resend")) {
+                boolean flag = DataMapper.resendEmailConfirmation(user_current.email);
+                if (flag) map.put("resend", true);
+                else map.put("resend", false);
+            }
+            return new ModelAndView(map,"verifyRegister.ftl");
         }),engine);
 
         get("/forgot-password/:type",((request, response) -> {

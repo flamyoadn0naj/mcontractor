@@ -20,6 +20,18 @@
       </ul>
     </nav>
 
+    <#if resend??>
+        <#if resend == true>
+            <div class="alert alert-dismissible alert-success">
+                An email has been sent again to your email address.
+            </div>
+        <#else>
+            <div class="alert alert-dismissible alert-danger">
+                Something went wrong. Please try again.
+            </div>
+        </#if>
+    </#if>
+
     <#if type == "send">
         <div class="text-black border-primary mb-3" style="display:flex; justify-content:center; text-align:center; margin:15%">
             <h2 style="max-width:40rem; margin-bottom:2%">
@@ -28,11 +40,13 @@
                 Please click on the link to verify your email address
             </h2>
         </div>
-        <div style="display:flex; justify-content:center">
-            <button type="submit" class="btn btn-primary" style="width:20rem">
-                Resend Email
-            </button>
-        </div>
+        <form action="/verify-register/send" method="post">
+            <div style="display:flex; justify-content:center">
+                <button type="submit" class="btn btn-primary" style="width:20rem" name="resend" value="true", id="resend">
+                    Resend Email
+                </button>
+            </div>
+        </form>
     <#else>
         <div class="text-black border-primary mb-3" style="display:flex; justify-content:center; text-align:center; margin:15%">
             <h2 style="max-width:40rem; margin-bottom:2%">

@@ -611,7 +611,7 @@ public class DataMapper {
         return flag;
     }
 
-    public static boolean resendEmailConfirm(String email) {
+    public static boolean resendEmailConfirmation(String email) {
         boolean flag = false;
         try {
             email = URLDecoder.decode(email, "UTF-8");
