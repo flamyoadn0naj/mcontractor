@@ -94,9 +94,13 @@ public class App {
             Map<String,Object> map = p.fst();
             map.forEach((k,v)->map.put(k,v));
             User logUser = p.snd();
+
             user_current.setAll(logUser.firstName, logUser.lastName, logUser.password,
                     logUser.email, -1, "learner");
-            if (logUser.firstName.length() > 0) response.redirect("/verify-register/send");
+            if (logUser.firstName.length() > 0){
+                request.session().attribute("email",logUser.email); //saved to session
+                response.redirect("/verify-register/send");
+            }
             return new ModelAndView(map,"login.ftl");
         },engine);
 
@@ -111,8 +115,19 @@ public class App {
                 String hash = request.queryParams("key2");
                 boolean flag = DataMapper.verifyEmailofUser(email, hash);
             }
+
             return new ModelAndView(map,"verifyRegister.ftl");
         },engine);
+
+        post("/verify-register/:type",((request, response) -> {
+            String pageType = request.params(":type");
+            Map<String,String> formFields = extractFields(request.body());
+            Pair p = Register.postMethodDefaults(formFields, user_current, pwd_manager);
+            String email = request.session().attribute("email");
+            Map<String,Object> map = p.fst();
+            map.forEach((k,v)->map.put(k,v));
+            return new ModelAndView(map,"forgotPassword.ftl");
+        }),engine);
 
         get("/forgot-password/:type",((request, response) -> {
             String pageType = request.params(":type");
