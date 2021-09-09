@@ -616,7 +616,7 @@ public class DataMapper {
         try {
             email = URLDecoder.decode(email, "UTF-8");
             Connection conn = MySqlConnection.getConnection();
-            PreparedStatement pst = conn.prepareStatement("select Email, Hash from user_details where Email=?");
+            PreparedStatement pst = conn.prepareStatement("select Hash from user_details where Email=?");
             pst.setString(1, email);
             ResultSet rs = pst.executeQuery();
             if (rs.next()) {
