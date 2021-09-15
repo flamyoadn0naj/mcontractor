@@ -15,7 +15,11 @@
             Courses
         </h2>
         <h4 class="card-header border-primary text-black-50 mb-3" style="margin-top: -1.5%">
-            Create Course
+            <#if headingChange??>
+                Edit Course
+            <#else>
+                Create Course
+            </#if>
         </h4>
         <form style="display:flex; justify-content:center;" method="post" action="/courses/create-course?e=${e}">
             <div class="card" style="width: 80%">

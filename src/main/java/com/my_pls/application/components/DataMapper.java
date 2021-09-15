@@ -656,8 +656,7 @@ public class DataMapper {
         return flag;
     }
 
-    public static Pair login(String input_password, String emVal, securePassword pwd_manager) {
-        Pair p = new Pair();
+    public static User login(String input_password, String emVal, securePassword pwd_manager) {
         User user = new User();
         try {
             emVal = URLDecoder.decode(emVal, "UTF-8");
@@ -667,18 +666,14 @@ public class DataMapper {
             if(rs.next()) {
                 String db_password = rs.getString("Password");
 
-                if (pwd_manager.comparePassword(db_password, input_password)) {
+                if (pwd_manager.comparePassword(db_password, input_password))
                     user.setAll(rs.getString("First_Name"),rs.getString("Last_Name"),
                             db_password, emVal, rs.getInt("Id"), rs.getString("role"));
-                    p = new Pair(null, user);
-                } else {
-                    p = new Pair(null, new User());
-                }
             }
         } catch (Exception e) {
-            System.out.println("Error at Login post");
+            System.out.println("Error at Login call");
         }
-        return p;
+        return user;
     }
 
     public static int findDiscussionGroupIdByCourseId(int course_id) {
@@ -867,6 +862,22 @@ public class DataMapper {
             }
         } catch (Exception e) {
             System.out.println("Exception at verifyEmailofUser " + e);
+        }
+        return flag;
+    }
+
+    public static boolean deleteDGMember(int user_id, int dg_id) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("delete from dg_members where user_id=? and dg_id=?");
+            pst.setInt(1, user_id);
+            pst.setInt(2, dg_id);
+            int i = pst.executeUpdate();
+            if (i != 0) {
+                flag = true;
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at deleteDGMember " + e);
         }
         return flag;
     }

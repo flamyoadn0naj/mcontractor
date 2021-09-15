@@ -4,6 +4,7 @@ import com.my_pls.MySqlConnection;
 import com.my_pls.application.App;
 import com.my_pls.securePassword;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.*;
 import java.text.ParseException;
@@ -37,18 +38,24 @@ public class Login {
                 map.put("emailVal","");
                 map.put("loginErr", "");
             } else {
-                String emVal = formFields.get("email");
+                String emVal = null;
+                try {
+                    emVal = URLDecoder.decode(formFields.get("email"), "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
                 String input_password = formFields.get("pass");
-                Pair p2 = DataMapper.login(input_password, emVal, pwd_manager);
-                User u = p2.snd();
-                if (u.firstName.isEmpty()) {
+                user = DataMapper.login(input_password, emVal, pwd_manager);
+                if (user.firstName.isEmpty()) {
                     map.put("loginErr", "display:list-item;margin-left:5%");
                     map.put("errorEmail", "");
                     map.put("emailVal", emVal);
                 } else {
                     Connection conn = MySqlConnection.getConnection();
                     DataMapper.updateCourses(conn);
-                    user = p2.snd();
+                    map.put("loginErr", "");
+                    map.put("errorEmail", "");
+                    map.put("emailVal", emVal);
                 }
             }
         } else {

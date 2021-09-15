@@ -100,9 +100,15 @@ public class DiscussionGroups {
             map.put("refresh", flag);
         }
 
+        if (formFields.containsKey("cancel")) {
+            int groupId = Integer.parseInt(formFields.get("cancel"));
+            boolean flag = DataMapper.deleteRequestForGroup(id, groupId);
+            map.put("refresh", flag);
+        }
+
         if (formFields.containsKey("leave")) {
             int groupId = Integer.parseInt(formFields.get("leave"));
-            boolean flag = DataMapper.deleteRequestForGroup(id, groupId);
+            boolean flag = DataMapper.deleteDGMember(id, groupId);
             map.put("refresh", flag);
         }
 

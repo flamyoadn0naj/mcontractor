@@ -124,7 +124,7 @@
                                     <a class="text-muted" href="/discussion/group-desc">${v.name}</a>
                                 </th>
                                 <td>
-                                    <button name="leave" value="${k}" style="float: right" class="btn btn-primary" type="submit">Cancel</button>
+                                    <button name="cancel" value="${k}" style="float: right" class="btn btn-primary" type="submit">Cancel</button>
                                 </td>
                             </tr>
                         </#list>

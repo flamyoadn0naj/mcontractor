@@ -70,6 +70,7 @@ public class App {
             Map<String, Object> finalMap = map;
             map.forEach((k, v)-> finalMap.put(k,v));
             if (logUser.firstName.length() > 0) {
+                System.out.println(logUser);
                 Session session = request.session(true);
                 session.attribute("firstName", logUser.firstName);
                 session.attribute("lastName", logUser.lastName);
@@ -282,6 +283,7 @@ public class App {
                 allCourses.remove(map.get("prereq_course"));
                 map.put("course_id", map.get("prereq_course"));
                 map.put("prereqs", allCourses);
+                map.put("headingChange", true);
             } else {
                 LinkedHashMap<String, Boolean> days = CreateCourse.findAllDays();
                 System.out.println(days);
