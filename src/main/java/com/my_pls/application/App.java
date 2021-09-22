@@ -2,11 +2,23 @@ package com.my_pls.application;
 
 import com.my_pls.*;
 import com.my_pls.application.components.*;
-import spark.ModelAndView;
-import spark.Session;
-import spark.TemplateEngine;
+import spark.*;
 import spark.template.freemarker.FreeMarkerEngine;
 
+
+//things for file upload
+import spark.utils.IOUtils;
+import javax.servlet.MultipartConfigElement;
+import javax.servlet.ServletException;
+import javax.servlet.http.Part;
+import java.io.*;
+
+//end things for file upload
+
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.net.URLDecoder;
 
@@ -34,6 +46,14 @@ public class App {
 
         final TemplateEngine engine = new FreeMarkerEngine();
         staticFileLocation("/public"); //So that it has access to the pubic resources(stylesheets, etc.)
+
+        //file upload location
+        File uploadDir = new File("uploadFolder");
+        uploadDir.mkdir(); // create the upload directory if it doesn't exist
+        //folder is at the same hierarchy level as main
+        staticFiles.externalLocation("uploadFolder");
+
+
         internalServerError((request, response) -> {
             response.redirect("/err");
             return "{\"message\":\"Server Error\"}";
@@ -511,6 +531,39 @@ public class App {
             return new ModelAndView(map,"homePage.ftl");
         }),engine);
 
-    }
+        get("/upload",((request, response) -> {
+            //Session sess = request.session();
+            //String role = sess.attribute("role").toString();
+            Map<String,String> map = new HashMap<>();
+            //map.put("role", role);
+            return new ModelAndView(map,"upload.ftl");
+        }),engine);
 
+//        post("/upload", (request, response) -> {
+//            request.attribute("org.eclipse.multipartConfig", new MultipartConfigElement("/public/fileUpload/"));
+//            Part filePart = request.raw().getPart("myfile");
+//
+//            try (InputStream inputStream = filePart.getInputStream()) {
+//                OutputStream outputStream = new FileOutputStream("/public/fileUpload/" + filePart.getSubmittedFileName());
+//                IOUtils.copy(inputStream, outputStream);
+//                outputStream.close();
+//            }
+//
+//            return "File uploaded and saved.";
+//        });
+
+
+
+        post("/upload", (request, response) -> {
+            Path tempFile = Files.createTempFile(uploadDir.toPath(), "", "");
+
+            request.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
+
+            try (InputStream input = request.raw().getPart("myfile").getInputStream()) { // getPart needs to use same "name" as input field in form
+                Files.copy(input, tempFile, StandardCopyOption.REPLACE_EXISTING);
+            }
+            response.redirect("/uplaod");
+            return "Success!";
+        });
+    }
 }
