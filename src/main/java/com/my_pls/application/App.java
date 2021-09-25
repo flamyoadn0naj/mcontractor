@@ -19,6 +19,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.FileAttribute;
 import java.util.*;
 import java.net.URLDecoder;
 
@@ -539,30 +540,21 @@ public class App {
             return new ModelAndView(map,"upload.ftl");
         }),engine);
 
-//        post("/upload", (request, response) -> {
-//            request.attribute("org.eclipse.multipartConfig", new MultipartConfigElement("/public/fileUpload/"));
-//            Part filePart = request.raw().getPart("myfile");
-//
-//            try (InputStream inputStream = filePart.getInputStream()) {
-//                OutputStream outputStream = new FileOutputStream("/public/fileUpload/" + filePart.getSubmittedFileName());
-//                IOUtils.copy(inputStream, outputStream);
-//                outputStream.close();
-//            }
-//
-//            return "File uploaded and saved.";
-//        });
-
-
-
         post("/upload", (request, response) -> {
-            Path tempFile = Files.createTempFile(uploadDir.toPath(), "", "");
+
+            // tempFile = Files.createFile(uploadDir.toPath(), "test", ".pdf");
 
             request.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
 
             try (InputStream input = request.raw().getPart("myfile").getInputStream()) { // getPart needs to use same "name" as input field in form
-                Files.copy(input, tempFile, StandardCopyOption.REPLACE_EXISTING);
+                //Path tempFile = Files.createTempFile(uploadDir.toPath(), "test", ".pdf");
+                File newFile = new File(uploadDir.toPath().toString(),request.raw().getPart("myfile").getSubmittedFileName());
+                //System.out.println(uploadDir.toPath());
+                //System.out.println(request.raw().getPart("myfile").getSubmittedFileName());
+                Files.copy(input, newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
-            response.redirect("/uplaod");
+            System.out.println();
+            response.redirect("/upload");
             return "Success!";
         });
     }

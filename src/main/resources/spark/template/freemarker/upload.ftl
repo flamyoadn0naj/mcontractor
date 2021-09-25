@@ -16,7 +16,7 @@
         </h2>
         <form action="/upload" method="post" enctype="multipart/form-data">
             <label for="myfile">Select a file</label>
-            <input type="file" id="myfile" name="myfile"/>
+            <input type="file" id="myfile" name="myfile" />
             <input type="submit" id="buttonUpload" value="Upload"/>
             <br>
             <p>Result:&nbsp;:<span id="result"></span></p>
