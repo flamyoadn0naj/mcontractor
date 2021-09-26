@@ -19,7 +19,10 @@
             <input type="file" id="myfile" name="myfile" />
             <input type="submit" id="buttonUpload" value="Upload"/>
             <br>
-            <p>Result:&nbsp;:<span id="result"></span></p>
+        </form>
+        <form action="/download" method="post" enctype="multipart/form-data">
+            <input type="submit" id="buttonDL" value="Download"/>
+            <br>
         </form>
     </div>
 </div>

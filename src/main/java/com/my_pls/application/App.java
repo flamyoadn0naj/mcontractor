@@ -22,6 +22,8 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileAttribute;
 import java.util.*;
 import java.net.URLDecoder;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static spark.Spark.*;
 
@@ -556,6 +558,33 @@ public class App {
             System.out.println();
             response.redirect("/upload");
             return "Success!";
+        });
+
+        post("/download", (request,response)-> {
+            File file = new File("uploadFolder/PDFTest.pdf");
+            response.raw().setContentType("application/octet-stream");
+            response.raw().setHeader("Content-Disposition","attachment; filename="+file.getName()+".zip");
+            try {
+
+                try(ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(response.raw().getOutputStream()));
+                    BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file)))
+                {
+                    ZipEntry zipEntry = new ZipEntry(file.getName());
+
+                    zipOutputStream.putNextEntry(zipEntry);
+                    byte[] buffer = new byte[1024];
+                    int len;
+                    while ((len = bufferedInputStream.read(buffer)) > 0) {
+                        zipOutputStream.write(buffer,0,len);
+                    }
+                    zipOutputStream.flush();
+                    zipOutputStream.close();
+                }
+            } catch (Exception e) {
+
+            }
+
+            return null;
         });
     }
 }
