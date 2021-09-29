@@ -347,7 +347,9 @@ public class App {
         get("/enroll",((request, response) -> {
             Session sess = request.session();
             String role = sess.attribute("role").toString();
-            Map<String,String> map = new HashMap<>();
+            Map<String,Object> map = new HashMap<>();
+            ArrayList<Map<String,Object>> courses = Enrollment.findAllAvailableCourses();
+            map.put("courses", courses);
             map.put("role", role);
             return new ModelAndView(map,"enroll.ftl");
         }),engine);
@@ -355,7 +357,7 @@ public class App {
         post("/enroll",((request, response) -> {
             Session sess = request.session();
             String role = sess.attribute("role").toString();
-            Map<String,String> map = new HashMap<>();
+            Map<String,Object> map = new HashMap<>();
             Map<String,String> formFields = extractFields(request.body());
             System.out.println(formFields);
             map.put("role", role);

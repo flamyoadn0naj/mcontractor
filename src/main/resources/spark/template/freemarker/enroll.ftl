@@ -20,10 +20,10 @@
                     <input class="form-control col-7" name="searchText" type="text" placeholder="Search" value="software">
                     <select class="form-control col-2" name="filterBy" id="exampleSelect1">
                         <option>All</option>
-                        <option>Course</option>
-                        <option>Professor</option>
+                        <option>Open</option>
+                        <option>Closed</option>
                     </select>
-                    <button class="btn btn-primary my-2 my-sm-0 col-2" type="submit">Search</button>
+                    <button disabled class="btn btn-primary my-2 my-sm-0 col-2" type="submit">Search</button>
                 </div>
 
                 <div style="margin-top: 2%">
@@ -37,21 +37,38 @@
                             <th scope="col">Meeting Time</th>
                             <th scope="col">Rating</th>
                         </tr>
-                        <tr>
-                            <th scope="row"><a class="text-muted" href="enroll/about">Introduction to Software Engineering</a></th>
-                            <td>AbdulMutalib Wahaishi</td>
-                            <td>Open</td>
-                            <td>3</td>
-                            <td>Tuesday, Thursday</td>
-                            <td>9:30 am - 10:45 am</td>
-                            <td>
-                                <span class="fa fa-star checked large"></span>
-                                <span class="fa fa-star checked large"></span>
-                                <span class="fa fa-star checked large"></span>
-                                <span class="fa fa-star checked large"></span>
-                                <span class="fa fa-star large"></span>
-                            </td>
-                        </tr>
+                        <#if courses??>
+                            <#list courses as c>
+                                <tr>
+                                    <th scope="row"><a class="text-muted" href="enroll/about/${c.id}">${c.name}</a></th>
+                                    <td>${c.prof}</td>
+                                    <td>${c.state}</td>
+                                    <td>${c.credits}</td>
+                                    <td>${c.meeting_days}</td>
+                                    <td>${c.startTimeF} - ${c.endTimeF}</td>
+                                    <td>
+                                        <#if c.rating??>
+                                            <#if c.rating == 0>
+                                                <span class="fa fa-star large"></span>
+                                                <span class="fa fa-star large"></span>
+                                                <span class="fa fa-star large"></span>
+                                                <span class="fa fa-star large"></span>
+                                                <span class="fa fa-star large"></span>
+                                            <#else>
+                                                <#list 1..c.rating as i>
+                                                    <span class="fa fa-star checked large"></span>
+                                                </#list>
+                                                <#list 1..c.unchecked as j>
+                                                    <span class="fa fa-star large"></span>
+                                                </#list>
+                                            </#if>
+                                            <#else>
+                                            No Rating Available
+                                        </#if>
+                                    </td>
+                                </tr>
+                            </#list>
+                        </#if>
                         <tr>
                             <th scope="row">Software Process and Management</th>
                             <td>Samuel Malachowsky</td>

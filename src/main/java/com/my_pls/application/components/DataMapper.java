@@ -515,6 +515,12 @@ public class DataMapper {
                 details.put("endDate",e);
                 details.put("status",rs.getString("status"));
                 details.put("id",String.valueOf(rs.getInt("id")));
+                details.put("cap", String.valueOf(rs.getInt("total_capacity")));
+                details.put("enrolled", String.valueOf(rs.getInt("enrolled")));
+                details.put("credits", String.valueOf(rs.getInt("credits")));
+                details.put("startTime", String.valueOf(rs.getString("start_Time")));
+                details.put("endTime", String.valueOf(rs.getString("end_Time")));
+                details.put("meeting_days",rs.getString("meeting_days"));
                 String prereq = "None";
                 Integer p = rs.getInt("prereq");
                 if (p != null && p != 0) prereq = String.valueOf(findCourseByCourseId(String.valueOf(p)).get("name"));
