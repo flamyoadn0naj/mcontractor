@@ -364,11 +364,20 @@ public class App {
             return new ModelAndView(map,"enroll.ftl");
         }),engine);
 
-        get("/enroll/about",((request, response) -> {
+        get("/enroll/about/:number",((request, response) -> {
             Session sess = request.session();
             String role = sess.attribute("role").toString();
             Map<String,String> map = new HashMap<>();
             map.put("role", role);
+
+            //display course specific info
+            map.put("courseNumber", request.params(":number"));
+            Map<String, Object> tempCourse = DataMapper.findCourseByCourseId(request.params(":number"));
+            for(Map.Entry<String, Object> entry: tempCourse.entrySet()){
+                map.put(entry.getKey(), entry.getValue().toString());
+                System.out.println(entry.getKey() + ", " + entry.getValue().toString());
+            }
+            map.put("profName",DataMapper.findProfName(Integer.parseInt(map.get("prof_id"))));
             return new ModelAndView(map,"enrollAbout.ftl");
         }),engine);
 

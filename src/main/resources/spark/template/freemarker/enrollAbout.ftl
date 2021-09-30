@@ -20,14 +20,15 @@
         <div style="width: 90%; margin-left: 2%">
             <div id="myTabContent" class="tab-content" style="margin:2%">
                 <div class="tab-pane fade active show" id="about">
-                    <p><b>Professor:</b> AbdulMutalib Wahaishi</p>
-                    <p><b>Meeting Days:</b> Tuesday, Thursday</p>
-                    <p><b>Meeting Time:</b> 5pm - 6:15pm </p>
-                    <p><b>Credits:</b> 3</p>
-                    <p><b>Pre-requisite:</b> None</p>
+
+                    <p><b>Professor:</b> ${profName}</p>
+                    <p><b>Meeting Days:</b> ${meeting_days}</p>
+                    <p><b>Meeting Time:</b> ${start_time} - ${end_time} </p>
+                    <p><b>Credits:</b> ${credits}</p>
+                    <p><b>Pre-requisite:</b> ${prereq_course}</p>
                     <p><b>Requirements:</b> To pass, you must get a C minimum</p>
-                    <p><b>Learning Objectives:</b> None</p>
-                    <p><b>Total Capacity:</b> 30</p>
+                    <p><b>Learning Objectives:</b> ${obj}</p>
+                    <p><b>Total Capacity:</b> ${cap}</p>
                     <p><b>Seats Available:</b> 5</p>
                     <p><b>Rating:</b>
                         <span class="fa fa-star checked "></span>

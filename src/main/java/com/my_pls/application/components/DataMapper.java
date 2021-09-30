@@ -266,7 +266,7 @@ public class DataMapper {
                 prof = rs.getInt("profId");
 
             }
-            rating = rating / feedback.size();
+            if(feedback.size() > 0) rating = rating / feedback.size();
             int unchecked = 5 - rating;
             ratingsObj.put("rating", rating);
             ratingsObj.put("feedback", feedback);
@@ -275,6 +275,7 @@ public class DataMapper {
             ratingsObj.put("prof_id", prof);
         } catch (Exception e) {
             System.out.println("Exception in getRatingAndFeedbackOfCourseGivenCourseId");
+            System.out.println(e.getMessage());
         }
         return ratingsObj;
     }

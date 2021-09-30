@@ -18,7 +18,6 @@
             <#if role == "prof">
                 <button type="button" class="btn btn-primary" style="float: right;">Save</button>
                 <button type="button" class="btn btn-primary" style="float: right; margin-right: 2%">Add Lesson</button>
-
             </#if>
             <ul class="nav nav-tabs">
                 <li class="nav-item">
