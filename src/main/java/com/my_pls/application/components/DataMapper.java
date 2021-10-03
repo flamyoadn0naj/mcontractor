@@ -328,13 +328,15 @@ public class DataMapper {
                 rating += rs.getInt("score");
                 feedback.add(rs.getString("feedback"));
             }
-            rating = rating / feedback.size();
-            int unchecked = 5 - rating;
-            ratingsObj.put("rating", rating);
-            ratingsObj.put("feedback", feedback);
-            ratingsObj.put("name", name);
-            ratingsObj.put("unchecked", unchecked);
-            ratingsObj.put("role", role);
+            if (!feedback.isEmpty()) {
+                rating = rating / feedback.size();
+                int unchecked = 5 - rating;
+                ratingsObj.put("rating", rating);
+                ratingsObj.put("feedback", feedback);
+                ratingsObj.put("name", name);
+                ratingsObj.put("unchecked", unchecked);
+                ratingsObj.put("role", role);
+            }
         } catch (Exception e) {
             System.out.println("Exception in getRatingAndFeedbackOfUser");
         }
@@ -885,6 +887,23 @@ public class DataMapper {
             }
         } catch (Exception e) {
             System.out.println("Exception at deleteDGMember " + e);
+        }
+        return flag;
+    }
+
+    public static boolean rateUser(int user_id, int rate_value, String feedback) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("insert into user_ratings (userId, score, feedback) VALUES (?,?,?)");
+            pst.setInt(1, user_id);
+            pst.setInt(2, rate_value);
+            pst.setString(3, feedback);
+            int i = pst.executeUpdate();
+            if (i != 0) {
+                flag = true;
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at getPendingGroupRequests " + e);
         }
         return flag;
     }

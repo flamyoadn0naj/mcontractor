@@ -41,13 +41,20 @@ public class Rating {
         return options;
     }
 
-    public static Map<String,Object> getMethodFunctionality() {
+    public static Map<String,Object> getMethodFunctionality(String role) {
         Map<String,Object> map = new HashMap<>();
-        map.put("role","admin");
         map.put("ratings", true);
         map.put("searchOptions", getSearchOptions(""));
-        Map<Integer, Map<String, Object>> users = getAllUserRatings("","");
-        Map<Integer, Map<String, Object>> courses = getAllCourseRatings("");
+        Map<Integer, Map<String, Object>> users = new HashMap<>();
+        Map<Integer, Map<String, Object>> courses = new HashMap<>();
+        if (role.contentEquals("learner"))
+            users = getAllUserRatings("","prof");
+        if (role.contentEquals("prof"))
+            users = getAllUserRatings("","learner");
+        if (role.contentEquals("admin")) {
+            users = getAllUserRatings("","");
+            courses = getAllCourseRatings("");
+        }
         map.put("users", users);
         map.put("courses", courses);
         if (users.isEmpty()) map.put("userEmpty", true);
@@ -55,18 +62,50 @@ public class Rating {
         return map;
     }
 
-    public static Map<String,Object> postMethodFunctionality(Map<String, String> formFields) {
+    public static boolean addRating(Map<String, String> formFields) {
+        boolean flag = false;
+        try {
+            String feedback = URLDecoder.decode(formFields.get("feedback"), "UTF-8");
+            int id = Integer.parseInt(formFields.get("doneRating"));
+            int rate_value = Integer.parseInt(formFields.get("Rating"));
+            flag = DataMapper.rateUser(id, rate_value, feedback);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        return flag;
+    }
+
+    public static Map<String,Object> postMethodFunctionality(Map<String, String> formFields, String role) {
         Map<String,Object> map = new HashMap<>();
         Map<Integer, Map<String, Object>> users = getAllUserRatings("","");
         Map<Integer, Map<String, Object>> courses = getAllCourseRatings("");
-        System.out.println(formFields);
         if (formFields == null) {
             map.put("ratings", true);
             map.put("users", users);
             map.put("courses", courses);
             map.put("searchOptions", getSearchOptions(""));
         } else {
-            if (formFields.containsKey("userId"))
+            if (formFields.containsKey("rate")) {
+                map.put("user_details", users.get(Integer.parseInt(formFields.get("rate"))));
+                map.put("rateUser", true);
+                map.put("curr_user", formFields.get("rate"));
+            } else if (formFields.containsKey("doneRating")) {
+                boolean addedRating = addRating(formFields);
+                if (addedRating) {
+                    map.put("success", "true");
+                    map.put("ratings", true);
+                } else {
+                    map.put("err", "true");
+                    map.put("user_details", users.get(Integer.parseInt(formFields.get("doneRating"))));
+                    map.put("rateUser", true);
+                    map.put("curr_user", formFields.get("rate"));
+                }
+                if (role.contentEquals("learner")) users = getAllUserRatings("", "prof");
+                if (role.contentEquals("prof")) users = getAllUserRatings("", "learner");
+                map.put("users", users);
+            }
+            else if (formFields.containsKey("userId"))
                 map.put("feedback",users.get(Integer.parseInt(formFields.get("userId"))));
             else if (formFields.containsKey("courseId"))
                 map.put("feedback", courses.get(Integer.parseInt(formFields.get("courseId"))));
@@ -85,12 +124,15 @@ public class Rating {
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
-                    String filter = formFields.get("filterBy");
+                    String filter = "";
+                    if (role.contentEquals("learner")) filter = "prof";
+                    if (role.contentEquals("prof")) filter = "learner";
+                    if (role.contentEquals("admin")) filter = formFields.get("filterBy");
+
                     users = getAllUserRatings(searchText, filter);
                     map.put("searchText", searchText);
                     map.put("filterKey", filter);
                     map.put("filterVal", Admin.mapFilterKey(filter));
-                    System.out.println( getSearchOptions(filter));
                     map.put("searchOptions", getSearchOptions(filter));
                 }
                 map.put("ratings", true);

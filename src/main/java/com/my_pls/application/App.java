@@ -384,7 +384,7 @@ public class App {
         get("/ratings",((request, response) -> {
             Session sess = request.session();
             String role = sess.attribute("role").toString();
-            Map<String, Object> map = Rating.getMethodFunctionality();
+            Map<String, Object> map = Rating.getMethodFunctionality(role);
             map.forEach((k,v)->map.put(k,v));
             map.put("role", role);
             return new ModelAndView(map,"ratings.ftl");
@@ -394,7 +394,7 @@ public class App {
             Session sess = request.session();
             String role = sess.attribute("role").toString();
             Map<String,String> formFields = extractFields(request.body());
-            Map<String,Object> map = Rating.postMethodFunctionality(formFields);
+            Map<String,Object> map = Rating.postMethodFunctionality(formFields, role);
             map.forEach((k,v)->map.put(k,v));
             map.put("role", role);
             return new ModelAndView(map,"ratings.ftl");
@@ -462,14 +462,6 @@ public class App {
             Map<String,String> map = new HashMap<>();
             map.put("role", role);
             return new ModelAndView(map,"discussionPost.ftl");
-        }),engine);
-
-        get("/rating/individual",((request, response) -> {
-            Session sess = request.session();
-            String role = sess.attribute("role").toString();
-            Map<String,String> map = new HashMap<>();
-            map.put("role",role);
-            return new ModelAndView(map,"ratingsIndividual.ftl");
         }),engine);
 
         get("/approval",((request, response) -> {

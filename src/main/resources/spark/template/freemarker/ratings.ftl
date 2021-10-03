@@ -14,100 +14,137 @@
         <h2 class="card-header border-primary text-black-50 mb-3">
             Ratings & Feedback
         </h2>
+        <#if success??>
+            <#if success == "true">
+                <div class="alert alert-dismissible alert-success" style="margin-top: -1.5%">
+                    Your rating has successfully been recorded.
+                </div>
+            </#if>
+        </#if>
+
+        <#if errorLink??>
+            <div class="alert alert-dismissible alert-danger" style="margin-top: -1.5%">
+                <strong>Error!</strong> Something went wrong, please try again.</a>
+            </div>
+        </#if>
         <div class="card" style="width: 95%; border:none; margin-left: 2.5%">
             <#if ratings??>
                 <#if role == "prof">
-                    <form style="display:flex; justify-content:center;" action="/ratings" method="post">
-                        <div class="space-between">
-                            <input class="form-control col-7" name="searchTextUser" type="text" placeholder="Search" value="">
-                            <button class="btn btn-primary my-2 my-sm-0 col-2" type="submit">Search</button>
+                    <form action="/ratings" method="post">
+                        <div class="space-between mb-2">
+                            <input required class="form-control col-7" name="searchText" type="text" placeholder="Search" value="${searchText!""}">
+                            <button class="btn btn-primary col-2" id="user" name="search" value="user" type="submit">Search</button>
+                            <a class="text-white btn btn-primary my-2 my-sm-0 col-2" href="/ratings">
+                                Clear
+                            </a>
                         </div>
                     </form>
-                    <div style="margin-top: 2%">
-                        <table class="table table-bordered">
-                            <tr class="table-primary">
-                                <th scope="col">Learner</th>
-                                <th scope="col">Rating</th>
-                                <th scope="col">Action</th>
-                            </tr>
-                            <tr>
-                                <th scope="row">Saad Hassan</th>
-                                <td>
-                                    <span class="fa fa-star checked large"></span>
-                                    <span class="fa fa-star checked large"></span>
-                                    <span class="fa fa-star checked large"></span>
-                                    <span class="fa fa-star checked large"></span>
-                                    <span class="fa fa-star large"></span>
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-primary">
-                                        <a href="/rating/individual" class="text-white">Rate</a>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Maheen Contractor</th>
-                                <td>
-                                    <span class="fa fa-star checked large"></span>
-                                    <span class="fa fa-star checked large"></span>
-                                    <span class="fa fa-star checked large"></span>
-                                    <span class="fa fa-star large"></span>
-                                    <span class="fa fa-star large"></span>
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-primary">
-                                        <a href="" class="text-white">Rate</a>
-                                    </button>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
+                    <form method="post" action="/ratings" class="mb-5">
+                        <div style="margin-top: 2%">
+                            <table class="table table-bordered">
+                                <tr class="table-primary">
+                                    <th scope="col">Professor</th>
+                                    <th scope="col">Rating</th>
+                                    <th scope="col">Feedback</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                                <#if users??>
+                                    <#list users as i,u>
+                                        <tr>
+                                            <th scope="row">${u.name}</th>
+                                            <td>
+                                                <#if u.rating == 0>
+                                                    <span class="fa fa-star large"></span>
+                                                    <span class="fa fa-star large"></span>
+                                                    <span class="fa fa-star large"></span>
+                                                    <span class="fa fa-star large"></span>
+                                                    <span class="fa fa-star large"></span>
+                                                <#else>
+                                                    <#list 1..u.rating as i>
+                                                        <span class="fa fa-star checked large"></span>
+                                                    </#list>
+                                                    <#list 1..u.unchecked as j>
+                                                        <span class="fa fa-star large"></span>
+                                                    </#list>
+                                                </#if>
+                                            </td>
+                                            <td>
+                                                <button type="submit" name="userId" value=${i} class="btn-download">
+                                                    <i class="fa fa-eye"></i>
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <button type="submit" class="btn btn-primary text-white" name="rate" value=${i}>
+                                                    Rate
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </#list>
+                                </#if>
+                            </table>
+                            <#if userEmpty??>
+                                <div>No Results Found</div>
+                            </#if>
+                        </div>
+                    </form>
                 <#elseif role == "learner">
-                    <form style="display:flex; justify-content:center;" action="/ratings" method="post">
-                        <div class="space-between">
-                            <input class="form-control col-7" name="searchTextUser" type="text" placeholder="Search" value="">
-                            <button class="btn btn-primary my-2 my-sm-0 col-2" type="submit">Search</button>
+                    <form action="/ratings" method="post">
+                        <div class="space-between mb-2">
+                            <input required class="form-control col-7" name="searchText" type="text" placeholder="Search" value="${searchText!""}">
+                            <button class="btn btn-primary col-2" id="user" name="search" value="user" type="submit">Search</button>
+                            <a class="text-white btn btn-primary my-2 my-sm-0 col-2" href="/ratings">
+                                Clear
+                            </a>
                         </div>
                     </form>
-                    <div style="margin-top: 2%">
-                        <table class="table table-bordered">
-                            <tr class="table-primary">
-                                <th scope="col">Professor</th>
-                                <th scope="col">Rating</th>
-                                <th scope="col">Action</th>
-                            </tr>
-                            <tr>
-                                <th scope="row">AbdulMutalib Wahaishi</th>
-                                <td>
-                                    <span class="fa fa-star checked large"></span>
-                                    <span class="fa fa-star checked large"></span>
-                                    <span class="fa fa-star checked large"></span>
-                                    <span class="fa fa-star checked large"></span>
-                                    <span class="fa fa-star large"></span>
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-primary">
-                                        <a href="/rating/individual" class="text-white">Rate</a>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Samuel Malachowsky</th>
-                                <td>
-                                    <span class="fa fa-star checked large"></span>
-                                    <span class="fa fa-star checked large"></span>
-                                    <span class="fa fa-star checked large"></span>
-                                    <span class="fa fa-star large"></span>
-                                    <span class="fa fa-star large"></span>
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-primary">
-                                        <a href="" class="text-white">Rate</a>
-                                    </button>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
+                    <form method="post" action="/ratings" class="mb-5">
+                            <div style="margin-top: 2%">
+                                <table class="table table-bordered">
+                                    <tr class="table-primary">
+                                        <th scope="col">Professor</th>
+                                        <th scope="col">Rating</th>
+                                        <th scope="col">Feedback</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                    <#if users??>
+                                        <#list users as i,u>
+                                            <tr>
+                                                <th scope="row">${u.name}</th>
+                                                <td>
+                                                    <#if u.rating == 0>
+                                                        <span class="fa fa-star large"></span>
+                                                        <span class="fa fa-star large"></span>
+                                                        <span class="fa fa-star large"></span>
+                                                        <span class="fa fa-star large"></span>
+                                                        <span class="fa fa-star large"></span>
+                                                    <#else>
+                                                        <#list 1..u.rating as i>
+                                                            <span class="fa fa-star checked large"></span>
+                                                        </#list>
+                                                        <#list 1..u.unchecked as j>
+                                                            <span class="fa fa-star large"></span>
+                                                        </#list>
+                                                    </#if>
+                                                </td>
+                                                <td>
+                                                    <button type="submit" name="userId" value=${i} class="btn-download">
+                                                        <i class="fa fa-eye"></i>
+                                                    </button>
+                                                </td>
+                                                <td>
+                                                    <button type="submit" class="btn btn-primary text-white" name="rate" value=${i}>
+                                                        Rate
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </#list>
+                                    </#if>
+                                </table>
+                                <#if userEmpty??>
+                                    <div>No Results Found</div>
+                                </#if>
+                            </div>
+                    </form>
                 <#else>
                     <div style="margin-top: 1%">
                         <h3> Users </h3>
@@ -242,6 +279,9 @@
                             </tr>
                         </#list>
                     </table>
+                </#if>
+                <#if rateUser??>
+                    <#include "ratingsIndividual.ftl">
                 </#if>
             </#if>
 
