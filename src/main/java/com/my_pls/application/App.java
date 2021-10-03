@@ -198,6 +198,16 @@ public class App {
             return new ModelAndView(map,"courseLearnMat.ftl");
         }),engine);
 
+        get("/course/learnMat/:number",((request, response) -> {
+            Map<String,Object> map = new HashMap<>();
+            Session sess = request.session();
+            map.put("role", sess.attribute("role").toString());
+            //add each lesson
+            map.put("lessons",DataMapper.getLessonsByCourseId(Integer.parseInt(request.params(":number"))));
+            map.put("courseNumber",request.params(":number"));
+            return new ModelAndView(map,"courseLearnMatS.ftl");
+        }),engine);
+
         get("/course/quiz",((request, response) -> {
             Map<String,String> map = new HashMap<>();
             Session sess = request.session();

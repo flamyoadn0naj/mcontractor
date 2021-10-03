@@ -49,7 +49,7 @@
                             <div class="card-header" id="headingOne">
                                 <h5 class="mb-0">
                                     <span class="text-primary small" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                        Lesson #1
+                                        Lesson #1 <#if courseNumber??>${courseNumber}<#else>no courseNum</#if>
                                     </span>
                                     <#if role == "prof">
                                         <div style="float: right">
