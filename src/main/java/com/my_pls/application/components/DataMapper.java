@@ -1,5 +1,6 @@
 package com.my_pls.application.components;
 
+import com.my_pls.Lesson;
 import com.my_pls.MySqlConnection;
 import com.my_pls.securePassword;
 import com.my_pls.sendEmail;
@@ -820,6 +821,40 @@ public class DataMapper {
             System.out.println("Exception at getPendingGroupRequests " + e);
         }
         return groups;
+    }
+
+    public static ArrayList<Lesson> getLessonsByCourseId(int id){
+        ArrayList<Lesson> allLessons = new ArrayList<>();
+        try {
+            PreparedStatement pst = conn.prepareStatement("select * from lessons where courseId="+ id);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                Lesson temp = new Lesson(rs.getInt("Id"),
+                        rs.getString("name"),
+                        rs.getString("requirements"));
+                temp.materials = getLearningMaterialsByLessonId(rs.getInt("Id"));
+                //System.out.println(rs.getString("requirements"));
+                allLessons.add(temp);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at getPendingGroupRequests " + e);
+        }
+        System.out.println(allLessons);
+        return allLessons;
+    }
+
+    public static List<String> getLearningMaterialsByLessonId(int id){
+        List<String> materials = new ArrayList<>();
+        try {
+            PreparedStatement pst = conn.prepareStatement("select * from learning_materials where lessonId="+ id);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                materials.add(rs.getString("content"));
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at getPendingGroupRequests " + e);
+        }
+        return materials;
     }
 
     public static boolean requestToJoinGroup(int id, int dg_id) {
