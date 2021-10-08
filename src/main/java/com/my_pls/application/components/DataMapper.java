@@ -979,4 +979,57 @@ public class DataMapper {
         }
         return requests;
     }
+
+    public static Map<Integer, Object> getMyCourses(int id) {
+        Map<Integer,Object> courses = new HashMap<>();
+        try {
+            PreparedStatement ps = conn.prepareStatement("select * from enrollments where userId="+ id);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> details = findCourseByCourseId(String.valueOf(rs.getInt("courseId")));
+                courses.put(rs.getInt("courseId"), details);
+            }
+
+        } catch (Exception e) {
+            System.out.println("Exception at getMyCourses");
+        }
+        return courses;
+    }
+
+    public static Map<Integer, Object> getTaughtCourses(int id) {
+        Map<Integer,Object> courses = new HashMap<>();
+        try {
+            PreparedStatement ps = conn.prepareStatement("select * from courses where profId="+ id);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> details = new HashMap<>();
+                details.put("name",rs.getString("course_name"));
+                String prof = DataMapper.findProfName(rs.getInt("profId"));
+                details.put("prof",prof);
+                LocalDate startDate = LocalDate.parse(rs.getString("start_date"));
+                String s = startDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+                LocalDate endDate = LocalDate.parse(rs.getString("end_date"));
+                String e = endDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+                details.put("startDate",s);
+                details.put("endDate",e);
+                details.put("status",rs.getString("status"));
+                details.put("id",rs.getInt("id"));
+                details.put("cap",rs.getInt("total_capacity"));
+                details.put("enrolled", rs.getInt("enrolled"));
+                details.put("credits", rs.getInt("credits"));
+                details.put("startTime", rs.getString("start_Time"));
+                details.put("endTime", rs.getString("end_Time"));
+                details.put("meeting_days",rs.getString("meeting_days"));
+                String prereq = "None";
+                Integer p = rs.getInt("prereq");
+                if (p != null && p != 0) prereq = String.valueOf(findCourseByCourseId(String.valueOf(p)).get("name"));
+                details.put("prereq", prereq);
+                courses.put(rs.getInt("id"), details);
+            }
+
+        } catch (Exception e) {
+            System.out.println("Exception at getTaughtCourses");
+        }
+        return courses;
+    }
 }

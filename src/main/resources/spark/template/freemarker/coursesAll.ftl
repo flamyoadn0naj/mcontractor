@@ -24,17 +24,17 @@
                 </li>
             </ul>
             <form method="post" action="/courses/all">
-                <div class="space-between">
-                    <div>
+                <div style="display: flex">
+                    <div style="width: 50%">
                         <#if role == "admin">
-                            <button class="btn btn-primary col-12 text-white" style="float:left">
+                            <button class="btn btn-primary text-white" style="float:left">
                                 <a href="/courses/create-course" class="text-white">Create Course</a>
                             </button>
                         </#if>
                     </div>
-                    <div class="mb-3" style="display: flex">
-                        <b style="margin-top: 2%" class="col-5">Filter By:</b>
-                        <select class="form-control col-5" name="filterBy" id="exampleSelect1" style="margin-right: 2%">
+                    <div class="mb-3" style="width: 50%; display: flex; justify-content: flex-end">
+                        <b class="col-2" style="margin-top: 2%" >Filter By:</b>
+                        <select class="form-control col-4" name="filterBy" id="exampleSelect1" style="margin-right: 2%">
                             <#list filterOptions as op>
                                 <option>${op}</option>
                             </#list>
@@ -42,7 +42,10 @@
                                 <option selected>${filterStatus}</option>
                             </#if>
                         </select>
-                        <button class="btn btn-primary col-5" type="submit">Search</button>
+                        <button class="btn btn-primary col-3" type="submit">Search</button>
+                        <a class="col-3" href="/courses/all">
+                            <button class="btn btn-primary col-12" type="button">Clear</button>
+                        </a>
                     </div>
                 </div>
             </form>
@@ -81,6 +84,9 @@
                     </#list>
                 </#if>
             </table>
+            <#if !courses??>
+                <div style="margin-left: 2%"> No Results Found</div>
+            </#if>
         </div>
     </div>
 </div>

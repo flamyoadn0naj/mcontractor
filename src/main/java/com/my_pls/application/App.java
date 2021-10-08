@@ -184,7 +184,7 @@ public class App {
             return new ModelAndView(map,"homePage.ftl");
         }),engine);
 
-        get("/course/about",((request, response) -> {
+        get("/course/about/:number",((request, response) -> {
             Map<String,String> map = new HashMap<>();
             Session sess = request.session();
             map.put("role", sess.attribute("role"));
@@ -268,10 +268,10 @@ public class App {
             Map<String,Object> map = new HashMap<>();
             if (formFields.containsKey("filterBy")) map = Courses.getMethodDefaults(formFields.get("filterBy"));
             else map = Courses.getMethodDefaults("");
-            if (formFields.containsKey("pre-reqs")) {
-                System.out.println(formFields);
-                map.put("prereq", true);
-            }
+//            if (formFields.containsKey("pre-reqs")) {
+//                System.out.println(formFields);
+//                map.put("prereq", true);
+//            }
             Map<String, Object> finalMap = map;
             map.forEach((k, v)-> finalMap.put(k,v));
             map.put("role",role);
@@ -282,16 +282,43 @@ public class App {
             Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
             String role = sess.attribute("role").toString();
+            int id = sess.attribute("id");
+            Map<Integer, Object> courses = Courses.getMyCourses(id, role);
+            map.put("filterStatus", "All");
+            ArrayList<String> filterOptions = new ArrayList<>();
+            filterOptions.add("Current");
+            filterOptions.add("Upcoming");
+            filterOptions.add("Completed");
+            map.put("filterOptions",filterOptions);
+            if (!courses.isEmpty()) map.put("courses", courses);
             map.put("role", role);
             return new ModelAndView(map,"courses.ftl");
         }),engine);
 
         post("/courses",((request, response) -> {
-            Map<String,String> map = new HashMap<>();
+            Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
             String role = sess.attribute("role").toString();
-            map.put("role", role);
+            int id = sess.attribute("id");
+            Map<Integer, Object> courses = Courses.getMyCourses(id, role);
             Map<String,String> formFields = extractFields(request.body());
+            String filterStatus = "All";
+            ArrayList<String> filterOptions = new ArrayList<>();
+            filterOptions.add("All");
+            filterOptions.add("Current");
+            filterOptions.add("Upcoming");
+            filterOptions.add("Completed");
+
+            if (formFields.containsKey("filterBy")) {
+                if (!formFields.get("filterBy").contentEquals("All"))
+                    courses = Courses.filterCourses(formFields.get("filterBy"), courses);
+                filterStatus = formFields.get("filterBy");
+            }
+            map.put("filterStatus",filterStatus);
+            filterOptions.remove(new String(filterStatus));
+            map.put("courses", courses);
+            map.put("filterOptions",filterOptions);
+            map.put("role", role);
             return new ModelAndView(map,"courses.ftl");
         }),engine);
 
