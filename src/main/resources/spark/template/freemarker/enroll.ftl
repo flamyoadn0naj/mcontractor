@@ -49,11 +49,7 @@
                                     <td>
                                         <#if c.rating??>
                                             <#if c.rating == 0>
-                                                <span class="fa fa-star large"></span>
-                                                <span class="fa fa-star large"></span>
-                                                <span class="fa fa-star large"></span>
-                                                <span class="fa fa-star large"></span>
-                                                <span class="fa fa-star large"></span>
+                                                No Rating Available
                                             <#else>
                                                 <#list 1..c.rating as i>
                                                     <span class="fa fa-star checked large"></span>

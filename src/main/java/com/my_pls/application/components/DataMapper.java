@@ -184,6 +184,7 @@ public class DataMapper {
                 map.put("cap",rs.getInt("total_capacity"));
                 int prof_id = rs.getInt("profId");
                 map.put("prof_id", prof_id);
+                map.put("status", rs.getString("status"));
                 String meeting_days = rs.getString("meeting_days");
                 map.put("meeting_days", meeting_days);
                 map.put("prereq_course", rs.getInt("prereq"));
@@ -987,6 +988,18 @@ public class DataMapper {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Map<String, Object> details = findCourseByCourseId(String.valueOf(rs.getInt("courseId")));
+                String prof = DataMapper.findProfName((Integer) details.get("prof_id"));
+                details.put("prof",prof);
+                String prereq = "None";
+                Integer p = (Integer) details.get("prereq_course");
+                if (p != null && p != 0) prereq = String.valueOf(findCourseByCourseId(String.valueOf(p)).get("name"));
+                details.put("prereq", prereq);
+                LocalDate startDate = LocalDate.parse(details.get("start_date").toString());
+                String s = startDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+                LocalDate endDate = LocalDate.parse(details.get("end_date").toString());
+                String e = endDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+                details.put("startDate",s);
+                details.put("endDate",e);
                 courses.put(rs.getInt("courseId"), details);
             }
 
