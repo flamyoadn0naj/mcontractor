@@ -167,7 +167,7 @@ public class DataMapper {
         return flag;
     }
 
-    public static Map<String, Object> findCourseByCourseId (String id){
+    public static Map<String, Object> findCourseByCourseId (String id) {
         Map<String, Object> map = new HashMap<>();
         try {
             PreparedStatement pst = conn.prepareStatement("select * from courses where id=?");
@@ -203,7 +203,10 @@ public class DataMapper {
                 details.put("name", rs.getString("name"));
                 if (rs.getInt("privacy") == 1) details.put("privacy", true);
                 Integer course = rs.getInt("course_id");
-                if (course != 0) details.put("course", true);
+                if (course != 0) {
+                    details.put("course", true);
+                    details.put("course_id", course);
+                }
                 details.put("id", dg_id);
             }
         } catch (Exception e) {
@@ -941,5 +944,39 @@ public class DataMapper {
             System.out.println("Exception at getPendingGroupRequests " + e);
         }
         return flag;
+    }
+
+    public static Map<Integer, String> viewAllGroupMembers(int dg_id) {
+        Map<Integer, String> members = new HashMap<>();
+        try {
+            PreparedStatement pst = conn.prepareStatement("select user_id, First_Name, Last_Name from " +
+                    "dg_members, user_details where user_id=Id and dg_id="+ dg_id);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                String name = rs.getString("First_Name") + " " + rs.getString("Last_Name");
+                int user_id = rs.getInt("user_id");
+                members.put(user_id, name);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at viewAllGroupMembers " + e);
+        }
+        return members;
+    }
+
+    public static Map<Integer, String> getAllPendingGroupRequestsOfGroup(int dg_id) {
+        Map<Integer, String> requests = new HashMap<>();
+        try {
+            PreparedStatement pst = conn.prepareStatement("select user_id, First_Name, Last_Name from " +
+                    "discussion_group_requests, user_details where user_id=Id and dg_id="+ dg_id);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                String name = rs.getString("First_Name") + " " + rs.getString("Last_Name");
+                int user_id = rs.getInt("user_id");
+                requests.put(user_id, name);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at getAllPendingGroupRequestsOfGroup " + e);
+        }
+        return requests;
     }
 }

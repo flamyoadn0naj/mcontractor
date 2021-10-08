@@ -118,4 +118,28 @@ public class DiscussionGroups {
         else map.put("requestedGroups",requestedGroups);
         return map;
     }
+
+    public static String isMemberOfGroup(int user_id, int id) {
+        String member = "no";
+        ArrayList<Map<String, Object>> myGroups = DataMapper.getMyDiscussionGroups(user_id);
+        Map<Integer, Object> requestedGroups = DataMapper.getPendingGroupRequests(user_id);
+        for (Map<String, Object> g: myGroups) {
+            int g_id = (int) g.get("id");
+            if (g_id == id) member = "yes";
+        }
+        for (Integer i : requestedGroups.keySet()) {
+            if (i == id) member = "req";
+        }
+        return member;
+    }
+
+    public static int findProfofCourse(Map<String, Object> group) {
+        int id = 0;
+        if (group.containsKey("course")) {
+            int courseId = (int) group.get("course_id");
+            Map<String, Object> course = DataMapper.findCourseByCourseId(String.valueOf(courseId));
+            id = (int) course.get("prof_id");
+        }
+        return id;
+    }
 }

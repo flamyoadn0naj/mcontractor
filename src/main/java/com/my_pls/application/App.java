@@ -458,13 +458,50 @@ public class App {
             return new ModelAndView(map,"createDiscussionGroup.ftl");
         }),engine);
 
-        get("/discussion/group-desc",((request, response) -> {
+        get("/discussion/group-desc/:id",((request, response) -> {
             Session sess = request.session();
             String role = sess.attribute("role").toString();
+            int user_id = sess.attribute("id");
+            int id = Integer.parseInt(request.params(":id"));
+            Map<String, Object> group = DataMapper.getGroupDetailsByGroupId(id);
+            String member = DiscussionGroups.isMemberOfGroup(user_id, id);
+            Map<Integer, String> members = DataMapper.viewAllGroupMembers(id);
+            Map<Integer, String> requests = DataMapper.getAllPendingGroupRequestsOfGroup(id);
+            int prof = DiscussionGroups.findProfofCourse(group);
             Map<String,Object> map = new HashMap<>();
+            if (prof != 0) map.put("prof", prof);
+            map.put("status", member);
+            map.put("group", group);
             map.put("role", role);
+            map.put("members", members);
+            map.put("reqs", requests);
+            map.put("id", id);
             return new ModelAndView(map,"groupDesc.ftl");
         }),engine);
+
+        post("/discussion/group-desc/:id", (request, response) -> {
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
+            int user_id = sess.attribute("id");
+            int id = Integer.parseInt(request.params(":id"));
+            Map<String,String> formFields = extractFields(request.body());
+            if (formFields.containsKey("add")) {
+                int u_id = Integer.parseInt(formFields.get("add"));
+                boolean flag = DataMapper.addDGmember(u_id, id);
+                boolean flag2 = false;
+                if (flag) flag2 = DataMapper.deleteRequestForGroup(u_id, id);
+                if (flag2) response.redirect("/discussion/group-desc/"+id);
+            } else if (formFields.containsKey("del")) {
+                int u_id = Integer.parseInt(formFields.get("del"));
+                boolean flag = DataMapper.deleteRequestForGroup(u_id, id);
+                if (flag) response.redirect("/discussion/group-desc/"+id);
+            } else if (formFields.containsKey("leave")) {
+                boolean flag = DataMapper.deleteDGMember(user_id, id);
+                if (flag) response.redirect("/discussion-groups");
+            }
+            Map<String,Object> map = new HashMap<>();
+            return new ModelAndView(map,"groupDesc.ftl");
+        },engine);
 
         get("/discussion/create-post",((request, response) -> {
             Session sess = request.session();
