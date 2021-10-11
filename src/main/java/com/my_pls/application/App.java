@@ -172,14 +172,23 @@ public class App {
         }),engine);
 
         get("/",((request, response) -> {
-            Map<String,String> map = new HashMap<>();
+            Map<String,Object> map = new HashMap<>();
             Session session = request.session();
             if (session.attribute("firstName") == null) {
                 response.redirect("/login/errAuth");
             } else {
+                String role = session.attribute("role").toString();
+                int id = session.attribute("id");
+                Home home = new Home(id, role);
                 map.put("name", session.attribute("firstName").toString() + " "
                         + session.attribute("lastName").toString());
                 map.put("role", session.attribute("role"));
+                Map<Integer, Object> courses = home.getCourses();
+                Map<String,Object> rating = home.getRating();
+                ArrayList<Map<String,Object>> groups = home.getGroups();
+                if (!courses.isEmpty()) map.put("courses", home.getCourses());
+                if(!groups.isEmpty()) map.put("groups", home.getGroups());
+                if (!rating.isEmpty()) map.put("rating", home.getRating());
             }
             return new ModelAndView(map,"homePage.ftl");
         }),engine);
@@ -587,19 +596,26 @@ public class App {
 
         get("/err",((request, response) -> {
             Map<String,Object> map = new HashMap<>();
-            Session sess = request.session();
-            if (sess.attribute("firstName") == null) {
+            Session session = request.session();
+            if (session.attribute("firstName") == null) {
                 response.redirect("/login/errAuth");
             } else {
-                String role = sess.attribute("role").toString();
-                String firstName = sess.attribute("firstName").toString();
-                String lastName = sess.attribute("lastName").toString();
-                map.put("name", firstName + " " + lastName);
+                String role = session.attribute("role").toString();
+                int id = session.attribute("id");
+                Home home = new Home(id, role);
+                map.put("name", session.attribute("firstName").toString() + " "
+                        + session.attribute("lastName").toString());
+                map.put("role", session.attribute("role"));
+                Map<Integer, Object> courses = home.getCourses();
+                Map<String,Object> rating = home.getRating();
+                ArrayList<Map<String,Object>> groups = home.getGroups();
+                if (!courses.isEmpty()) map.put("courses", home.getCourses());
+                if(!groups.isEmpty()) map.put("groups", home.getGroups());
+                if (!rating.isEmpty()) map.put("rating", home.getRating());
                 map.put("notAuthorized", "You have been redirected to the " +
                         "home page as you were not authorized to view the page" +
                         " you selected or something went wrong. Please email " +
                         "mypls@rit.edu for support");
-                map.put("role", role);
             }
             return new ModelAndView(map,"homePage.ftl");
         }),engine);
