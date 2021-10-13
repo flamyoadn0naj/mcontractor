@@ -712,6 +712,52 @@ public class DataMapper {
         return flag;
     }
 
+    public static boolean createQuestion(Quiz question1) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("insert into quiz_questions (quizId,question,answer,mark,responseA,responseB,responseC,responseD) VALUES (?,?,?,?,?,?,?,?)");
+            pst.setInt(1, question1.quizId);
+            pst.setString(2, question1.questionText);
+            pst.setInt(3,question1.answer);
+            pst.setInt(4,question1.mark);
+            pst.setString(5,question1.responseA);
+            pst.setString(6, question1.responseB);
+            pst.setString(7, question1.responseC);
+            pst.setString(8, question1.responseD);
+            int i = pst.executeUpdate();
+            if (i != 0) flag = true;
+        } catch(Exception e) {
+            System.out.println("Exception at createQuestion " + e);
+        }
+        return flag;
+    }
+
+
+    public static boolean createQuiz(int lessonID, Quiz question1) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("insert into quizzes (lessonId, completed) VALUES (?,?)");
+            pst.setInt(1, lessonID);
+            pst.setInt(2, 0);
+            int i = pst.executeUpdate();
+            if (i != 0) {
+                PreparedStatement pst1 = conn.prepareStatement("select * from quizzes where lessonId=?");
+                pst1.setInt(1,lessonID);
+                ResultSet dbrs = pst1.executeQuery();
+                while (dbrs.next()){
+                    int quizId = dbrs.getInt("Id");
+                    question1.quizId = quizId;
+                    createQuestion(question1);
+                }
+                flag = true;
+            }
+        } catch(Exception e) {
+            System.out.println("Exception at createQuiz " + e);
+        }
+        return flag;
+    }
+
+
     public static boolean updateDGMembers(int old_prof_id, int new_prof_id, int d_id) {
         boolean flag = false;
         try {
