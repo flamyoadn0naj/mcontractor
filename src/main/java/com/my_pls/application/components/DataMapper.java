@@ -780,7 +780,7 @@ public class DataMapper {
             }
 
         } catch(Exception e) {
-            System.out.println("Exception at createQuiz " + e);
+            System.out.println("Exception at getQuestions " + e);
         }
         return questions;
     }
@@ -836,10 +836,11 @@ public class DataMapper {
     public static boolean createQuiz(Quiz newQuiz) {
         boolean flag = false;
         try {
-            PreparedStatement pst = conn.prepareStatement("insert into quizzes (lessonId,name,completed) VALUES (?,?,?)");
+            PreparedStatement pst = conn.prepareStatement("insert into quizzes (lessonId,name,completed,enabled) VALUES (?,?,?,?)");
             pst.setInt(1, newQuiz.lessonId);
             pst.setString(2, newQuiz.quizName);
             pst.setInt(3, 0);
+            pst.setInt(4, 1);
             int i = pst.executeUpdate();
             flag = true;
 //            if (i != 0) {
