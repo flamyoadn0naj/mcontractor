@@ -776,7 +776,7 @@ public class DataMapper {
                 question.responseC = dbrs.getString("responseC");
                 question.responseD = dbrs.getString("responseD");
                 questions.add(question);
-                System.out.println(question.questionText);
+
             }
 
         } catch(Exception e) {
