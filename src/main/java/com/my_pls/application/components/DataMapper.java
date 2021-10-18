@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.function.Function;
 
 public class DataMapper {
+    private static int MAXQUIZ = 200;
     private static Connection conn = MySqlConnection.getConnection();
     private static Function<String,String> addQuotes = s -> "\"" + s + "\"";
 
@@ -620,7 +621,7 @@ public class DataMapper {
                 }
             }
         } catch (Exception e) {
-            System.out.println("Exception at Forget Passoword " + e);
+            System.out.println("Exception at Forget Password " + e);
         }
         return flag;
     }
@@ -715,6 +716,154 @@ public class DataMapper {
         }
         return flag;
     }
+
+    public static boolean createQuestion(Quiz question1) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("insert into quiz_questions (quizId,question,answer,mark,responseA,responseB,responseC,responseD) VALUES (?,?,?,?,?,?,?,?)");
+            pst.setInt(1, question1.quizId);
+            pst.setString(2, question1.questionText);
+            pst.setString(3,question1.answer);
+            pst.setInt(4,question1.mark);
+            pst.setString(5,question1.responseA);
+            pst.setString(6, question1.responseB);
+            pst.setString(7, question1.responseC);
+            pst.setString(8, question1.responseD);
+            int i = pst.executeUpdate();
+            if (i != 0) flag = true;
+        } catch(Exception e) {
+            System.out.println("Exception at createQuestion " + e);
+        }
+        return flag;
+    }
+
+    public static boolean updateQuestion(Quiz question1) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("update quiz_questions set question=?,answer=?,mark=?,responseA=?,responseB=?,responseC=?,responseD=? WHERE quizId=? and questionId=?");
+
+            pst.setString(1, question1.questionText);
+            pst.setString(2,question1.answer);
+            pst.setInt(3,question1.mark);
+            pst.setString(4,question1.responseA);
+            pst.setString(5, question1.responseB);
+            pst.setString(6, question1.responseC);
+            pst.setString(7, question1.responseD);
+            pst.setInt(8, question1.quizId);
+            pst.setInt(9, question1.questionId);
+            int i = pst.executeUpdate();
+            if (i != 0) flag = true;
+        } catch(Exception e) {
+            System.out.println("Exception at createQuestion " + e);
+        }
+        return flag;
+    }
+
+    public static ArrayList<Quiz> getQuestions(Quiz quiz){
+//        Quiz[] questions = new Quiz[MAXQUIZ]; //= new Quiz[0];
+//        ArrayList<Map<Quiz,Quiz>> questions = new ArrayList<Map<Quiz, Quiz>>();
+        ArrayList<Quiz> questions = new ArrayList<Quiz>();
+        int i=0;
+        try{
+            PreparedStatement pst1 = conn.prepareStatement("select * from quiz_questions where quizId=?");
+            pst1.setInt(1,quiz.quizId);
+            ResultSet dbrs = pst1.executeQuery();
+            while (dbrs.next()){
+                Quiz question = new Quiz();
+                question.quizId = quiz.quizId;
+                question.questionId = dbrs.getInt("questionId");
+                question.questionText = dbrs.getString("question");
+                question.answer = dbrs.getString("answer");
+                question.mark = dbrs.getInt("mark");
+                question.responseA = dbrs.getString("responseA");
+                question.responseB = dbrs.getString("responseB");
+                question.responseC = dbrs.getString("responseC");
+                question.responseD = dbrs.getString("responseD");
+                questions.add(question);
+
+            }
+
+        } catch(Exception e) {
+            System.out.println("Exception at getQuestions " + e);
+        }
+        return questions;
+    }
+
+    public static ArrayList<Quiz>  viewQuizzes(int lessonID) {
+//        ArrayList<Map<String,String>> quizzes = new ArrayList<Map<String, String>>();
+        ArrayList<Quiz> quizzes = new ArrayList<Quiz>();
+        try {
+            PreparedStatement pst1 = conn.prepareStatement("select * from quizzes where lessonId=?");
+            pst1.setInt(1,lessonID);
+            ResultSet rs = pst1.executeQuery();
+
+            while(rs.next()) {
+                Quiz quiz = new Quiz();
+                quiz.quizId = rs.getInt("Id");
+                quiz.quizName = rs.getString("name");
+                quiz.MinMark = rs.getInt("minimumMarks");
+                quiz.mark = rs.getInt("totalMarks");
+                quizzes.add(quiz);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at view Quizes "+e);
+        }
+        return quizzes;
+    }
+//    public static Quiz[] getQuizzes(int lessonID){
+//        Quiz[] quizzes = new Quiz[MAXQUIZ]; //= new Quiz[0];
+//        Quiz test = new Quiz();
+//        int i=0;
+//            try{
+//                PreparedStatement pst1 = conn.prepareStatement("select * from quizzes where lessonId=?");
+//                pst1.setInt(1,lessonID);
+//                ResultSet dbrs = pst1.executeQuery();
+//
+//                while (dbrs.next()){
+//                    test.quizId = 1;
+//                    System.out.println(test.quizId);
+//                    System.out.println(quizzes[i].quizId);
+//                    quizzes[i].quizId = dbrs.getInt("Id");
+//                    quizzes[i].quizName = dbrs.getString("name");
+//                    quizzes[i].MinMark = dbrs.getInt("minimumMarks");
+//                    quizzes[i].mark = dbrs.getInt("totalMarks");
+//                    System.out.println("Q Name "+quizzes[i].quizName);
+//                    i++;
+//                }
+//
+//        } catch(Exception e) {
+//            System.out.println("Exception at createQuiz " + e);
+//        }
+//        return quizzes;
+//    }
+
+    public static boolean createQuiz(Quiz newQuiz) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("insert into quizzes (lessonId,name,completed,enabled) VALUES (?,?,?,?)");
+            pst.setInt(1, newQuiz.lessonId);
+            pst.setString(2, newQuiz.quizName);
+            pst.setInt(3, 0);
+            pst.setInt(4, 1);
+            int i = pst.executeUpdate();
+            flag = true;
+//            if (i != 0) {
+//                PreparedStatement pst1 = conn.prepareStatement("select * from quizzes where lessonId=?");
+//                pst1.setInt(1,lessonID);
+//                ResultSet dbrs = pst1.executeQuery();
+//                while (dbrs.next()){
+//                    int quizId = dbrs.getInt("Id");
+//                    question1.quizId = quizId;
+//                    createQuestion(question1);
+//                }
+//                flag = true;
+//            }
+        } catch(Exception e) {
+            System.out.println("Exception at createQuiz " + e);
+        }
+        return flag;
+    }
+
 
     public static boolean updateDGMembers(int old_prof_id, int new_prof_id, int d_id) {
         boolean flag = false;
