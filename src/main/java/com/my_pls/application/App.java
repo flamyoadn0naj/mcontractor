@@ -57,24 +57,6 @@ public class App {
         uploadDir.mkdir(); // create the upload directory if it doesn't exist
         //folder is at the same hierarchy level as main
         staticFiles.externalLocation("uploadFolder");
-////        Quiz testQ = new Quiz();
-////        testQ.lessonId = 111;
-//////        testQ.quizName = "test1";
-//////        DataMapper.createQuiz(testQ);
-////        DataMapper.viewQuizzes(111);
-////        testQ.quizId = 11;
-////        testQ.questionId = 1;
-////        testQ.questionText = "First Q123";
-////        testQ.lessonId = 111;
-////        testQ.answer = "C";
-////        testQ.mark = 50;
-////        testQ.responseA = "shello1";
-////        testQ.responseB = "hsello1";
-////        testQ.responseC = "helslo123";
-////        testQ.responseD = "hesllo1234";
-//////        DataMapper.createQuestion(testQ);
-//////        DataMapper.getQuestions(testQ);
-//        if (DataMapper.updateQuestion(testQ)) System.out.println("done");
         internalServerError((request, response) -> {
             response.redirect("/err");
             return "{\"message\":\"Server Error\"}";
@@ -235,13 +217,43 @@ public class App {
             return new ModelAndView(map,"courseLearnMatS.ftl");
         }),engine);
 
+
         get("/course/quiz",((request, response) -> {
             Map<String,String> map = new HashMap<>();
             Session sess = request.session();
+            int courseId = sess.attribute("id");
             map.put("role", sess.attribute("role"));
+            ArrayList<Quiz> quizzes = DataMapper.viewQuizzes(courseId);
             return new ModelAndView(map,"courseQuiz.ftl");
         }),engine);
 
+
+        post("/courses/quiz",((request, response) -> {
+            Map<String,Object> map = new HashMap<>();
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
+            int id = sess.attribute("id");
+            Map<Integer, Object> courses = Courses.getMyCourses(id, role);
+            Map<String,String> formFields = extractFields(request.body());
+            String filterStatus = "All";
+            ArrayList<String> filterOptions = new ArrayList<>();
+            filterOptions.add("All");
+            filterOptions.add("Current");
+            filterOptions.add("Upcoming");
+            filterOptions.add("Completed");
+
+            if (formFields.containsKey("filterBy")) {
+                if (!formFields.get("filterBy").contentEquals("All"))
+                    courses = Courses.filterCourses(formFields.get("filterBy"), courses);
+                filterStatus = formFields.get("filterBy");
+            }
+            map.put("filterStatus",filterStatus);
+            filterOptions.remove(new String(filterStatus));
+            map.put("courses", courses);
+            map.put("filterOptions",filterOptions);
+            map.put("role", role);
+            return new ModelAndView(map,"courses.ftl");
+        }),engine);
         get("/course/grades",((request, response) -> {
             Map<String,String> map = new HashMap<>();
             Session sess = request.session();
