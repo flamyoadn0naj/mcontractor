@@ -219,11 +219,12 @@ public class App {
 
 
         get("/course/quiz",((request, response) -> {
-            Map<String,String> map = new HashMap<>();
+            Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
             int courseId = sess.attribute("id");
             map.put("role", sess.attribute("role"));
-            ArrayList<Quiz> quizzes = DataMapper.viewQuizzes(courseId);
+            Map<Integer, Object>  quizzes = Quiz.getQuizzes(courseId);
+            if (!quizzes.isEmpty()) map.put("quizzes",quizzes);
             return new ModelAndView(map,"courseQuiz.ftl");
         }),engine);
 

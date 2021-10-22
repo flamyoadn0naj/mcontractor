@@ -19,8 +19,8 @@ public class Quiz {
     public String responseC;
     public String responseD;
     public String answer;
-    
-    public static Map<Integer, Object> getQuizzes(int lessonId, String role) {
+
+    public static Map<Integer, Object> getQuizzes(int lessonId) {
         Map<Integer,Object> quizzes = new HashMap<>();
         Map<Integer,Object> MyQuizzes = DataMapper.viewQuizzes(lessonId);
 

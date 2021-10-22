@@ -67,7 +67,9 @@
                                                 <i class="fa fa-share"></i>
                                             </button>
                                         <#else>
-                                            <button type="button" class="btn btn-primary">Take</button>
+                                            <#if {c.enabled} == "true">
+                                                <button type="button" class="btn btn-primary">Take</button>
+                                            </#if>
                                         </#if>
                                     </td>
                                 </tr>
