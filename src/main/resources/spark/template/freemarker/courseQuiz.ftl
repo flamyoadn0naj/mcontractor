@@ -54,10 +54,11 @@
                         <#if quizzes??>
                             <#list quizzes as k,c>
                                 <tr>
-                                    <th scope="row"><a class="text-muted" href="course/about/${k}">${c.name}</a></th>
-                                    <td>${c.maxMarks}</td>
-                                    <td>${c.minMarks}</td>
-                                    <td>${c.score}</td>
+                                    <td>${c.name}</td>
+<#--                                    <th scope="row"><a class="text-muted" href="course/about/${k}">${c.name}</a></th>-->
+                                    <td>${c.marks}</td>
+                                    <td>${c.minMark}</td>
+                                    <td>${c.marks}</td>
                                     <td>
                                         <#if role == "prof">
                                             <button type="button" class="btn-download" style="float: right">
@@ -67,7 +68,7 @@
                                                 <i class="fa fa-share"></i>
                                             </button>
                                         <#else>
-                                            <#if {c.enabled} == "true">
+                                            <#if c.status == 1>
                                                 <button type="button" class="btn btn-primary">Take</button>
                                             </#if>
                                         </#if>

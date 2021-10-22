@@ -801,9 +801,9 @@ public class DataMapper {
                 Map<String, Object> quiz = new HashMap<>();
                 quiz.put("lessonId",lessonID);
                 quiz.put("quizId",rs.getInt("Id"));
-                quiz.put("quizName",rs.getString("name"));
-                quiz.put("MinMark",rs.getInt("minimumMarks"));
-                quiz.put("status",rs.getString("enabled"));
+                quiz.put("name",rs.getString("name"));
+                quiz.put("minMark",rs.getInt("minimumMarks"));
+                quiz.put("status",rs.getInt("enabled"));
                 quiz.put("marks", rs.getInt("totalMarks"));
                 quizzes.put(rs.getInt("Id"),quiz);
             }

@@ -221,7 +221,7 @@ public class App {
         get("/course/quiz",((request, response) -> {
             Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
-            int courseId = sess.attribute("id");
+            int courseId = 111; //sess.attribute("id");
             map.put("role", sess.attribute("role"));
             Map<Integer, Object>  quizzes = Quiz.getQuizzes(courseId);
             if (!quizzes.isEmpty()) map.put("quizzes",quizzes);
