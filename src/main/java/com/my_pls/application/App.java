@@ -7,19 +7,14 @@ import spark.template.freemarker.FreeMarkerEngine;
 
 
 //things for file upload
-import spark.utils.IOUtils;
 import javax.servlet.MultipartConfigElement;
-import javax.servlet.ServletException;
-import javax.servlet.http.Part;
 import java.io.*;
 
 //end things for file upload
 
 
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.FileAttribute;
 import java.util.*;
 import java.net.URLDecoder;
 import java.util.zip.ZipEntry;
@@ -27,6 +22,7 @@ import java.util.zip.ZipOutputStream;
 
 
 import static com.my_pls.application.components.DataMapper.createQuiz;
+import static com.my_pls.application.components.DataMapper.deleteCourse;
 import static spark.Spark.*;
 
 public class App {
@@ -57,6 +53,24 @@ public class App {
         uploadDir.mkdir(); // create the upload directory if it doesn't exist
         //folder is at the same hierarchy level as main
         staticFiles.externalLocation("uploadFolder");
+////        Quiz testQ = new Quiz();
+////        testQ.lessonId = 111;
+//////        testQ.quizName = "test1";
+//////        DataMapper.createQuiz(testQ);
+////        DataMapper.viewQuizzes(111);
+////        testQ.quizId = 11;
+////        testQ.questionId = 1;
+////        testQ.questionText = "First Q123";
+////        testQ.lessonId = 111;
+////        testQ.answer = "C";
+////        testQ.mark = 50;
+////        testQ.responseA = "shello1";
+////        testQ.responseB = "hsello1";
+////        testQ.responseC = "helslo123";
+////        testQ.responseD = "hesllo1234";
+//////        DataMapper.createQuestion(testQ);
+//////        DataMapper.getQuestions(testQ);
+//        if (DataMapper.updateQuestion(testQ)) System.out.println("done");
         internalServerError((request, response) -> {
             response.redirect("/err");
             return "{\"message\":\"Server Error\"}";
@@ -194,9 +208,36 @@ public class App {
         }),engine);
 
         get("/course/about/:number",((request, response) -> {
-            Map<String,String> map = new HashMap<>();
+            Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
-            map.put("role", sess.attribute("role"));
+            int id = sess.attribute("id");
+            String courseId = request.params(":number");
+            Map<String,Object> course = Courses.getCourse(courseId);
+            if((int)course.get("prof_id") == id) map.put("role", "prof");
+            else map.put("role","learner");
+            map.put("course",course);
+            map.put("course_id", courseId);
+            return new ModelAndView(map,"courseAbout.ftl");
+        }),engine);
+
+        post("/course/about/:number",((request, response) -> {
+            Map<String,Object> map = new HashMap<>();
+            Map<String,String> formFields = extractFields(request.body());
+            Session sess = request.session();
+            int id = sess.attribute("id");
+            String courseId = request.params(":number");
+            boolean flag = false;
+            if (formFields.containsKey("req")) {
+                String req = URLDecoder.decode(formFields.get("req"), "UTF-8");
+                flag = DataMapper.updateCourseRequirements(Integer.parseInt(courseId), req);
+            }
+            if (flag) response.redirect("/course/about/" + courseId);
+            else map.put("err", true);
+            Map<String,Object> course = Courses.getCourse(courseId);
+            if((int)course.get("prof_id") == id) map.put("role", "prof");
+            else map.put("role", "learner");
+            map.put("course",course);
+            map.put("course_id", courseId);
             return new ModelAndView(map,"courseAbout.ftl");
         }),engine);
 
@@ -217,7 +258,47 @@ public class App {
             return new ModelAndView(map,"courseLearnMatS.ftl");
         }),engine);
 
+        post("/lesson/save/:courseId", (request,response)-> {
 
+            Map<String,String> formFields = extractFields(request.body());
+
+            System.out.println(formFields);
+            System.out.println(URLDecoder.decode(formFields.get("req"),"UTF-8"));
+            Lesson temp = new Lesson(Integer.parseInt(URLDecoder.decode(formFields.get("lessonId"),"UTF-8")),
+                    URLDecoder.decode(formFields.get("name"),"UTF-8"),
+                    URLDecoder.decode(formFields.get("req"),"UTF-8"));
+            System.out.println(temp.getId());
+            for(Map.Entry<String, String> element : formFields.entrySet()){
+                String k = URLDecoder.decode(element.getKey(),"UTF-8");
+                String v = URLDecoder.decode(element.getValue(),"UTF-8");
+                if(k.equals(v)){
+                    //
+                    temp.materials.add(v);
+                }
+            }
+            //branch based on which button was pressed
+            if( formFields.containsKey("saveButton")){
+                DataMapper.createOrUpdateLesson(temp,Integer.parseInt(request.params(":courseId")));
+
+            }else if(formFields.containsKey("deleteButton")){
+                DataMapper.deleteLesson(temp.getId());
+
+            }else if(formFields.containsKey("dlButton")){
+                FileManager.downloadFile(request,response,URLDecoder.decode(formFields.get("dlButton"),"UTF-8"));
+                return null;
+            }else if(formFields.containsKey("deleteLMButton")){
+                DataMapper.deleteLearningMaterial(temp.getId(),URLDecoder.decode(formFields.get("deleteLMButton"),"UTF-8"));
+            }
+            response.redirect("/course/learnMat/"+request.params(":courseId"));
+            return null;
+        });
+
+        post("/lesson/add/:courseId", (request,response)-> {
+
+            DataMapper.createLesson("New Lesson","Lesson Requirements", Integer.parseInt(request.params(":courseId")));
+            response.redirect("/course/learnMat/"+request.params(":courseId"));
+            return null;
+        });
         get("/course/quiz",((request, response) -> {
             Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
@@ -228,33 +309,6 @@ public class App {
             return new ModelAndView(map,"courseQuiz.ftl");
         }),engine);
 
-
-        post("/courses/quiz",((request, response) -> {
-            Map<String,Object> map = new HashMap<>();
-            Session sess = request.session();
-            String role = sess.attribute("role").toString();
-            int id = sess.attribute("id");
-            Map<Integer, Object> courses = Courses.getMyCourses(id, role);
-            Map<String,String> formFields = extractFields(request.body());
-            String filterStatus = "All";
-            ArrayList<String> filterOptions = new ArrayList<>();
-            filterOptions.add("All");
-            filterOptions.add("Current");
-            filterOptions.add("Upcoming");
-            filterOptions.add("Completed");
-
-            if (formFields.containsKey("filterBy")) {
-                if (!formFields.get("filterBy").contentEquals("All"))
-                    courses = Courses.filterCourses(formFields.get("filterBy"), courses);
-                filterStatus = formFields.get("filterBy");
-            }
-            map.put("filterStatus",filterStatus);
-            filterOptions.remove(new String(filterStatus));
-            map.put("courses", courses);
-            map.put("filterOptions",filterOptions);
-            map.put("role", role);
-            return new ModelAndView(map,"courses.ftl");
-        }),engine);
         get("/course/grades",((request, response) -> {
             Map<String,String> map = new HashMap<>();
             Session sess = request.session();
@@ -666,21 +720,19 @@ public class App {
             return new ModelAndView(map,"upload.ftl");
         }),engine);
 
-        post("/upload", (request, response) -> {
+        post("/upload/:courseId/:lessonId", (request, response) -> {
 
             // tempFile = Files.createFile(uploadDir.toPath(), "test", ".pdf");
 
             request.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
 
-            try (InputStream input = request.raw().getPart("myfile").getInputStream()) { // getPart needs to use same "name" as input field in form
-                //Path tempFile = Files.createTempFile(uploadDir.toPath(), "test", ".pdf");
-                File newFile = new File(uploadDir.toPath().toString(),request.raw().getPart("myfile").getSubmittedFileName());
-                //System.out.println(uploadDir.toPath());
-                //System.out.println(request.raw().getPart("myfile").getSubmittedFileName());
+            try (InputStream input = request.raw().getPart("uploadFile").getInputStream()) { // getPart needs to use same "name" as input field in form
+                File newFile = new File(uploadDir.toPath().toString(),request.raw().getPart("uploadFile").getSubmittedFileName());
                 Files.copy(input, newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                DataMapper.createLearningMaterial(Integer.parseInt(request.params(":lessonId")),request.raw().getPart("uploadFile").getSubmittedFileName());
             }
             System.out.println();
-            response.redirect("/upload");
+            response.redirect("/course/learnMat/"+request.params(":courseId"));
             return "Success!";
         });
 
