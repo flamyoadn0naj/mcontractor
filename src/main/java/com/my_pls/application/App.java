@@ -208,6 +208,13 @@ public class App {
             return new ModelAndView(map,"courseLearnMatS.ftl");
         }),engine);
 
+        post("/lesson/save/:id", (request,response)-> {
+            System.out.println(request.params(":id"));
+            //need course ID to redirect to
+            response.redirect("/courses");
+            return null;
+        });
+
         get("/course/quiz",((request, response) -> {
             Map<String,String> map = new HashMap<>();
             Session sess = request.session();

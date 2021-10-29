@@ -16,7 +16,6 @@
         </h2>
         <div style="width: 90%; margin-left: 2%">
             <#if role == "prof">
-                <button type="button" class="btn btn-primary" style="float: right;">Save</button>
                 <button type="button" class="btn btn-primary" style="float: right; margin-right: 2%">Add Lesson</button>
             </#if>
             <ul class="nav nav-tabs">
@@ -43,6 +42,7 @@
             </ul>
             <div id="myTabContent" class="tab-content" style="margin:2%">
                 <#list lessons as lesson>
+                <form style="display:flex; justify-content:center;" method="post" action="/lesson/save/${lesson.id}">
                     <div class="tab-pane fade active show" id="learnMat">
                         <div id="accordion">
                             <div class="card">
@@ -53,6 +53,7 @@
                                     </span>
                                         <#if role == "prof">
                                             <div style="float: right">
+                                                <button type="submit" class="btn btn-primary" style="float: right;">Save</button>
                                                 <button class="btn-download" style="float: right"><i class="fa fa-trash"></i></button>
                                                 <button type="button" class="btn-download" style="float: right"><i class="fa fa-upload"></i></button>
                                                 <input type="file" class="small" id="inputGroupFile02" style="width: 50%; float: right; margin-left: 2%;">
@@ -89,6 +90,7 @@
                             </div>
                         </div>
                     </div>
+                    </form>
                 </#list>
             </div>
         </div>
