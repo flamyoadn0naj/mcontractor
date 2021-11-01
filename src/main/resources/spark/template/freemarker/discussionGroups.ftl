@@ -14,11 +14,7 @@
         <h2 class="card-header border-primary text-black-50 mb-3">
             Discussion Groups
         </h2>
-        <#if viewDetails??>
-            <#include "groupDesc.ftl">
-        <#else>
-            <#include "discussionGroupsView.ftl">
-        </#if>
+        <#include "discussionGroupsView.ftl">
     </div>
 </div>
 </body>

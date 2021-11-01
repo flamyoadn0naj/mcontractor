@@ -167,7 +167,7 @@ public class DataMapper {
         return flag;
     }
 
-    public static Map<String, Object> findCourseByCourseId (String id){
+    public static Map<String, Object> findCourseByCourseId (String id) {
         Map<String, Object> map = new HashMap<>();
         try {
             PreparedStatement pst = conn.prepareStatement("select * from courses where id=?");
@@ -184,6 +184,7 @@ public class DataMapper {
                 map.put("cap",rs.getInt("total_capacity"));
                 int prof_id = rs.getInt("profId");
                 map.put("prof_id", prof_id);
+                map.put("status", rs.getString("status"));
                 String meeting_days = rs.getString("meeting_days");
                 map.put("meeting_days", meeting_days);
                 map.put("prereq_course", rs.getInt("prereq"));
@@ -203,7 +204,10 @@ public class DataMapper {
                 details.put("name", rs.getString("name"));
                 if (rs.getInt("privacy") == 1) details.put("privacy", true);
                 Integer course = rs.getInt("course_id");
-                if (course != 0) details.put("course", true);
+                if (course != 0) {
+                    details.put("course", true);
+                    details.put("course_id", course);
+                }
                 details.put("id", dg_id);
             }
         } catch (Exception e) {
@@ -329,13 +333,15 @@ public class DataMapper {
                 rating += rs.getInt("score");
                 feedback.add(rs.getString("feedback"));
             }
-            rating = rating / feedback.size();
-            int unchecked = 5 - rating;
-            ratingsObj.put("rating", rating);
-            ratingsObj.put("feedback", feedback);
-            ratingsObj.put("name", name);
-            ratingsObj.put("unchecked", unchecked);
-            ratingsObj.put("role", role);
+            if (!feedback.isEmpty()) {
+                rating = rating / feedback.size();
+                int unchecked = 5 - rating;
+                ratingsObj.put("rating", rating);
+                ratingsObj.put("feedback", feedback);
+                ratingsObj.put("name", name);
+                ratingsObj.put("unchecked", unchecked);
+                ratingsObj.put("role", role);
+            }
         } catch (Exception e) {
             System.out.println("Exception in getRatingAndFeedbackOfUser");
         }
@@ -922,5 +928,121 @@ public class DataMapper {
             System.out.println("Exception at deleteDGMember " + e);
         }
         return flag;
+    }
+
+    public static boolean rateUser(int user_id, int rate_value, String feedback) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("insert into user_ratings (userId, score, feedback) VALUES (?,?,?)");
+            pst.setInt(1, user_id);
+            pst.setInt(2, rate_value);
+            pst.setString(3, feedback);
+            int i = pst.executeUpdate();
+            if (i != 0) {
+                flag = true;
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at getPendingGroupRequests " + e);
+        }
+        return flag;
+    }
+
+    public static Map<Integer, String> viewAllGroupMembers(int dg_id) {
+        Map<Integer, String> members = new HashMap<>();
+        try {
+            PreparedStatement pst = conn.prepareStatement("select user_id, First_Name, Last_Name from " +
+                    "dg_members, user_details where user_id=Id and dg_id="+ dg_id);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                String name = rs.getString("First_Name") + " " + rs.getString("Last_Name");
+                int user_id = rs.getInt("user_id");
+                members.put(user_id, name);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at viewAllGroupMembers " + e);
+        }
+        return members;
+    }
+
+    public static Map<Integer, String> getAllPendingGroupRequestsOfGroup(int dg_id) {
+        Map<Integer, String> requests = new HashMap<>();
+        try {
+            PreparedStatement pst = conn.prepareStatement("select user_id, First_Name, Last_Name from " +
+                    "discussion_group_requests, user_details where user_id=Id and dg_id="+ dg_id);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                String name = rs.getString("First_Name") + " " + rs.getString("Last_Name");
+                int user_id = rs.getInt("user_id");
+                requests.put(user_id, name);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at getAllPendingGroupRequestsOfGroup " + e);
+        }
+        return requests;
+    }
+
+    public static Map<Integer, Object> getMyCourses(int id) {
+        Map<Integer,Object> courses = new HashMap<>();
+        try {
+            PreparedStatement ps = conn.prepareStatement("select * from enrollments where userId="+ id);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> details = findCourseByCourseId(String.valueOf(rs.getInt("courseId")));
+                String prof = DataMapper.findProfName((Integer) details.get("prof_id"));
+                details.put("prof",prof);
+                String prereq = "None";
+                Integer p = (Integer) details.get("prereq_course");
+                if (p != null && p != 0) prereq = String.valueOf(findCourseByCourseId(String.valueOf(p)).get("name"));
+                details.put("prereq", prereq);
+                LocalDate startDate = LocalDate.parse(details.get("start_date").toString());
+                String s = startDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+                LocalDate endDate = LocalDate.parse(details.get("end_date").toString());
+                String e = endDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+                details.put("startDate",s);
+                details.put("endDate",e);
+                courses.put(rs.getInt("courseId"), details);
+            }
+
+        } catch (Exception e) {
+            System.out.println("Exception at getMyCourses");
+        }
+        return courses;
+    }
+
+    public static Map<Integer, Object> getTaughtCourses(int id) {
+        Map<Integer,Object> courses = new HashMap<>();
+        try {
+            PreparedStatement ps = conn.prepareStatement("select * from courses where profId="+ id);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> details = new HashMap<>();
+                details.put("name",rs.getString("course_name"));
+                String prof = DataMapper.findProfName(rs.getInt("profId"));
+                details.put("prof",prof);
+                LocalDate startDate = LocalDate.parse(rs.getString("start_date"));
+                String s = startDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+                LocalDate endDate = LocalDate.parse(rs.getString("end_date"));
+                String e = endDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+                details.put("startDate",s);
+                details.put("endDate",e);
+                details.put("status",rs.getString("status"));
+                details.put("id",rs.getInt("id"));
+                details.put("cap",rs.getInt("total_capacity"));
+                details.put("enrolled", rs.getInt("enrolled"));
+                details.put("credits", rs.getInt("credits"));
+                details.put("startTime", rs.getString("start_Time"));
+                details.put("endTime", rs.getString("end_Time"));
+                details.put("meeting_days",rs.getString("meeting_days"));
+                String prereq = "None";
+                Integer p = rs.getInt("prereq");
+                if (p != null && p != 0) prereq = String.valueOf(findCourseByCourseId(String.valueOf(p)).get("name"));
+                details.put("prereq", prereq);
+                courses.put(rs.getInt("id"), details);
+            }
+
+        } catch (Exception e) {
+            System.out.println("Exception at getTaughtCourses");
+        }
+        return courses;
     }
 }

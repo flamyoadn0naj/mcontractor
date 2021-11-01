@@ -184,7 +184,7 @@ public class App {
             return new ModelAndView(map,"homePage.ftl");
         }),engine);
 
-        get("/course/about",((request, response) -> {
+        get("/course/about/:number",((request, response) -> {
             Map<String,String> map = new HashMap<>();
             Session sess = request.session();
             map.put("role", sess.attribute("role"));
@@ -275,10 +275,10 @@ public class App {
             Map<String,Object> map = new HashMap<>();
             if (formFields.containsKey("filterBy")) map = Courses.getMethodDefaults(formFields.get("filterBy"));
             else map = Courses.getMethodDefaults("");
-            if (formFields.containsKey("pre-reqs")) {
-                System.out.println(formFields);
-                map.put("prereq", true);
-            }
+//            if (formFields.containsKey("pre-reqs")) {
+//                System.out.println(formFields);
+//                map.put("prereq", true);
+//            }
             Map<String, Object> finalMap = map;
             map.forEach((k, v)-> finalMap.put(k,v));
             map.put("role",role);
@@ -289,16 +289,43 @@ public class App {
             Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
             String role = sess.attribute("role").toString();
+            int id = sess.attribute("id");
+            Map<Integer, Object> courses = Courses.getMyCourses(id, role);
+            map.put("filterStatus", "All");
+            ArrayList<String> filterOptions = new ArrayList<>();
+            filterOptions.add("Current");
+            filterOptions.add("Upcoming");
+            filterOptions.add("Completed");
+            map.put("filterOptions",filterOptions);
+            if (!courses.isEmpty()) map.put("courses", courses);
             map.put("role", role);
             return new ModelAndView(map,"courses.ftl");
         }),engine);
 
         post("/courses",((request, response) -> {
-            Map<String,String> map = new HashMap<>();
+            Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
             String role = sess.attribute("role").toString();
-            map.put("role", role);
+            int id = sess.attribute("id");
+            Map<Integer, Object> courses = Courses.getMyCourses(id, role);
             Map<String,String> formFields = extractFields(request.body());
+            String filterStatus = "All";
+            ArrayList<String> filterOptions = new ArrayList<>();
+            filterOptions.add("All");
+            filterOptions.add("Current");
+            filterOptions.add("Upcoming");
+            filterOptions.add("Completed");
+
+            if (formFields.containsKey("filterBy")) {
+                if (!formFields.get("filterBy").contentEquals("All"))
+                    courses = Courses.filterCourses(formFields.get("filterBy"), courses);
+                filterStatus = formFields.get("filterBy");
+            }
+            map.put("filterStatus",filterStatus);
+            filterOptions.remove(new String(filterStatus));
+            map.put("courses", courses);
+            map.put("filterOptions",filterOptions);
+            map.put("role", role);
             return new ModelAndView(map,"courses.ftl");
         }),engine);
 
@@ -401,7 +428,7 @@ public class App {
         get("/ratings",((request, response) -> {
             Session sess = request.session();
             String role = sess.attribute("role").toString();
-            Map<String, Object> map = Rating.getMethodFunctionality();
+            Map<String, Object> map = Rating.getMethodFunctionality(role);
             map.forEach((k,v)->map.put(k,v));
             map.put("role", role);
             return new ModelAndView(map,"ratings.ftl");
@@ -411,7 +438,7 @@ public class App {
             Session sess = request.session();
             String role = sess.attribute("role").toString();
             Map<String,String> formFields = extractFields(request.body());
-            Map<String,Object> map = Rating.postMethodFunctionality(formFields);
+            Map<String,Object> map = Rating.postMethodFunctionality(formFields, role);
             map.forEach((k,v)->map.put(k,v));
             map.put("role", role);
             return new ModelAndView(map,"ratings.ftl");
@@ -465,13 +492,50 @@ public class App {
             return new ModelAndView(map,"createDiscussionGroup.ftl");
         }),engine);
 
-        get("/discussion/group-desc",((request, response) -> {
+        get("/discussion/group-desc/:id",((request, response) -> {
             Session sess = request.session();
             String role = sess.attribute("role").toString();
+            int user_id = sess.attribute("id");
+            int id = Integer.parseInt(request.params(":id"));
+            Map<String, Object> group = DataMapper.getGroupDetailsByGroupId(id);
+            String member = DiscussionGroups.isMemberOfGroup(user_id, id);
+            Map<Integer, String> members = DataMapper.viewAllGroupMembers(id);
+            Map<Integer, String> requests = DataMapper.getAllPendingGroupRequestsOfGroup(id);
+            int prof = DiscussionGroups.findProfofCourse(group);
             Map<String,Object> map = new HashMap<>();
+            if (prof != 0) map.put("prof", prof);
+            map.put("status", member);
+            map.put("group", group);
             map.put("role", role);
+            map.put("members", members);
+            map.put("reqs", requests);
+            map.put("id", id);
             return new ModelAndView(map,"groupDesc.ftl");
         }),engine);
+
+        post("/discussion/group-desc/:id", (request, response) -> {
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
+            int user_id = sess.attribute("id");
+            int id = Integer.parseInt(request.params(":id"));
+            Map<String,String> formFields = extractFields(request.body());
+            if (formFields.containsKey("add")) {
+                int u_id = Integer.parseInt(formFields.get("add"));
+                boolean flag = DataMapper.addDGmember(u_id, id);
+                boolean flag2 = false;
+                if (flag) flag2 = DataMapper.deleteRequestForGroup(u_id, id);
+                if (flag2) response.redirect("/discussion/group-desc/"+id);
+            } else if (formFields.containsKey("del")) {
+                int u_id = Integer.parseInt(formFields.get("del"));
+                boolean flag = DataMapper.deleteRequestForGroup(u_id, id);
+                if (flag) response.redirect("/discussion/group-desc/"+id);
+            } else if (formFields.containsKey("leave")) {
+                boolean flag = DataMapper.deleteDGMember(user_id, id);
+                if (flag) response.redirect("/discussion-groups");
+            }
+            Map<String,Object> map = new HashMap<>();
+            return new ModelAndView(map,"groupDesc.ftl");
+        },engine);
 
         get("/discussion/create-post",((request, response) -> {
             Session sess = request.session();
@@ -479,14 +543,6 @@ public class App {
             Map<String,String> map = new HashMap<>();
             map.put("role", role);
             return new ModelAndView(map,"discussionPost.ftl");
-        }),engine);
-
-        get("/rating/individual",((request, response) -> {
-            Session sess = request.session();
-            String role = sess.attribute("role").toString();
-            Map<String,String> map = new HashMap<>();
-            map.put("role",role);
-            return new ModelAndView(map,"ratingsIndividual.ftl");
         }),engine);
 
         get("/approval",((request, response) -> {

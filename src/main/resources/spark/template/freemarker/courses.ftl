@@ -26,23 +26,28 @@
                 </ul>
             </#if>
             <form method="post" action="/courses">
-                <div class="space-between">
-                    <div>
+                <div style="display: flex">
+                    <div style="width: 50%">
                         <#if role == "admin">
-                            <button class="btn btn-primary col-12 text-white" style="float:left" type="submit">
+                            <button class="btn btn-primary text-white" style="float:left">
                                 <a href="/courses/create-course" class="text-white">Create Course</a>
                             </button>
                         </#if>
                     </div>
-                    <div class="mb-3" style="float: right; display: flex">
-                        <b style="margin-right: 2%" class="col-5">Filter By:</b>
-                        <select class="form-control col-5" name="filterBy" id="exampleSelect1" style="margin-right: 2%">
-                            <option>All</option>
-                            <option>Upcoming</option>
-                            <option>Current</option>
-                            <option>Completed</option>
+                    <div class="mb-3" style="width: 50%; display: flex; justify-content: flex-end">
+                        <b class="col-2" style="margin-top: 2%" >Filter By:</b>
+                        <select class="form-control col-4" name="filterBy" id="exampleSelect1" style="margin-right: 2%">
+                            <#list filterOptions as op>
+                                <option>${op}</option>
+                            </#list>
+                            <#if filterStatus??>
+                                <option selected>${filterStatus}</option>
+                            </#if>
                         </select>
-                        <button class="btn btn-primary col-5" type="submit">Search</button>
+                        <button class="btn btn-primary col-3" type="submit">Search</button>
+                        <a class="col-3" href="/courses">
+                            <button class="btn btn-primary col-12" type="button">Clear</button>
+                        </a>
                     </div>
                 </div>
             </form>
@@ -50,46 +55,27 @@
             <tr class="table-primary">
                 <th scope="col">Name</th>
                 <th scope="col">Professor</th>
+                <th scope="col">Prerequisites</th>
                 <th scope="col">Start Date</th>
                 <th scope="col">End Date</th>
                 <th scope="col">Status</th>
             </tr>
-            <tr>
-                <th scope="row"><a class="text-muted" href="course/about">Introduction to Software Engineering</a></th>
-                <td>AbdulMutalib Wahaishi</td>
-                <td>September 2020</td>
-                <td>December 2020</td>
-                <td>Current</td>
-            </tr>
-            <tr>
-                <th scope="row">Colloquium</th>
-                <td>Pengchang Shi</td>
-                <td>September 2020</td>
-                <td>December 2020</td>
-                <td>Current</td>
-            </tr>
-            <tr>
-                <th scope="row">Programming Language Concepts</th>
-                <td>Matthew Fluet</td>
-                <td>September 2020</td>
-                <td>December 2020</td>
-                <td>Current</td>
-            </tr>
-            <tr>
-                <th scope="row">Human Computer Interaction</th>
-                <td>Matt Huenerfauth</td>
-                <td>January 2020</td>
-                <td>May 2020</td>
-                <td>Completed</td>
-            </tr>
-            <tr>
-                <th scope="row">Machine Learning</th>
-                <td>Christopher M. Homan</td>
-                <td>January 2020</td>
-                <td>May 2020</td>
-                <td>Completed</td>
-            </tr>
+                <#if courses??>
+                    <#list courses as k,c>
+                        <tr>
+                            <th scope="row"><a class="text-muted" href="course/about/${k}">${c.name}</a></th>
+                            <td>${c.prof}</td>
+                            <td style="text-align: center">${c.prereq}</td>
+                            <td>${c.startDate}</td>
+                            <td>${c.endDate}</td>
+                            <td>${c.status}</td>
+                        </tr>
+                    </#list>
+                </#if>
             </table>
+            <#if !courses??>
+                <div style="margin-left: 2%"> No Results Found</div>
+            </#if>
         </div>
     </div>
 </div>

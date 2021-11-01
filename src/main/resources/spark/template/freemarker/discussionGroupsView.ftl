@@ -10,7 +10,7 @@
 <a class="btn btn-primary col-2 mb-3" href="/discussion/create"
    style="margin-top: 0.5%; float: right; align-self: flex-end; margin-right: 2%;">Create Group</a>
 <div style="display: flex;justify-content: space-evenly">
-    <div class="card" style="width: 32%; border: #78C2AD">
+    <div class="card" style="width: 35%; border: #78C2AD">
         <h4 class="card-header border-primary text-black-50 mb-3">
             My Groups
         </h4>
@@ -23,7 +23,7 @@
                         <#list groups as g>
                             <tr>
                                 <th scope="row">
-                                    <a class="text-muted" href="/discussion/group-desc">${g.name}</a>
+                                    <a class="text-muted" href="/discussion/group-desc/${g.id}">${g.name}</a>
                                     <#if g.privacy??>
                                         <button type="button" class="btn-download" style="margin-left: 2%">
                                             <i class="fa fa-lock"></i>
@@ -83,7 +83,7 @@
                         <#list allGroups as k,v>
                     <tr>
                         <th scope="row">
-                            <a class="text-muted" href="">${v.name}</a>
+                            <a class="text-muted" href="/discussion/group-desc/${k}">${v.name}</a>
                             <#if v.privacy??>
                                 <button type="button" class="btn-download" style="margin-left: 2%">
                                     <i class="fa fa-lock"></i>
@@ -108,7 +108,7 @@
             </div>
         </form>
     </div>
-    <div class="card" style="width: 30%; border: #78c2ad">
+    <div class="card" style="width: 27%; border: #78c2ad">
         <h4 class="card-header border-primary text-black-50 mb-3">
             Pending Requests
         </h4>
@@ -121,7 +121,7 @@
                         <#list requestedGroups as k, v>
                             <tr>
                                 <th scope="row">
-                                    <a class="text-muted" href="/discussion/group-desc">${v.name}</a>
+                                    <a class="text-muted" href="/discussion/group-desc/${k}">${v.name}</a>
                                 </th>
                                 <td>
                                     <button name="cancel" value="${k}" style="float: right" class="btn btn-primary" type="submit">Cancel</button>

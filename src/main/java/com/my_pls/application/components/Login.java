@@ -25,7 +25,6 @@ public class Login {
         map.put("loginErr", "");
         map.put("emailVal","");
         map.put("pageType","Login");
-        map.put("loading","false");
         map.put("styleVal", "margin-top:5%; width:45%");
         return map;
     }
