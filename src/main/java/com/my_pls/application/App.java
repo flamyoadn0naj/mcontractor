@@ -208,10 +208,23 @@ public class App {
             return new ModelAndView(map,"courseLearnMatS.ftl");
         }),engine);
 
-        post("/lesson/save/:id", (request,response)-> {
-            System.out.println(request.params(":id"));
-            //need course ID to redirect to
-            response.redirect("/courses");
+        post("/lesson/save/:courseId", (request,response)-> {
+            Map<String,String> formFields = extractFields(request.body());
+            System.out.println(formFields);
+            System.out.println(URLDecoder.decode(formFields.get("req"),"UTF-8"));
+            Lesson temp = new Lesson(Integer.parseInt(URLDecoder.decode(formFields.get("lessonId"),"UTF-8")),
+                                    URLDecoder.decode(formFields.get("name"),"UTF-8"),
+                                    URLDecoder.decode(formFields.get("req"),"UTF-8"));
+            for(Map.Entry<String, String> element : formFields.entrySet()){
+                String k = URLDecoder.decode(element.getKey(),"UTF-8");
+                String v = URLDecoder.decode(element.getValue(),"UTF-8");
+                if(k.equals(v)){
+                    temp.materials.add(v);
+                }
+            }
+            //add learning materials
+            DataMapper.createOrUpdateLesson(temp);
+            response.redirect("/course/learnMat/"+request.params(":courseId"));
             return null;
         });
 

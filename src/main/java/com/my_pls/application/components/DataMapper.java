@@ -847,6 +847,14 @@ public class DataMapper {
         return allLessons;
     }
 
+    public static void createOrUpdateLesson(Lesson value){
+        //check if lesson exists by id
+            //update
+            //add
+        //drop learning materials by id
+            //add all learning materials
+    }
+
     public static List<String> getLearningMaterialsByLessonId(int id){
         List<String> materials = new ArrayList<>();
         try {

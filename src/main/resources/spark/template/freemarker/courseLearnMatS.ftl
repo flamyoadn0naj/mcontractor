@@ -42,14 +42,18 @@
             </ul>
             <div id="myTabContent" class="tab-content" style="margin:2%">
                 <#list lessons as lesson>
-                <form style="display:flex; justify-content:center;" method="post" action="/lesson/save/${lesson.id}">
-                    <div class="tab-pane fade active show" id="learnMat">
+                <form style="display:flex; justify-content:center; width:100%;" method="post" action="/lesson/save/${courseNumber}">
+                    <div class="tab-pane fade active show" id="learnMat" style="width:100%; margin:10px;">
                         <div id="accordion">
-                            <div class="card">
+                            <div class="card" >
                                 <div class="card-header" id="headingOne">
                                     <h5 class="mb-0">
                                     <span class="text-primary small" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                        ${lesson.name}
+                                        <#if role == "prof">
+                                        <input name="name" type="text" id="name" value="${lesson.name}">
+                                        <#else>
+                                            ${lesson.name}
+                                        </#if>
                                     </span>
                                         <#if role == "prof">
                                             <div style="float: right">
@@ -66,7 +70,8 @@
                                         <#if role == "prof">
                                             <div class="mb-3">
                                                 <b>Requirements:</b>
-                                                <input style="width: 80%" name="req1" type="text" id="req1" value="${lesson.requirements}">
+                                                <input style="width: 80%" name="req" type="text" id="req" value="${lesson.requirements}">
+                                                <input style="display:none" name="lessonId" type="text" id="lessonId" value="${lesson.id}">
                                             </div>
                                         <#else>
                                             <div class="mb-3"> <b>Requirements:</b> ${lesson.requirements}</div>
@@ -75,7 +80,7 @@
                                             <#list lesson.materials as material>
 
                                                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                    ${material}
+                                                    <input  name=${material} type="text" value="${material}" readonly>
                                                     <div>
                                                         <button class="btn-download"><i class="fa fa-download"></i></button>
                                                          <#if role == "prof">
