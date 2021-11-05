@@ -31,37 +31,76 @@
                     <h2 class="card-header text-white bg-primary mb-3" style="padding:10pt">
                         Courses
                     </h2>
+                    <#if courses??>
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Introduction to Software Engineering</li>
-                        <li class="list-group-item">Colloquium</li>
-                        <li class="list-group-item">Programming Language Concepts</li>
-                        <li class="list-group-item">Human Computer Interaction</li>
-                        <li class="list-group-item">Machine Learning</li>
+                        <#list courses as k,c>
+                            <li class="list-group-item"><a class="text-muted" href="course/about/${k}">${c.name}</a></li>
+                        </#list>
                     </ul>
+                    <#else>
+                        <div style="text-align: center; margin-top: 2%"> You are not enrolled in any courses </div>
+                    </#if>
                 </div>
                 <div class="card text-black border-primary mb-3" style="width:30%; margin-top:5%">
                     <h2 class="card-header text-white bg-primary mb-3" style="padding:10pt">
                         Discussion Groups
                     </h2>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Introduction to Software Engineering</li>
-                        <li class="list-group-item">Trekking</li>
-                        <li class="list-group-item">Swimming</li>
-                        <li class="list-group-item">Foodies in RIT</li>
-                        <li class="list-group-item">Machine Learning</li>
-                    </ul>
+                    <#if groups??>
+                    <table class="table" style="border: none">
+                        <tr class="table-primary justify-content-between">
+                        </tr>
+                            <#list groups as g>
+                                <tr>
+                                    <th scope="row">
+                                        <a class="text-muted" href="/discussion/group-desc/${g.id}">${g.name}</a>
+                                        <#if g.privacy??>
+                                            <button type="button" class="btn-download" style="margin-left: 2%">
+                                                <i class="fa fa-lock"></i>
+                                            </button>
+                                        </#if>
+                                        <#if g.course??>
+                                            <span class="badge badge-primary" style="margin-left: 2%">Course</span>
+                                        </#if>
+                                    </th>
+                                </tr>
+                            </#list>
+                    </table>
+                    <#else>
+                        <div style="text-align: center; margin-top: 2%"> You are not a member of any group </div>
+                    </#if>
                 </div>
                 <div class="card text-black border-primary mb-3" style="width:30%; margin-top:5%">
                     <h2 class="card-header text-white bg-primary mb-3" style="padding:10pt">
                         Rating
                     </h2>
-                    <div style="display: flex; justify-content: space-evenly;">
-                        <span class="fa fa-star checked large"></span>
-                        <span class="fa fa-star checked large"></span>
-                        <span class="fa fa-star checked large"></span>
-                        <span class="fa fa-star large"></span>
-                        <span class="fa fa-star large"></span>
-                    </div>
+                    <#if rating??>
+                        <div class="mb-3" style="margin-bottom: 2%; margin-top: 2%; display: flex; justify-content: space-evenly">
+                        <#if rating.rating == 0>
+                            <div style="text-align: center; margin-top: 2%"> No Rating Found </div>
+                        <#else>
+                            <#list 1..rating.rating as i>
+                                <span class="fa fa-star checked large"></span>
+                            </#list>
+                            <#list 1..rating.unchecked as j>
+                                <span class="fa fa-star large"></span>
+                            </#list>
+                        </#if>
+                        </div>
+                        <div class="mb-2" style="margin-left: 10%">
+                            <ul class="list-group list-group-flush">
+                            <#list rating.feedback as f>
+                                <#if f?counter < 5>
+                                    <li class="list-group-item" style="display: flex">
+                                    <div> ${f?counter}. </div>
+                                    <div style="margin-left: 4%">${f}</div>
+                                    </li>
+                                </#if>
+                            </#list>
+                            </ul>
+                        </div>
+                    <#else>
+                        <div style="text-align: center; margin-top: 2%"> No Rating Found </div>
+                    </#if>
                 </div>
             </div>
         </div>
