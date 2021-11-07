@@ -843,16 +843,40 @@ public class DataMapper {
         } catch (Exception e) {
             System.out.println("Exception at getPendingGroupRequests " + e);
         }
-        System.out.println(allLessons);
+        //System.out.println(allLessons);
         return allLessons;
     }
 
-    public static void createOrUpdateLesson(Lesson value){
-        //check if lesson exists by id
-            //update
-            //add
-        //drop learning materials by id
+    public static void createOrUpdateLesson(Lesson value, int courseId){
+        //System.out.println("Create or Update lesson");
+        try {
+            //check if lesson exists by id
+            PreparedStatement existCheck = conn.prepareStatement("select * from lessons where Id="+value.getId());
+            ResultSet exists = existCheck.executeQuery();
+            PreparedStatement lessonStatement;
+            if(exists.next()){
+                //update
+                lessonStatement = conn.prepareStatement("update lessons set name=\""+value.getName()+"\", requirements=\""+value.getRequirements()+"\" where Id="+value.getId());
+
+            } else {
+                //add
+                lessonStatement = conn.prepareStatement("insert into lessons (courseId, name, requirements) values("+courseId+", "+value.getName()+", "+value.getRequirements()+") ");
+            }
+            lessonStatement.execute();
+
+            //drop learning materials by lesson id
+            PreparedStatement delMat = conn.prepareStatement("delete from learning_materials where lessonId="+value.getId());
+            delMat.execute();
             //add all learning materials
+            PreparedStatement addMat;
+            for(String mat : value.getMaterials()){
+                //System.out.println("insert into learning_materials (lessonId, content) values("+value.getId()+", \""+mat+"\")");
+                addMat = conn.prepareStatement("insert into learning_materials (lessonId, content) values("+value.getId()+", \""+mat+"\")");
+                addMat.execute();
+            }
+        } catch(Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 
     public static List<String> getLearningMaterialsByLessonId(int id){

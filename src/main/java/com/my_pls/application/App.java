@@ -7,19 +7,14 @@ import spark.template.freemarker.FreeMarkerEngine;
 
 
 //things for file upload
-import spark.utils.IOUtils;
 import javax.servlet.MultipartConfigElement;
-import javax.servlet.ServletException;
-import javax.servlet.http.Part;
 import java.io.*;
 
 //end things for file upload
 
 
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.FileAttribute;
 import java.util.*;
 import java.net.URLDecoder;
 import java.util.zip.ZipEntry;
@@ -218,9 +213,11 @@ public class App {
         }),engine);
 
         post("/lesson/save/:courseId", (request,response)-> {
+
             Map<String,String> formFields = extractFields(request.body());
-            System.out.println(formFields);
-            System.out.println(URLDecoder.decode(formFields.get("req"),"UTF-8"));
+
+            //System.out.println(formFields);
+            //System.out.println(URLDecoder.decode(formFields.get("req"),"UTF-8"));
             Lesson temp = new Lesson(Integer.parseInt(URLDecoder.decode(formFields.get("lessonId"),"UTF-8")),
                                     URLDecoder.decode(formFields.get("name"),"UTF-8"),
                                     URLDecoder.decode(formFields.get("req"),"UTF-8"));
@@ -228,11 +225,34 @@ public class App {
                 String k = URLDecoder.decode(element.getKey(),"UTF-8");
                 String v = URLDecoder.decode(element.getValue(),"UTF-8");
                 if(k.equals(v)){
+                    //
                     temp.materials.add(v);
                 }
             }
             //add learning materials
-            DataMapper.createOrUpdateLesson(temp);
+            //       System.out.println(formFields.containsKey("saveButton"));
+            //            System.out.println(formFields.containsKey("deleteButton"));
+            if( formFields.containsKey("saveButton")){
+                System.out.println("Save Button");
+                System.out.println(formFields.get("saveButton"));
+
+            }else if(formFields.containsKey("deleteButton")){
+                System.out.println("deleteButton");
+                System.out.println(formFields.get("deleteButton"));
+
+            }else if(formFields.containsKey("dlButton")){
+                System.out.println("dlButton");
+                System.out.println(formFields.get("dlButton"));
+
+            }else if(formFields.containsKey("uploadButton")){
+                System.out.println("uploadButton");
+                System.out.println(formFields.get("uploadButton"));
+
+            }else if(formFields.containsKey("deleteLMButton")){
+                System.out.println("deleteLMButton");
+                System.out.println(formFields.get("deleteLMButton"));
+            }
+            DataMapper.createOrUpdateLesson(temp,Integer.parseInt(request.params(":courseId")));
             response.redirect("/course/learnMat/"+request.params(":courseId"));
             return null;
         });

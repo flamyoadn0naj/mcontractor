@@ -57,9 +57,9 @@
                                     </span>
                                         <#if role == "prof">
                                             <div style="float: right">
-                                                <button type="submit" class="btn btn-primary" style="float: right;">Save</button>
-                                                <button class="btn-download" style="float: right"><i class="fa fa-trash"></i></button>
-                                                <button type="button" class="btn-download" style="float: right"><i class="fa fa-upload"></i></button>
+                                                <button type="submit" class="btn btn-primary" style="float: right;" name="saveButton" value=${lesson.id}>Save</button>
+                                                <button class="btn-download" style="float: right" name="deleteButton" value=${lesson.id}><i class="fa fa-trash"></i></button>
+                                                <button type="submit" class="btn-download" style="float: right" name="uploadButton" value=${lesson.id}><i class="fa fa-upload"></i></button>
                                                 <input type="file" class="small" id="inputGroupFile02" style="width: 50%; float: right; margin-left: 2%;">
                                             </div>
                                         </#if>
@@ -82,9 +82,9 @@
                                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                                     <input  name=${material} type="text" value="${material}" readonly>
                                                     <div>
-                                                        <button class="btn-download"><i class="fa fa-download"></i></button>
+                                                        <button type="submit" class="btn-download" name="dlButton" value=${material}><i class="fa fa-download" ></i></button>
                                                          <#if role == "prof">
-                                                             <button class="btn-download"><i class="fa fa-trash"></i></button>
+                                                             <button type="submit" class="btn-download" name="deleteLMButton" value=${material}><i class="fa fa-trash"></i></button>
                                                          </#if>
                                                     </div>
                                                 </li>
