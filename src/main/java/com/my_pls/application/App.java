@@ -221,6 +221,7 @@ public class App {
             Lesson temp = new Lesson(Integer.parseInt(URLDecoder.decode(formFields.get("lessonId"),"UTF-8")),
                                     URLDecoder.decode(formFields.get("name"),"UTF-8"),
                                     URLDecoder.decode(formFields.get("req"),"UTF-8"));
+            System.out.println(temp.getId());
             for(Map.Entry<String, String> element : formFields.entrySet()){
                 String k = URLDecoder.decode(element.getKey(),"UTF-8");
                 String v = URLDecoder.decode(element.getValue(),"UTF-8");
@@ -229,16 +230,12 @@ public class App {
                     temp.materials.add(v);
                 }
             }
-            //add learning materials
-            //       System.out.println(formFields.containsKey("saveButton"));
-            //            System.out.println(formFields.containsKey("deleteButton"));
+            //branch based on which button was pressed
             if( formFields.containsKey("saveButton")){
-                System.out.println("Save Button");
-                System.out.println(formFields.get("saveButton"));
+                DataMapper.createOrUpdateLesson(temp,Integer.parseInt(request.params(":courseId")));
 
             }else if(formFields.containsKey("deleteButton")){
-                System.out.println("deleteButton");
-                System.out.println(formFields.get("deleteButton"));
+                DataMapper.deleteLesson(temp.getId());
 
             }else if(formFields.containsKey("dlButton")){
                 System.out.println("dlButton");
@@ -249,14 +246,19 @@ public class App {
                 System.out.println(formFields.get("uploadButton"));
 
             }else if(formFields.containsKey("deleteLMButton")){
-                System.out.println("deleteLMButton");
-                System.out.println(formFields.get("deleteLMButton"));
+                DataMapper.deleteLearningMaterial(temp.getId(),URLDecoder.decode(formFields.get("deleteLMButton"),"UTF-8"));
             }
-            DataMapper.createOrUpdateLesson(temp,Integer.parseInt(request.params(":courseId")));
+
             response.redirect("/course/learnMat/"+request.params(":courseId"));
             return null;
         });
 
+        post("/lesson/add/:courseId", (request,response)-> {
+
+            DataMapper.createLesson("New Lesson","Lesson Requirements", Integer.parseInt(request.params(":courseId")));
+            response.redirect("/course/learnMat/"+request.params(":courseId"));
+            return null;
+        });
         get("/course/quiz",((request, response) -> {
             Map<String,String> map = new HashMap<>();
             Session sess = request.session();

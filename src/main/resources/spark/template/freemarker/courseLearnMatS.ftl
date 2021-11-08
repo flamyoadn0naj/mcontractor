@@ -16,7 +16,9 @@
         </h2>
         <div style="width: 90%; margin-left: 2%">
             <#if role == "prof">
-                <button type="button" class="btn btn-primary" style="float: right; margin-right: 2%">Add Lesson</button>
+            <form method="post" action="/lesson/add/${courseNumber}">
+                <button type="submit" class="btn btn-primary" style="float: right; margin-right: 2%">Add Lesson</button>
+            </form>
             </#if>
             <ul class="nav nav-tabs">
                 <li class="nav-item">
@@ -82,9 +84,9 @@
                                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                                     <input  name=${material} type="text" value="${material}" readonly>
                                                     <div>
-                                                        <button type="submit" class="btn-download" name="dlButton" value=${material}><i class="fa fa-download" ></i></button>
+                                                        <button type="submit" class="btn-download" name="dlButton" value="${material}"><i class="fa fa-download" ></i></button>
                                                          <#if role == "prof">
-                                                             <button type="submit" class="btn-download" name="deleteLMButton" value=${material}><i class="fa fa-trash"></i></button>
+                                                             <button type="submit" class="btn-download" name="deleteLMButton" value="${material}"><i class="fa fa-trash"></i></button>
                                                          </#if>
                                                     </div>
                                                 </li>

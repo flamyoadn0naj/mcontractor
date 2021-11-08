@@ -878,6 +878,34 @@ public class DataMapper {
             System.out.println(e.getMessage());
         }
     }
+    public static void createLesson(String name, String req, int courseID){
+        try {
+            PreparedStatement maxId = conn.prepareStatement("select MAX(Id) from lessons");
+            ResultSet rs = maxId.executeQuery();
+            rs.next();
+            int id = rs.getInt(1) + 1;
+            PreparedStatement pst = conn.prepareStatement("insert into lessons (Id,courseId, name, requirements) values("+id+", "+courseID+", \""+name+"\", \""+req+"\")");
+            pst.execute();
+
+        } catch (Exception e) {
+            System.out.println("Exception at createLesson " + e);
+        }
+    }
+    public static void deleteLesson(int lessonId){
+        try {
+            //drop learning materials
+            PreparedStatement pst = conn.prepareStatement("delete from learning_materials where lessonId="+lessonId);
+            pst.execute();
+
+            //drop lesson
+            pst = conn.prepareStatement("delete from lessons where Id="+lessonId);
+            pst.execute();
+
+        } catch (Exception e) {
+            System.out.println("Exception at deleteLesson " + e);
+        }
+
+    }
 
     public static List<String> getLearningMaterialsByLessonId(int id){
         List<String> materials = new ArrayList<>();
@@ -888,9 +916,18 @@ public class DataMapper {
                 materials.add(rs.getString("content"));
             }
         } catch (Exception e) {
-            System.out.println("Exception at getPendingGroupRequests " + e);
+            System.out.println("Exception at getLearningMaterialsByLessonId " + e);
         }
         return materials;
+    }
+
+    public static void deleteLearningMaterial(int lessonId, String name){
+        try{
+            PreparedStatement pst = conn.prepareStatement("delete from learning_materials where lessonId="+lessonId+" AND content=\""+name+"\"");
+            pst.execute();
+        } catch (Exception e){
+            System.out.println("Exception at deleteLearningMaterial " + e);
+        }
     }
 
     public static boolean requestToJoinGroup(int id, int dg_id) {
