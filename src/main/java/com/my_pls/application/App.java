@@ -20,6 +20,8 @@ import java.net.URLDecoder;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+
+import static com.my_pls.application.components.DataMapper.createQuiz;
 import static spark.Spark.*;
 
 public class App {
@@ -50,8 +52,24 @@ public class App {
         uploadDir.mkdir(); // create the upload directory if it doesn't exist
         //folder is at the same hierarchy level as main
         staticFiles.externalLocation("uploadFolder");
-
-
+////        Quiz testQ = new Quiz();
+////        testQ.lessonId = 111;
+//////        testQ.quizName = "test1";
+//////        DataMapper.createQuiz(testQ);
+////        DataMapper.viewQuizzes(111);
+////        testQ.quizId = 11;
+////        testQ.questionId = 1;
+////        testQ.questionText = "First Q123";
+////        testQ.lessonId = 111;
+////        testQ.answer = "C";
+////        testQ.mark = 50;
+////        testQ.responseA = "shello1";
+////        testQ.responseB = "hsello1";
+////        testQ.responseC = "helslo123";
+////        testQ.responseD = "hesllo1234";
+//////        DataMapper.createQuestion(testQ);
+//////        DataMapper.getQuestions(testQ);
+//        if (DataMapper.updateQuestion(testQ)) System.out.println("done");
         internalServerError((request, response) -> {
             response.redirect("/err");
             return "{\"message\":\"Server Error\"}";
