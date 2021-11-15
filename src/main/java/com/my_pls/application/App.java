@@ -207,9 +207,36 @@ public class App {
         }),engine);
 
         get("/course/about/:number",((request, response) -> {
-            Map<String,String> map = new HashMap<>();
+            Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
-            map.put("role", sess.attribute("role"));
+            int id = sess.attribute("id");
+            String courseId = request.params(":number");
+            Map<String,Object> course = Courses.getCourse(courseId);
+            if((int)course.get("prof_id") == id) map.put("role", "prof");
+            else map.put("role","learner");
+            map.put("course",course);
+            map.put("course_id", courseId);
+            return new ModelAndView(map,"courseAbout.ftl");
+        }),engine);
+
+        post("/course/about/:number",((request, response) -> {
+            Map<String,Object> map = new HashMap<>();
+            Map<String,String> formFields = extractFields(request.body());
+            Session sess = request.session();
+            int id = sess.attribute("id");
+            String courseId = request.params(":number");
+            boolean flag = false;
+            if (formFields.containsKey("req")) {
+               String req = URLDecoder.decode(formFields.get("req"), "UTF-8");
+               flag = DataMapper.updateCourseRequirements(Integer.parseInt(courseId), req);
+            }
+            if (flag) response.redirect("/course/about/" + courseId);
+            else map.put("err", true);
+            Map<String,Object> course = Courses.getCourse(courseId);
+            if((int)course.get("prof_id") == id) map.put("role", "prof");
+            else map.put("role", "learner");
+            map.put("course",course);
+            map.put("course_id", courseId);
             return new ModelAndView(map,"courseAbout.ftl");
         }),engine);
 

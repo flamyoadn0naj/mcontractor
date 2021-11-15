@@ -189,6 +189,7 @@ public class DataMapper {
                 String meeting_days = rs.getString("meeting_days");
                 map.put("meeting_days", meeting_days);
                 map.put("prereq_course", rs.getInt("prereq"));
+                map.put("requirements", rs.getString("requirements"));
             }
         } catch (Exception e) {
             System.out.println("Exception at findCourseByCourseId " + e);
@@ -1253,7 +1254,8 @@ public class DataMapper {
                 details.put("meeting_days",rs.getString("meeting_days"));
                 String prereq = "None";
                 Integer p = rs.getInt("prereq");
-                if (p != null && p != 0) prereq = String.valueOf(findCourseByCourseId(String.valueOf(p)).get("name"));
+                if (p != null && p != 0)
+                    prereq = String.valueOf(findCourseByCourseId(String.valueOf(p)).get("name"));
                 details.put("prereq", prereq);
                 courses.put(rs.getInt("id"), details);
             }
@@ -1262,5 +1264,19 @@ public class DataMapper {
             System.out.println("Exception at getTaughtCourses");
         }
         return courses;
+    }
+
+    public static boolean updateCourseRequirements(int courseId, String req) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("update courses set requirements=? where id=?");
+            pst.setString(1, req);
+            pst.setInt(2, courseId);
+            int i = pst.executeUpdate();
+            if (i != 0) flag = true;
+        } catch (Exception e) {
+            System.out.println("Error at updateCourseRequirements " + e);
+        }
+        return flag;
     }
 }

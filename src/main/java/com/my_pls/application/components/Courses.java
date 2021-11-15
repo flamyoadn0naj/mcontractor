@@ -1,8 +1,11 @@
 package com.my_pls.application.components;
 
 import com.my_pls.MySqlConnection;
+import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
 
 import java.sql.*;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class Courses {
@@ -54,5 +57,27 @@ public class Courses {
             if (status.contentEquals(filterBy)) allCourses.put(i,c);
         }
         return allCourses;
+    }
+
+    public static Map<String, Object> getCourse(String courseId) {
+        Map<String,Object> course = DataMapper.findCourseByCourseId(courseId);
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm");
+        DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:m a");
+        LocalTime startTime = LocalTime.parse(String.valueOf(course.get("start_time")), df);
+        String s = startTime.format(df2);
+        LocalTime endTime = LocalTime.parse(String.valueOf(course.get("end_time")), df);
+        String e = endTime.format(df2);
+        course.put("start_time", s);
+        course.put("end_time", e);
+        course.put("prof_name", DataMapper.findProfName((Integer) course.get("prof_id")));
+        String prereq = "None";
+        Integer p = (Integer) course.get("prereq_course");
+        if (p != null && p != 0)
+            prereq = String.valueOf(DataMapper.findCourseByCourseId(String.valueOf(p)).get("name"));
+        course.put("preReq", prereq);
+        Map<String, Object> rating = DataMapper
+                .getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"");
+        if (!rating.isEmpty()) course.put("rating", rating);
+        return course;
     }
 }
