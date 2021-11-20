@@ -694,6 +694,7 @@ public class DataMapper {
 
     public static int findDiscussionGroupIdByCourseId(int course_id) {
         int dg_id = -1;
+
         try {
             PreparedStatement pst = conn.prepareStatement("select id from discussion_groups where course_id=" + course_id);
             ResultSet rs = pst.executeQuery();
