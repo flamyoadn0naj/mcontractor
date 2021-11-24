@@ -8,23 +8,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
-<#include "navbar.ftl">
-<div style="display: flex;justify-content: center">
-    <div class="card text-black mb-3" style="width:100%; border: none">
-        <h2 class="card-header border-primary text-black-50 mb-3">
-            Upload File Test
-        </h2>
-        <form action="/upload" method="post" enctype="multipart/form-data">
-            <label for="myfile">Select a file</label>
-            <input type="file" id="myfile" name="myfile" />
-            <input type="submit" id="buttonUpload" value="Upload"/>
-            <br>
-        </form>
-        <form action="/download" method="post" enctype="multipart/form-data">
-            <input type="submit" id="buttonDL" value="Download"/>
-            <br>
-        </form>
-    </div>
-</div>
+<form action="/upload" method="post" enctype="multipart/form-data">
+    <input type="file" class="small" id="inputGroupFile02" style="float: left; margin-left: 2%;" name="uploadFile" value ="">
+    <button type="submit" class="btn-download" style="float: left; margin-top: 15px" name="uploadButton" value=""><i class="fa fa-upload"></i></button>
+</form>
 </body>
 </html>

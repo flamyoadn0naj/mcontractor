@@ -1072,6 +1072,15 @@ public class DataMapper {
         return materials;
     }
 
+    public static void createLearningMaterial(int lessonId, String name){
+        try{
+            PreparedStatement pst = conn.prepareStatement("insert into learning_materials (lessonId, content) values ("+lessonId+", \""+name+"\")");
+            pst.execute();
+        } catch (Exception e){
+            System.out.println("Exception at createLearningMaterial " + e);
+        }
+    }
+
     public static void deleteLearningMaterial(int lessonId, String name){
         try{
             PreparedStatement pst = conn.prepareStatement("delete from learning_materials where lessonId="+lessonId+" AND content=\""+name+"\"");

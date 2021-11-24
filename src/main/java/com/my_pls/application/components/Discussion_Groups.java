@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DiscussionGroups {
+public class Discussion_Groups {
     public static boolean createGroup(Map<String, String> formFields, int user_id) {
         boolean flag = false;
         int privacy = Integer.parseInt(formFields.get("customRadio"));
