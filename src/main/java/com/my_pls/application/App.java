@@ -8,6 +8,7 @@ import spark.template.freemarker.FreeMarkerEngine;
 
 //things for file upload
 import javax.servlet.MultipartConfigElement;
+import javax.xml.crypto.Data;
 import java.io.*;
 
 //end things for file upload
@@ -189,7 +190,7 @@ public class App {
             Map<String,Object> map = new HashMap<>();
             Session session = request.session();
             if (session.attribute("firstName") == null) {
-                response.redirect("/login/errAuth");
+                response.redirect("/login");
             } else {
                 String role = session.attribute("role").toString();
                 int id = session.attribute("id");
@@ -216,7 +217,7 @@ public class App {
             if((int)course.get("prof_id") == id) map.put("role", "prof");
             else map.put("role","learner");
             map.put("course",course);
-            map.put("course_id", courseId);
+            map.put("courseId", courseId);
             return new ModelAndView(map,"courseAbout.ftl");
         }),engine);
 
@@ -226,6 +227,9 @@ public class App {
             Session sess = request.session();
             int id = sess.attribute("id");
             String courseId = request.params(":number");
+            Map<String,Object> course = Courses.getCourse(courseId);
+            if((int)course.get("prof_id") == id) map.put("role", "prof");
+            else response.redirect("/err");
             boolean flag = false;
             if (formFields.containsKey("req")) {
                String req = URLDecoder.decode(formFields.get("req"), "UTF-8");
@@ -233,11 +237,8 @@ public class App {
             }
             if (flag) response.redirect("/course/about/" + courseId);
             else map.put("err", true);
-            Map<String,Object> course = Courses.getCourse(courseId);
-            if((int)course.get("prof_id") == id) map.put("role", "prof");
-            else map.put("role", "learner");
             map.put("course",course);
-            map.put("course_id", courseId);
+            map.put("courseId", courseId);
             return new ModelAndView(map,"courseAbout.ftl");
         }),engine);
 
@@ -251,15 +252,24 @@ public class App {
         get("/course/learnMat/:number",((request, response) -> {
             Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
-            map.put("role", sess.attribute("role").toString());
+            int id = sess.attribute("id");
+            String courseId = request.params(":number");;
+            Map<String,Object> course = DataMapper.findCourseByCourseId(courseId);
+            if((int)course.get("prof_id") == id) map.put("role", "prof");
+            else map.put("role","learner");
             //add each lesson
-            map.put("lessons",DataMapper.getLessonsByCourseId(Integer.parseInt(request.params(":number"))));
-            map.put("courseNumber",request.params(":number"));
+            map.put("lessons",DataMapper.getLessonsByCourseId(Integer.parseInt(courseId)));
+            map.put("courseNumber",courseId);
+            map.put("name", course.get("name"));
             return new ModelAndView(map,"courseLearnMatS.ftl");
         }),engine);
 
         post("/lesson/save/:courseId", (request,response)-> {
-
+            Session sess = request.session();
+            int id = sess.attribute("id");
+            String courseId = request.params(":courseId");;
+            Map<String,Object> course = Courses.getCourse(courseId);
+            if((int)course.get("prof_id") != id) response.redirect("/err");
             Map<String,String> formFields = extractFields(request.body());
 
             System.out.println(formFields);
@@ -278,7 +288,7 @@ public class App {
             }
             //branch based on which button was pressed
             if( formFields.containsKey("saveButton")){
-                DataMapper.createOrUpdateLesson(temp,Integer.parseInt(request.params(":courseId")));
+                DataMapper.createOrUpdateLesson(temp,Integer.parseInt(courseId));
 
             }else if(formFields.containsKey("deleteButton")){
                 DataMapper.deleteLesson(temp.getId());
@@ -289,49 +299,82 @@ public class App {
             }else if(formFields.containsKey("deleteLMButton")){
                 DataMapper.deleteLearningMaterial(temp.getId(),URLDecoder.decode(formFields.get("deleteLMButton"),"UTF-8"));
             }
-            response.redirect("/course/learnMat/"+request.params(":courseId"));
+            response.redirect("/course/learnMat/"+courseId);
             return null;
         });
 
         post("/lesson/add/:courseId", (request,response)-> {
-
+            Session sess = request.session();
+            int id = sess.attribute("id");
+            String courseId = request.params(":courseId");;
+            Map<String,Object> course = Courses.getCourse(courseId);
+            if((int)course.get("prof_id") != id) response.redirect("/err");
             DataMapper.createLesson("New Lesson","Lesson Requirements", Integer.parseInt(request.params(":courseId")));
-            response.redirect("/course/learnMat/"+request.params(":courseId"));
+            response.redirect("/course/learnMat/"+courseId);
             return null;
         });
-        get("/course/quiz",((request, response) -> {
-            Map<String,String> map = new HashMap<>();
+        get("/course/quiz/:courseId",((request, response) -> {
+            Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
-            map.put("role", sess.attribute("role"));
+            int id = sess.attribute("id");
+            String courseId = request.params(":courseId");
+            Map<String,Object> course = Courses.getCourse(courseId);
+            if((int)course.get("prof_id") == id) map.put("role", "prof");
+            else map.put("role","learner");
+            map.put("courseId", courseId);
+            map.put("name", course.get("name"));
             return new ModelAndView(map,"courseQuiz.ftl");
         }),engine);
 
-        get("/course/grades",((request, response) -> {
-            Map<String,String> map = new HashMap<>();
+        get("/course/grades/:courseId",((request, response) -> {
+            Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
-            map.put("role", sess.attribute("role"));
+            int id = sess.attribute("id");
+            String courseId = request.params(":courseId");
+            Map<String,Object> course = Courses.getCourse(courseId);
+            if((int)course.get("prof_id") == id) map.put("role", "prof");
+            else response.redirect("/course/grade/individual/" + courseId);
+            map.put("courseId", courseId);
+            map.put("name", course.get("name"));
             return new ModelAndView(map,"courseGrade.ftl");
         }),engine);
 
-        get("/course/grade/individual",((request, response) -> {
-            Map<String,String> map = new HashMap<>();
+        get("/course/grade/individual/:courseId",((request, response) -> {
+            Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
-            map.put("role", sess.attribute("role"));
+            int id = sess.attribute("id");
+            String courseId = request.params(":courseId");
+            Map<String,Object> course = Courses.getCourse(courseId);
+            if((int)course.get("prof_id") == id) map.put("role", "prof");
+            else map.put("role","learner");
+            map.put("courseId", courseId);
+            map.put("name", course.get("name"));
             return new ModelAndView(map,"courseGradeIndividual.ftl");
         }),engine);
 
-        get("/course/classlist",((request, response) -> {
-            Map<String,String> map = new HashMap<>();
+        get("/course/classlist/:courseId",((request, response) -> {
+            Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
-            map.put("role", sess.attribute("role"));
+            int id = sess.attribute("id");
+            String courseId = request.params(":courseId");
+            Map<String,Object> course = Courses.getCourse(courseId);
+            if((int)course.get("prof_id") == id) map.put("role", "prof");
+            else map.put("role","learner");
+            map.put("courseId", courseId);
+            map.put("name", course.get("name"));
             return new ModelAndView(map,"courseClasslist.ftl");
         }),engine);
 
-        get("/course/rate",((request, response) -> {
+        get("/course/rate/:courseId",((request, response) -> {
             Session sess = request.session();
-            String role = sess.attribute("role").toString();
-            Map<String,String> map = new HashMap<>();
-            map.put("role", role);
+            Map<String,Object> map = new HashMap<>();
+            int id = sess.attribute("id");
+            String courseId = request.params(":courseId");
+            Map<String,Object> course = Courses.getCourse(courseId);
+            if((int)course.get("prof_id") == id) map.put("role", "prof");
+            else map.put("role","learner");
+            map.put("courseId", courseId);
+            map.put("name", course.get("name"));
             return new ModelAndView(map,"courseRate.ftl");
         }),engine);
 

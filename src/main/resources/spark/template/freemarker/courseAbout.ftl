@@ -22,29 +22,29 @@
             <div style="width: 90%; margin-left: 2%">
                 <ul class="nav nav-tabs">
                     <li class="nav-item">
-                        <a class="nav-link active" data-toggle="tab" href="/course/about">About</a>
+                        <a class="nav-link active" data-toggle="tab" href="/course/about/${courseId}">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="/course/learnMat">Learning Material</a>
+                        <a class="nav-link" data-toggle="tab" href="/course/learnMat/${courseId}">Learning Material</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="/course/quiz">Quizzes</a>
+                        <a class="nav-link" data-toggle="tab" href="/course/quiz/${courseId}">Quizzes</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="/course/grades">Grades</a>
+                        <a class="nav-link" data-toggle="tab" href="/course/grades/${courseId}">Grades</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="/course/classlist">Classlist</a>
+                        <a class="nav-link" data-toggle="tab" href="/course/classlist/${courseId}">Classlist</a>
                     </li>
                     <#if role != "prof">
                         <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="/course/rate">Rate</a>
+                            <a class="nav-link" data-toggle="tab" href="/course/rate/${courseId}">Rate</a>
                         </li>
                     </#if>
                 </ul>
                 <div id="myTabContent" class="tab-content" style="margin:2%">
                     <div class="tab-pane fade active show" id="about">
-                        <form action="/course/about/${course_id}" method="post">
+                        <form action="/course/about/${courseId}" method="post">
                             <p class="mb-3"><b>Professor:</b> ${course.prof_name}</p>
                             <p class="mb-3"><b>Meeting Days:</b> ${course.meeting_days}</p>
                             <p class="mb-3"><b>Meeting Time:</b> ${course.start_time} - ${course.end_time} </p>

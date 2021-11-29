@@ -12,7 +12,7 @@
 <div style="display: flex;justify-content: center">
     <div class="card text-black mb-3" style="width:100%; border: none">
         <h2 class="card-header border-primary text-black-50 mb-3">
-            Introduction to Software Engineering
+            ${name}
         </h2>
         <div style="width: 90%; margin-left: 2%">
             <#if role == "prof">
@@ -22,23 +22,23 @@
             </#if>
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="/course/about">About</a>
+                    <a class="nav-link" data-toggle="tab" href="/course/about/${courseNumber}">About</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" data-toggle="tab" href="/course/learnMat">Learning Material</a>
+                    <a class="nav-link active" data-toggle="tab" href="/course/learnMat/${courseNumber}">Learning Material</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="/course/quiz">Quizzes</a>
+                    <a class="nav-link" data-toggle="tab" href="/course/quiz/${courseNumber}">Quizzes</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="/course/grades">Grades</a>
+                    <a class="nav-link" data-toggle="tab" href="/course/grades/${courseNumber}">Grades</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="/course/classlist">Classlist</a>
+                    <a class="nav-link" data-toggle="tab" href="/course/classlist/${courseNumber}">Classlist</a>
                 </li>
                 <#if role != "prof">
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="/course/rate">Rate</a>
+                        <a class="nav-link" data-toggle="tab" href="/course/rate/${courseNumber}">Rate</a>
                     </li>
                 </#if>
             </ul>
