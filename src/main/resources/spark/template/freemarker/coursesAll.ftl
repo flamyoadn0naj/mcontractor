@@ -62,7 +62,7 @@
                 <#if courses??>
                     <#list courses as c>
                         <tr>
-                            <th scope="row"><a class="text-muted" href="">${c.name}</a></th>
+                            <th scope="row"><div class="text-muted">${c.name}</div></th>
                             <td>${c.prof}</td>
                             <td style="text-align: center">${c.prereq}</td>
                             <td>${c.startDate}</td>

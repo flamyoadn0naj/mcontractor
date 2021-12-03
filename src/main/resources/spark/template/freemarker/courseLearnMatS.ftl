@@ -44,15 +44,27 @@
             </ul>
             <div id="myTabContent" class="tab-content" style="margin:2%">
                 <#list lessons as lesson>
+                <#if role == "prof">
+                <div class="card" >
+                    <form action="/upload/${courseNumber}/${lesson.id}" method="post" enctype="multipart/form-data">
+                        <label for="uploadFile" style="float:left; margin-top:10px; margin-left:5px; margin-right:1em;" name="lessonId" value="${lesson.id}"><b>Upload file for ${lesson.name}:</b></label>
+                        <input type="file" class="small" id="inputGroupFile02" style="float: left;margin-top:10px;" name="uploadFile" value ="">
+                        <button type="submit" class="btn-download" style="float: left; margin-top: 8px; margin-left:-2em;" name="uploadButton" value=""><i class="fa fa-upload"></i></button>
+                    </form>
+                </div>
+                </#if>
                 <form style="display:flex; justify-content:center; width:100%;" method="post" action="/lesson/save/${courseNumber}">
                     <div class="tab-pane fade active show" id="learnMat" style="width:100%; margin:10px;">
                         <div id="accordion">
                             <div class="card" >
+
                                 <div class="card-header" id="headingOne">
+
                                     <h5 class="mb-0">
                                     <span class="text-primary small" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                                         <#if role == "prof">
-                                        <input name="name" type="text" id="name" value="${lesson.name}">
+
+                                            <input name="name" type="text" id="name" value="${lesson.name}">
                                         <#else>
                                             ${lesson.name}
                                         </#if>
@@ -61,8 +73,7 @@
                                             <div style="float: right">
                                                 <button type="submit" class="btn btn-primary" style="float: right;" name="saveButton" value=${lesson.id}>Save</button>
                                                 <button class="btn-download" style="float: right" name="deleteButton" value=${lesson.id}><i class="fa fa-trash"></i></button>
-                                                <button type="submit" class="btn-download" style="float: right" name="uploadButton" value=${lesson.id}><i class="fa fa-upload"></i></button>
-                                                <input type="file" class="small" id="inputGroupFile02" style="width: 50%; float: right; margin-left: 2%;">
+
                                             </div>
                                         </#if>
                                     </h5>
@@ -82,7 +93,7 @@
                                             <#list lesson.materials as material>
 
                                                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                    <input  name=${material} type="text" value="${material}" readonly>
+                                                    <p  style="text-decoration: underline;"name=${material}  value="${material}">${material}</p>
                                                     <div>
                                                         <button type="submit" class="btn-download" name="dlButton" value="${material}"><i class="fa fa-download" ></i></button>
                                                          <#if role == "prof">
@@ -93,11 +104,13 @@
                                             </#list>
                                         </ul>
                                     </div>
+
                                 </div>
+
                             </div>
                         </div>
                     </div>
-                    </form>
+                </form>
                 </#list>
             </div>
         </div>
