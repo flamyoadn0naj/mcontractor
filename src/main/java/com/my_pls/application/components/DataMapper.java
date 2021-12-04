@@ -189,6 +189,7 @@ public class DataMapper {
                 String meeting_days = rs.getString("meeting_days");
                 map.put("meeting_days", meeting_days);
                 map.put("prereq_course", rs.getInt("prereq"));
+                map.put("requirements", rs.getString("requirements"));
             }
         } catch (Exception e) {
             System.out.println("Exception at findCourseByCourseId " + e);
@@ -693,6 +694,7 @@ public class DataMapper {
 
     public static int findDiscussionGroupIdByCourseId(int course_id) {
         int dg_id = -1;
+
         try {
             PreparedStatement pst = conn.prepareStatement("select id from discussion_groups where course_id=" + course_id);
             ResultSet rs = pst.executeQuery();
@@ -983,8 +985,68 @@ public class DataMapper {
         } catch (Exception e) {
             System.out.println("Exception at getPendingGroupRequests " + e);
         }
-        System.out.println(allLessons);
+        //System.out.println(allLessons);
         return allLessons;
+    }
+
+    public static void createOrUpdateLesson(Lesson value, int courseId){
+        //System.out.println("Create or Update lesson");
+        try {
+            //check if lesson exists by id
+            PreparedStatement existCheck = conn.prepareStatement("select * from lessons where Id="+value.getId());
+            ResultSet exists = existCheck.executeQuery();
+            PreparedStatement lessonStatement;
+            if(exists.next()){
+                //update
+                lessonStatement = conn.prepareStatement("update lessons set name=\""+value.getName()+"\", requirements=\""+value.getRequirements()+"\" where Id="+value.getId());
+
+            } else {
+                //add
+                lessonStatement = conn.prepareStatement("insert into lessons (courseId, name, requirements) values("+courseId+", "+value.getName()+", "+value.getRequirements()+") ");
+            }
+            lessonStatement.execute();
+
+            //drop learning materials by lesson id
+            PreparedStatement delMat = conn.prepareStatement("delete from learning_materials where lessonId="+value.getId());
+            delMat.execute();
+            //add all learning materials
+            PreparedStatement addMat;
+            for(String mat : value.getMaterials()){
+                //System.out.println("insert into learning_materials (lessonId, content) values("+value.getId()+", \""+mat+"\")");
+                addMat = conn.prepareStatement("insert into learning_materials (lessonId, content) values("+value.getId()+", \""+mat+"\")");
+                addMat.execute();
+            }
+        } catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+    public static void createLesson(String name, String req, int courseID){
+        try {
+            PreparedStatement maxId = conn.prepareStatement("select MAX(Id) from lessons");
+            ResultSet rs = maxId.executeQuery();
+            rs.next();
+            int id = rs.getInt(1) + 1;
+            PreparedStatement pst = conn.prepareStatement("insert into lessons (Id,courseId, name, requirements) values("+id+", "+courseID+", \""+name+"\", \""+req+"\")");
+            pst.execute();
+
+        } catch (Exception e) {
+            System.out.println("Exception at createLesson " + e);
+        }
+    }
+    public static void deleteLesson(int lessonId){
+        try {
+            //drop learning materials
+            PreparedStatement pst = conn.prepareStatement("delete from learning_materials where lessonId="+lessonId);
+            pst.execute();
+
+            //drop lesson
+            pst = conn.prepareStatement("delete from lessons where Id="+lessonId);
+            pst.execute();
+
+        } catch (Exception e) {
+            System.out.println("Exception at deleteLesson " + e);
+        }
+
     }
 
     public static List<String> getLearningMaterialsByLessonId(int id){
@@ -996,9 +1058,27 @@ public class DataMapper {
                 materials.add(rs.getString("content"));
             }
         } catch (Exception e) {
-            System.out.println("Exception at getPendingGroupRequests " + e);
+            System.out.println("Exception at getLearningMaterialsByLessonId " + e);
         }
         return materials;
+    }
+
+    public static void createLearningMaterial(int lessonId, String name){
+        try{
+            PreparedStatement pst = conn.prepareStatement("insert into learning_materials (lessonId, content) values ("+lessonId+", \""+name+"\")");
+            pst.execute();
+        } catch (Exception e){
+            System.out.println("Exception at createLearningMaterial " + e);
+        }
+    }
+
+    public static void deleteLearningMaterial(int lessonId, String name){
+        try{
+            PreparedStatement pst = conn.prepareStatement("delete from learning_materials where lessonId="+lessonId+" AND content=\""+name+"\"");
+            pst.execute();
+        } catch (Exception e){
+            System.out.println("Exception at deleteLearningMaterial " + e);
+        }
     }
 
     public static boolean requestToJoinGroup(int id, int dg_id) {
@@ -1175,7 +1255,8 @@ public class DataMapper {
                 details.put("meeting_days",rs.getString("meeting_days"));
                 String prereq = "None";
                 Integer p = rs.getInt("prereq");
-                if (p != null && p != 0) prereq = String.valueOf(findCourseByCourseId(String.valueOf(p)).get("name"));
+                if (p != null && p != 0)
+                    prereq = String.valueOf(findCourseByCourseId(String.valueOf(p)).get("name"));
                 details.put("prereq", prereq);
                 courses.put(rs.getInt("id"), details);
             }
@@ -1184,5 +1265,19 @@ public class DataMapper {
             System.out.println("Exception at getTaughtCourses");
         }
         return courses;
+    }
+
+    public static boolean updateCourseRequirements(int courseId, String req) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("update courses set requirements=? where id=?");
+            pst.setString(1, req);
+            pst.setInt(2, courseId);
+            int i = pst.executeUpdate();
+            if (i != 0) flag = true;
+        } catch (Exception e) {
+            System.out.println("Error at updateCourseRequirements " + e);
+        }
+        return flag;
     }
 }

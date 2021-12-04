@@ -232,8 +232,10 @@ public class App {
             else response.redirect("/err");
             boolean flag = false;
             if (formFields.containsKey("req")) {
-                String req = URLDecoder.decode(formFields.get("req"), "UTF-8");
-                flag = DataMapper.updateCourseRequirements(Integer.parseInt(courseId), req);
+
+               String req = URLDecoder.decode(formFields.get("req"), "UTF-8");
+               flag = DataMapper.updateCourseRequirements(Integer.parseInt(courseId), req);
+
             }
             if (flag) response.redirect("/course/about/" + courseId);
             else map.put("err", true);
@@ -275,8 +277,10 @@ public class App {
             System.out.println(formFields);
             System.out.println(URLDecoder.decode(formFields.get("req"),"UTF-8"));
             Lesson temp = new Lesson(Integer.parseInt(URLDecoder.decode(formFields.get("lessonId"),"UTF-8")),
-                    URLDecoder.decode(formFields.get("name"),"UTF-8"),
-                    URLDecoder.decode(formFields.get("req"),"UTF-8"));
+
+            URLDecoder.decode(formFields.get("name"),"UTF-8"),
+            URLDecoder.decode(formFields.get("req"),"UTF-8"));
+
             System.out.println(temp.getId());
             for(Map.Entry<String, String> element : formFields.entrySet()){
                 String k = URLDecoder.decode(element.getKey(),"UTF-8");
@@ -294,8 +298,10 @@ public class App {
                 DataMapper.deleteLesson(temp.getId());
 
             }else if(formFields.containsKey("dlButton")){
-                FileManager.downloadFile(request,response,URLDecoder.decode(formFields.get("dlButton"),"UTF-8"));
-                return null;
+
+                    FileManager.downloadFile(request,response,URLDecoder.decode(formFields.get("dlButton"),"UTF-8"));
+                    return null;
+
             }else if(formFields.containsKey("deleteLMButton")){
                 DataMapper.deleteLearningMaterial(temp.getId(),URLDecoder.decode(formFields.get("deleteLMButton"),"UTF-8"));
             }
@@ -316,10 +322,12 @@ public class App {
         get("/course/quiz/:courseId",((request, response) -> {
             Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
+
             int courseId = 111; //sess.attribute("id");
             map.put("role", sess.attribute("role"));
             Map<Integer, Object>  quizzes = Quiz.getQuizzes(courseId);
             if (!quizzes.isEmpty()) map.put("quizzes",quizzes);
+
             return new ModelAndView(map,"courseQuiz.ftl");
 
             // Map<String,Object> map = new HashMap<>();

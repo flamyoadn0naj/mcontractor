@@ -9,58 +9,77 @@
 </head>
 <body>
     <#include "navbar.ftl">
+    <#if err??>
+        <div class="alert alert-dismissible alert-danger">
+            <strong>Error! </strong> Something went wrong, please try again later.
+        </div>
+    </#if>
     <div style="display: flex;justify-content: center">
         <div class="card text-black mb-3" style="width:100%; border: none">
             <h2 class="card-header border-primary text-black-50 mb-3">
-                Introduction to Software Engineering
+                ${course.name}
             </h2>
             <div style="width: 90%; margin-left: 2%">
                 <ul class="nav nav-tabs">
                     <li class="nav-item">
-                        <a class="nav-link active" data-toggle="tab" href="/course/about">About</a>
+                        <a class="nav-link active" data-toggle="tab" href="/course/about/${courseId}">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="/course/learnMat">Learning Material</a>
+                        <a class="nav-link" data-toggle="tab" href="/course/learnMat/${courseId}">Learning Material</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="/course/quiz">Quizzes</a>
+                        <a class="nav-link" data-toggle="tab" href="/course/quiz/${courseId}">Quizzes</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="/course/grades">Grades</a>
+                        <a class="nav-link" data-toggle="tab" href="/course/grades/${courseId}">Grades</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="/course/classlist">Classlist</a>
+                        <a class="nav-link" data-toggle="tab" href="/course/classlist/${courseId}">Classlist</a>
                     </li>
                     <#if role != "prof">
                         <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="/course/rate">Rate</a>
+                            <a class="nav-link" data-toggle="tab" href="/course/rate/${courseId}">Rate</a>
                         </li>
                     </#if>
                 </ul>
                 <div id="myTabContent" class="tab-content" style="margin:2%">
                     <div class="tab-pane fade active show" id="about">
-                        <form>
-                            <p class="mb-3"><b>Professor:</b> AbdulMutalib Wahaishi</p>
-                            <p class="mb-3"><b>Meeting Days:</b> Tuesday, Thursday</p>
-                            <p class="mb-3"><b>Meeting Time:</b> 5pm - 6:15pm </p>
-                            <p class="mb-3"><b>Pre-requisite:</b> None</p>
+                        <form action="/course/about/${courseId}" method="post">
+                            <p class="mb-3"><b>Professor:</b> ${course.prof_name}</p>
+                            <p class="mb-3"><b>Meeting Days:</b> ${course.meeting_days}</p>
+                            <p class="mb-3"><b>Meeting Time:</b> ${course.start_time} - ${course.end_time} </p>
+                            <p class="mb-3"><b>Pre-requisite:</b> ${course.preReq!"None"}</p>
                             <#if role == "prof">
                                 <div class="mb-3">
                                     <b>Requirements:</b>
-                                    <input style="width: 80%" name="req" type="text" id="req" value="To pass, you must get a C minimum">
+                                    <input required style="width: 80%" name="req" type="text" id="req" value="${course.requirements}">
                                 </div>
                             <#else>
-                                <p class="mb-3"><b>Requirements:</b>To pass, you must get a C minimum</p>
+                                <p class="mb-3"><b>Requirements:</b>${course.requirements}</p>
                             </#if>
-                            <p class="mb-3"><b>Rating:</b>
-                                <span class="fa fa-star checked "></span>
-                                <span class="fa fa-star checked "></span>
-                                <span class="fa fa-star checked "></span>
-                                <span class="fa fa-star checked"></span>
-                                <span class="fa fa-star "></span>
-                            </p>
+                            <p class="mb-3"><b>Course Objectives:</b> ${course.obj}</p>
+                            <p class="mb-3"><b>Status</b> ${course.status}</p>
+                            <div style="display: flex">
+                            <b>Rating: </b>
+                            <#if rating??>
+                            <div class="mb-3" style="margin-bottom: 2%; margin-top: 2%; display: flex; justify-content: space-evenly">
+                                <#if rating.rating == 0>
+                                    <div style="text-align: center; margin-top: 2%"> No Rating Found </div>
+                                <#else>
+                                    <#list 1..rating.rating as i>
+                                        <span class="fa fa-star checked large"></span>
+                                    </#list>
+                                    <#list 1..rating.unchecked as j>
+                                        <span class="fa fa-star large"></span>
+                                    </#list>
+                                </#if>
+                            </div>
+                            <#else>
+                                <div style="margin-left: 5pt"> No Rating Found </div>
+                            </#if>
+                            </div>
                             <#if role == "prof">
-                                <button type="button" class="btn btn-primary mb-3" style="float: right">
+                                <button type="submit" class="btn btn-primary mb-3" style="float: right">
                                     Save
                                 </button>
                             </#if>
