@@ -791,21 +791,23 @@ public class DataMapper {
         return questions;
     }
 
-    public static ArrayList<Quiz>  viewQuizzes(int lessonID) {
+    public static Map<Integer, Object>  viewQuizzes(int lessonID) {
 //        ArrayList<Map<String,String>> quizzes = new ArrayList<Map<String, String>>();
-        ArrayList<Quiz> quizzes = new ArrayList<Quiz>();
+        Map<Integer,Object> quizzes = new HashMap<>();
         try {
             PreparedStatement pst1 = conn.prepareStatement("select * from quizzes where lessonId=?");
             pst1.setInt(1,lessonID);
             ResultSet rs = pst1.executeQuery();
 
             while(rs.next()) {
-                Quiz quiz = new Quiz();
-                quiz.quizId = rs.getInt("Id");
-                quiz.quizName = rs.getString("name");
-                quiz.MinMark = rs.getInt("minimumMarks");
-                quiz.mark = rs.getInt("totalMarks");
-                quizzes.add(quiz);
+                Map<String, Object> quiz = new HashMap<>();
+                quiz.put("lessonId",lessonID);
+                quiz.put("quizId",rs.getInt("Id"));
+                quiz.put("name",rs.getString("name"));
+                quiz.put("minMark",rs.getInt("minimumMarks"));
+                quiz.put("status",rs.getInt("enabled"));
+                quiz.put("marks", rs.getInt("totalMarks"));
+                quizzes.put(rs.getInt("Id"),quiz);
             }
         } catch (Exception e) {
             System.out.println("Exception at view Quizes "+e);
@@ -849,17 +851,6 @@ public class DataMapper {
             pst.setInt(4, 1);
             int i = pst.executeUpdate();
             flag = true;
-//            if (i != 0) {
-//                PreparedStatement pst1 = conn.prepareStatement("select * from quizzes where lessonId=?");
-//                pst1.setInt(1,lessonID);
-//                ResultSet dbrs = pst1.executeQuery();
-//                while (dbrs.next()){
-//                    int quizId = dbrs.getInt("Id");
-//                    question1.quizId = quizId;
-//                    createQuestion(question1);
-//                }
-//                flag = true;
-//            }
         } catch(Exception e) {
             System.out.println("Exception at createQuiz " + e);
         }

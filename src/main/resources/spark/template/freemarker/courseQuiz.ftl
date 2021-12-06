@@ -51,61 +51,91 @@
                             <th scope="col">Score</th>
                             <th scope="col">Action</th>
                         </tr>
-                        <tr>
-                            <th scope="row">Quiz 1</th>
-                            <td>100</td>
-                            <td>80</td>
-                            <td>85</td>
-                            <td>
-                                <#if role == "prof">
-                                    <button type="button" class="btn-download" style="float: right">
-                                        <i class="fa fa-edit"></i>
-                                    </button>
-                                    <button type="button" class="btn-download" style="float: right">
-                                        <i class="fa fa-share"></i>
-                                    </button>
-                                <#else>
-                                    <button type="button" class="btn btn-primary">Take</button>
-                                </#if>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Quiz 2</th>
-                            <td>100</td>
-                            <td>70</td>
-                            <td>85</td>
-                            <td>
-                                <#if role == "prof">
-                                    <button type="button" class="btn-download" style="float: right">
-                                        <i class="fa fa-edit"></i>
-                                    </button>
-                                    <button type="button" class="btn-download" style="float: right">
-                                        <i class="fa fa-share"></i>
-                                    </button>
-                                <#else>
-                                    <button type="button" class="btn btn-primary">Take</button>
-                                </#if>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Midterm 1</th>
-                            <td>200</td>
-                            <td>150</td>
-                            <td>180</td>
-                            <td>
-                                <#if role == "prof">
-                                    <button type="button" class="btn-download" style="float: right">
-                                        <i class="fa fa-edit"></i>
-                                    </button>
-                                    <button type="button" class="btn-download" style="float: right">
-                                        <i class="fa fa-share"></i>
-                                    </button>
-                                <#else>
-                                    <button type="button" class="btn btn-primary">Take</button>
-                                </#if>
-                            </td>
-                        </tr>
+                        <#if quizzes??>
+                            <#list quizzes as k,c>
+                                <tr>
+                                    <td>${c.name}</td>
+<#--                                    <th scope="row"><a class="text-muted" href="course/about/${k}">${c.name}</a></th>-->
+                                    <td>${c.marks}</td>
+                                    <td>${c.minMark}</td>
+                                    <td>${c.marks}</td>
+                                    <td>
+                                        <#if role == "prof">
+                                            <button type="button" class="btn-download" style="float: right">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                            <button type="button" class="btn-download" style="float: right">
+                                                <i class="fa fa-share"></i>
+                                            </button>
+                                        <#else>
+                                            <#if c.status == 1>
+                                                <button type="button" class="btn btn-primary">Take</button>
+                                            </#if>
+                                        </#if>
+                                    </td>
+                                </tr>
+                            </#list>
+                        </#if>
                     </table>
+                    <#if !quizzes??>
+                        <div style="margin-left: 2%"> No Quizzes Found</div>
+                    </#if>
+
+<#--                        <tr>-->
+<#--                            <th scope="row">Quiz 1</th>-->
+<#--                            <td>100</td>-->
+<#--                            <td>80</td>-->
+<#--                            <td>85</td>-->
+<#--                            <td>-->
+<#--                                <#if role == "prof">-->
+<#--                                    <button type="button" class="btn-download" style="float: right">-->
+<#--                                        <i class="fa fa-edit"></i>-->
+<#--                                    </button>-->
+<#--                                    <button type="button" class="btn-download" style="float: right">-->
+<#--                                        <i class="fa fa-share"></i>-->
+<#--                                    </button>-->
+<#--                                <#else>-->
+<#--                                    <button type="button" class="btn btn-primary">Take</button>-->
+<#--                                </#if>-->
+<#--                            </td>-->
+<#--                        </tr>-->
+<#--                        <tr>-->
+<#--                            <th scope="row">Quiz 2</th>-->
+<#--                            <td>100</td>-->
+<#--                            <td>70</td>-->
+<#--                            <td>85</td>-->
+<#--                            <td>-->
+<#--                                <#if role == "prof">-->
+<#--                                    <button type="button" class="btn-download" style="float: right">-->
+<#--                                        <i class="fa fa-edit"></i>-->
+<#--                                    </button>-->
+<#--                                    <button type="button" class="btn-download" style="float: right">-->
+<#--                                        <i class="fa fa-share"></i>-->
+<#--                                    </button>-->
+<#--                                <#else>-->
+<#--                                    <button type="button" class="btn btn-primary">Take</button>-->
+<#--                                </#if>-->
+<#--                            </td>-->
+<#--                        </tr>-->
+<#--                        <tr>-->
+<#--                            <th scope="row">Midterm 1</th>-->
+<#--                            <td>200</td>-->
+<#--                            <td>150</td>-->
+<#--                            <td>180</td>-->
+<#--                            <td>-->
+<#--                                <#if role == "prof">-->
+<#--                                    <button type="button" class="btn-download" style="float: right">-->
+<#--                                        <i class="fa fa-edit"></i>-->
+<#--                                    </button>-->
+<#--                                    <button type="button" class="btn-download" style="float: right">-->
+<#--                                        <i class="fa fa-share"></i>-->
+<#--                                    </button>-->
+<#--                                <#else>-->
+<#--                                    <button type="button" class="btn btn-primary">Take</button>-->
+<#--                                </#if>-->
+<#--                            </td>-->
+<#--                        </tr>-->
+<#--                    </table>-->
 <#--                    <div class="mb-3" style="display: flex; justify-content: space-between">-->
 <#--                        <span>-->
 <#--                            Lesson #1-->
