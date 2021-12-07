@@ -54,8 +54,8 @@
                         <#if quizzes??>
                             <#list quizzes as k,c>
                                 <tr>
-                                    <td>${c.name}</td>
-<#--                                    <th scope="row"><a class="text-muted" href="course/about/${k}">${c.name}</a></th>-->
+<#--                                    <td>${c.name}</td>-->
+                                    <th scope="row"><a class="text-muted" href="course/quiz/${k}">${c.name}</a></th>
                                     <td>${c.marks}</td>
                                     <td>${c.minMark}</td>
                                     <td>${c.marks}</td>

@@ -54,24 +54,7 @@ public class App {
         uploadDir.mkdir(); // create the upload directory if it doesn't exist
         //folder is at the same hierarchy level as main
         staticFiles.externalLocation("uploadFolder");
-////        Quiz testQ = new Quiz();
-////        testQ.lessonId = 111;
-//////        testQ.quizName = "test1";
-//////        DataMapper.createQuiz(testQ);
-////        DataMapper.viewQuizzes(111);
-////        testQ.quizId = 11;
-////        testQ.questionId = 1;
-////        testQ.questionText = "First Q123";
-////        testQ.lessonId = 111;
-////        testQ.answer = "C";
-////        testQ.mark = 50;
-////        testQ.responseA = "shello1";
-////        testQ.responseB = "hsello1";
-////        testQ.responseC = "helslo123";
-////        testQ.responseD = "hesllo1234";
-//////        DataMapper.createQuestion(testQ);
-//////        DataMapper.getQuestions(testQ);
-//        if (DataMapper.updateQuestion(testQ)) System.out.println("done");
+
         internalServerError((request, response) -> {
             response.redirect("/err");
             return "{\"message\":\"Server Error\"}";
@@ -320,27 +303,20 @@ public class App {
             return null;
         });
         get("/course/quiz/:courseId",((request, response) -> {
-            Map<String,Object> map = new HashMap<>();
-            Session sess = request.session();
 
-            int courseId = 111; //sess.attribute("id");
-            map.put("role", sess.attribute("role"));
-            Map<Integer, Object>  quizzes = Quiz.getQuizzes(courseId);
-            if (!quizzes.isEmpty()) map.put("quizzes",quizzes);
+             Map<String,Object> map = new HashMap<>();
+             Session sess = request.session();
+             int id = sess.attribute("id");
+             String courseId = request.params(":courseId");
+             Map<String,Object> course = Courses.getCourse(courseId);
+             if((int)course.get("prof_id") == id) map.put("role", "prof");
+             else map.put("role","learner");
+             map.put("courseId", courseId);
+             map.put("name", course.get("name"));
+            Map<Integer, Object>  quizzes = Quiz.getQuizzes(Integer.parseInt(courseId));
+                if (!quizzes.isEmpty()) map.put("quizzes",quizzes);
 
             return new ModelAndView(map,"courseQuiz.ftl");
-
-            // Map<String,Object> map = new HashMap<>();
-            // Session sess = request.session();
-            // int id = sess.attribute("id");
-            // String courseId = request.params(":courseId");
-            // Map<String,Object> course = Courses.getCourse(courseId);
-            // if((int)course.get("prof_id") == id) map.put("role", "prof");
-            // else map.put("role","learner");
-            // map.put("courseId", courseId);
-            // map.put("name", course.get("name"));
-            // return new ModelAndView(map,"courseQuiz.ftl");
-
         }),engine);
 
         get("/course/grades/:courseId",((request, response) -> {
