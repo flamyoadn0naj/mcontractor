@@ -1162,7 +1162,7 @@ public class DataMapper {
                 flag = true;
             }
         } catch (Exception e) {
-            System.out.println("Exception at getPendingGroupRequests " + e);
+            System.out.println("Exception at rateUser " + e);
         }
         return flag;
     }
@@ -1277,6 +1277,23 @@ public class DataMapper {
             if (i != 0) flag = true;
         } catch (Exception e) {
             System.out.println("Error at updateCourseRequirements " + e);
+        }
+        return flag;
+    }
+
+    public static boolean rateCourse(int courseId, int rate_value, String feedback) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("insert into course_ratings (course_id, score, feedback) VALUES (?,?,?)");
+            pst.setInt(1, courseId);
+            pst.setInt(2, rate_value);
+            pst.setString(3, feedback);
+            int i = pst.executeUpdate();
+            if (i != 0) {
+                flag = true;
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at rateCourse " + e);
         }
         return flag;
     }

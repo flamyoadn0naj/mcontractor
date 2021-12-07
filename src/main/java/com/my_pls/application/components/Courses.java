@@ -3,6 +3,8 @@ package com.my_pls.application.components;
 import com.my_pls.MySqlConnection;
 import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.sql.*;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -79,5 +81,18 @@ public class Courses {
                 .getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"");
         if (!rating.isEmpty()) course.put("rating", rating);
         return course;
+    }
+
+    public static boolean addRating(Map<String, String> formFields, String courseId) {
+        boolean flag = false;
+        try {
+            String feedback = URLDecoder.decode(formFields.get("feedback"), "UTF-8");
+            int rate_value = Integer.parseInt(formFields.get("Rating"));
+            flag = DataMapper.rateCourse(Integer.parseInt(courseId), rate_value, feedback);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        return flag;
     }
 }

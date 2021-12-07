@@ -366,6 +366,27 @@ public class App {
             Map<String,Object> course = Courses.getCourse(courseId);
             if((int)course.get("prof_id") == id) map.put("role", "prof");
             else map.put("role","learner");
+            Map<String,Object> rating = DataMapper.getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"");
+            if (!rating.isEmpty()) map.put("rating", rating);
+            map.put("courseId", courseId);
+            map.put("name", course.get("name"));
+            return new ModelAndView(map,"courseRate.ftl");
+        }),engine);
+
+        post("/course/rate/:courseId",((request, response) -> {
+            Session sess = request.session();
+            Map<String,Object> map = new HashMap<>();
+            int id = sess.attribute("id");
+            String courseId = request.params(":courseId");
+            Map<String,Object> course = Courses.getCourse(courseId);
+            if((int)course.get("prof_id") == id) map.put("role", "prof");
+            else map.put("role","learner");
+            Map<String,String> formFields = extractFields(request.body());
+            boolean flag = Courses.addRating(formFields, courseId);
+            if (flag) map.put("success", true);
+            else map.put("err", true);
+            Map<String,Object> rating = DataMapper.getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"");
+            if (!rating.isEmpty()) map.put("rating", rating);
             map.put("courseId", courseId);
             map.put("name", course.get("name"));
             return new ModelAndView(map,"courseRate.ftl");
@@ -395,10 +416,6 @@ public class App {
             Map<String,Object> map = new HashMap<>();
             if (formFields.containsKey("filterBy")) map = Courses.getMethodDefaults(formFields.get("filterBy"));
             else map = Courses.getMethodDefaults("");
-//            if (formFields.containsKey("pre-reqs")) {
-//                System.out.println(formFields);
-//                map.put("prereq", true);
-//            }
             Map<String, Object> finalMap = map;
             map.forEach((k, v)-> finalMap.put(k,v));
             map.put("role",role);
