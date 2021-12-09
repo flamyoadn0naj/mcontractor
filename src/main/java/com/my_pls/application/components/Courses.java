@@ -88,7 +88,10 @@ public class Courses {
         try {
             String feedback = URLDecoder.decode(formFields.get("feedback"), "UTF-8");
             int rate_value = Integer.parseInt(formFields.get("Rating"));
-            flag = DataMapper.rateCourse(Integer.parseInt(courseId), rate_value, feedback);
+            if (formFields.containsKey("doneRating"))
+                flag = DataMapper.rateCourse(Integer.parseInt(courseId), rate_value, feedback);
+            else
+                flag = DataMapper.rateUser(Integer.parseInt(formFields.get("doneRatingProf")), rate_value, feedback);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

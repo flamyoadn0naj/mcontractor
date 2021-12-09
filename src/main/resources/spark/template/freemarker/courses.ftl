@@ -15,7 +15,7 @@
         <h2 class="card-header border-primary text-black-50 mb-3">
             Courses
         </h2>
-        <div style="width: 90%; margin-left: 2%">
+        <div style="width: 96%; margin-left: 2%">
             <#if role == "admin">
                 <ul class="nav nav-tabs mb-3">
                     <li class="nav-item">
@@ -52,13 +52,15 @@
                     </div>
                 </div>
             </form>
-            <table class="table table-bordered">
-            <tr class="table-primary">
+            <table class="table table-bordered table-responsive text-nowrap">
+            <tr class="table-primary w-auto">
                 <th scope="col">Name</th>
                 <th scope="col">Professor</th>
                 <th scope="col">Prerequisites</th>
                 <th scope="col">Start Date</th>
                 <th scope="col">End Date</th>
+                <th scope="col">Meeting Days</th>
+                <th scope="col">Meeting Time</th>
                 <th scope="col">Status</th>
             </tr>
                 <#if courses??>
@@ -69,6 +71,8 @@
                             <td style="text-align: center">${c.prereq}</td>
                             <td>${c.startDate}</td>
                             <td>${c.endDate}</td>
+                            <td>${c.meeting_days}</td>
+                            <td>${c.startTime} - ${c.endTime}</td>
                             <td>${c.status}</td>
                         </tr>
                     </#list>

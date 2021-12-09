@@ -11,6 +11,7 @@ import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.*;
@@ -68,7 +69,10 @@ public class DataMapper {
             pst.setString(12, obj);
             if (prereq != null) pst.setInt(13, prereq);
             int i = pst.executeUpdate();
-            if (i != 0) flag = true;
+            if (i != 0) {
+                flag = true;
+                updateCourses();
+            }
         } catch (Exception e) {
             System.out.println("Exception in createOrUpdateCourse " + e);
         }
@@ -169,6 +173,7 @@ public class DataMapper {
     }
 
     public static Map<String, Object> findCourseByCourseId (String id) {
+        id = id.replaceAll("\\s","");
         Map<String, Object> map = new HashMap<>();
         try {
             PreparedStatement pst = conn.prepareStatement("select * from courses where id=?");
@@ -528,8 +533,14 @@ public class DataMapper {
                 details.put("cap", String.valueOf(rs.getInt("total_capacity")));
                 details.put("enrolled", String.valueOf(rs.getInt("enrolled")));
                 details.put("credits", String.valueOf(rs.getInt("credits")));
-                details.put("startTime", String.valueOf(rs.getString("start_Time")));
-                details.put("endTime", String.valueOf(rs.getString("end_Time")));
+                DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm");
+                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:m a");
+                LocalTime startTime = LocalTime.parse(String.valueOf(rs.getString("start_time")), df);
+                String st = startTime.format(df2);
+                LocalTime endTime = LocalTime.parse(String.valueOf(rs.getString("end_time")), df);
+                String et = endTime.format(df2);
+                details.put("startTime", st);
+                details.put("endTime", et);
                 details.put("meeting_days",rs.getString("meeting_days"));
                 String prereq = "None";
                 Integer p = rs.getInt("prereq");
@@ -867,18 +878,19 @@ public class DataMapper {
             pst.setInt(3, old_prof_id);
             int i = pst.executeUpdate();
             if (i != 0) flag = true;
+            System.out.println("flag " + flag);
         } catch(Exception e) {
             System.out.println("Exception at updateDGMembers " + e);
         }
         return flag;
     }
 
-    public static void updateCourses(Connection sqlconnection){
+    public static void updateCourses(){
         String sql_statement = "Select * from courses where status<>'Completed'";
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
         Date today_date = new Date();
         try{
-            Statement pst = sqlconnection.createStatement();
+            Statement pst = conn.createStatement();
             ResultSet dbrs = pst.executeQuery(sql_statement);
             while (dbrs.next()){
                 int course_id = dbrs.getInt("id");
@@ -888,18 +900,17 @@ public class DataMapper {
                 if (today_date.compareTo(end_date)>0){
 //                    Update course status
                     sql_statement = "UPDATE courses SET status = 'Completed' WHERE id ="+course_id;
-                    Statement stmt2 = sqlconnection.createStatement();
+                    Statement stmt2 = conn.createStatement();
                     stmt2.executeUpdate(sql_statement);
                     stmt2.close();
                 }else if(today_date.compareTo(start_date)>=0){
                     sql_statement = "UPDATE courses SET status = 'Current' WHERE id ="+course_id;
-                    Statement stmt2 = sqlconnection.createStatement();
+                    Statement stmt2 = conn.createStatement();
                     stmt2.executeUpdate(sql_statement);
                     stmt2.close();
                 }
             }
             dbrs.close();
-            sqlconnection.close();
         } catch (SQLException | ParseException throwables) {
             throwables.printStackTrace();
         }
@@ -1218,6 +1229,14 @@ public class DataMapper {
                 String s = startDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
                 LocalDate endDate = LocalDate.parse(details.get("end_date").toString());
                 String e = endDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+                DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm");
+                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:m a");
+                LocalTime startTime = LocalTime.parse(String.valueOf(details.get("start_time").toString()), df);
+                String st = startTime.format(df2);
+                LocalTime endTime = LocalTime.parse(String.valueOf(details.get("end_time").toString()), df);
+                String et = endTime.format(df2);
+                details.put("startTime", st);
+                details.put("endTime", et);
                 details.put("startDate",s);
                 details.put("endDate",e);
                 courses.put(rs.getInt("courseId"), details);
@@ -1250,8 +1269,14 @@ public class DataMapper {
                 details.put("cap",rs.getInt("total_capacity"));
                 details.put("enrolled", rs.getInt("enrolled"));
                 details.put("credits", rs.getInt("credits"));
-                details.put("startTime", rs.getString("start_Time"));
-                details.put("endTime", rs.getString("end_Time"));
+                DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm");
+                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:m a");
+                LocalTime startTime = LocalTime.parse(String.valueOf(rs.getString("start_time")), df);
+                String st = startTime.format(df2);
+                LocalTime endTime = LocalTime.parse(String.valueOf(rs.getString("end_time")), df);
+                String et = endTime.format(df2);
+                details.put("startTime", st);
+                details.put("endTime", et);
                 details.put("meeting_days",rs.getString("meeting_days"));
                 String prereq = "None";
                 Integer p = rs.getInt("prereq");

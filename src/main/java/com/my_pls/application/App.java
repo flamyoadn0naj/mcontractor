@@ -186,7 +186,12 @@ public class App {
                 ArrayList<Map<String,Object>> groups = home.getGroups();
                 if (!courses.isEmpty()) map.put("courses", home.getCourses());
                 if(!groups.isEmpty()) map.put("groups", home.getGroups());
-                if (!rating.isEmpty()) map.put("rating", home.getRating());
+                if (!rating.isEmpty()) {
+                    map.put("rating", home.getRating());
+                    if (((ArrayList<String>) rating.get("feedback")).size() > 5) {
+                        map.put("seeMore", true);
+                    }
+                }
             }
             return new ModelAndView(map,"homePage.ftl");
         }),engine);
@@ -367,9 +372,12 @@ public class App {
             if((int)course.get("prof_id") == id) map.put("role", "prof");
             else map.put("role","learner");
             Map<String,Object> rating = DataMapper.getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"");
-            if (!rating.isEmpty()) map.put("rating", rating);
+            if (!rating.isEmpty()) map.put("course_rate", rating);
+            rating = DataMapper.getRatingAndFeedbackOfUserGivenUserId((int)course.get("prof_id"), "", "");
+            if (!rating.isEmpty()) map.put("prof", rating);
             map.put("courseId", courseId);
             map.put("name", course.get("name"));
+            map.put("profId", course.get("prof_id"));
             return new ModelAndView(map,"courseRate.ftl");
         }),engine);
 
@@ -386,9 +394,12 @@ public class App {
             if (flag) map.put("success", true);
             else map.put("err", true);
             Map<String,Object> rating = DataMapper.getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"");
-            if (!rating.isEmpty()) map.put("rating", rating);
+            if (!rating.isEmpty()) map.put("course_rate", rating);
+            rating = DataMapper.getRatingAndFeedbackOfUserGivenUserId((int)course.get("prof_id"), "", "");
+            if (!rating.isEmpty()) map.put("prof", rating);
             map.put("courseId", courseId);
             map.put("name", course.get("name"));
+            map.put("profId", course.get("prof_id"));
             return new ModelAndView(map,"courseRate.ftl");
         }),engine);
 

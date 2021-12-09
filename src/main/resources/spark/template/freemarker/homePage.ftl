@@ -34,7 +34,7 @@
                     <#if courses??>
                     <ul class="list-group list-group-flush">
                         <#list courses as k,c>
-                            <li class="list-group-item"><a class="text-muted" href="course/about/${k}">${c.name}</a></li>
+                            <li class="list-group-item"><a class="text-muted" style="font-weight: bold" href="course/about/${k}">${c.name}</a></li>
                         </#list>
                     </ul>
                     <#else>

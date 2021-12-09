@@ -50,8 +50,7 @@ public class Login {
                     map.put("errorEmail", "");
                     map.put("emailVal", emVal);
                 } else {
-                    Connection conn = MySqlConnection.getConnection();
-                    DataMapper.updateCourses(conn);
+                    DataMapper.updateCourses();
                     map.put("loginErr", "");
                     map.put("errorEmail", "");
                     map.put("emailVal", emVal);
