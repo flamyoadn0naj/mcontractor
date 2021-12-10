@@ -1,5 +1,6 @@
 package com.my_pls.application.components;
 
+import javax.xml.crypto.Data;
 import java.net.URLDecoder;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -87,9 +88,9 @@ public class CreateCourse {
                 boolean flag2 = DataMapper.createOrUpdateCourse(edit, name, prof_id, daysString, startTime, endTime,
                         startDate, endDate, credits, capacity, obj, prereq);
                 if(flag2) {
-                    if (edit.contentEquals("-1"))
-                        flag = addDiscussionGroupForCourse(name, prof_id);
-                    else flag = editDiscussionGroupForCourse(name, prof_id, Integer.parseInt(edit), old_profId);
+                    if (edit.contentEquals("-1")) {
+                        flag = addDiscussionGroupAndEnrolmentForCourse(name, prof_id);
+                    } else flag = editDiscussionGroupAndEnrollmentForCourse(name, prof_id, Integer.parseInt(edit), old_profId);
                 }
             }
         } catch (Exception e) {
@@ -123,26 +124,31 @@ public class CreateCourse {
         return map;
     }
 
-    public static boolean addDiscussionGroupForCourse(String name, int prof_id) {
+    public static boolean addDiscussionGroupAndEnrolmentForCourse(String name, int prof_id) {
         boolean flag = false;
         int id = DataMapper.findLastInsertedId("courses");
         if (id != -1) {
-            int i = DataMapper.addDiscussionGroup(name, id, 1);
-            if (i != 0) {
-                int d_id = DataMapper.findLastInsertedId("discussion_groups");
-                if (d_id != -1) {
-                    flag = DataMapper.addDGmember(prof_id, d_id);
+            int j = DataMapper.enroll(id, prof_id);
+            if (j != 0) {
+                int i = DataMapper.addDiscussionGroup(name, id, 1);
+                if (i != 0) {
+                    int d_id = DataMapper.findLastInsertedId("discussion_groups");
+                    if (d_id != -1) {
+                        flag = DataMapper.addDGmember(prof_id, d_id);
+                    }
                 }
             }
         }
         return  flag;
     }
 
-    private static boolean editDiscussionGroupForCourse(String name, int prof_id, int course_id, int old_profId) {
-        boolean flag = false;
-        int d_id = DataMapper.findDiscussionGroupIdByCourseId(course_id);
-        boolean flag2 = DataMapper.updateDGMembers(old_profId, prof_id, d_id);
-        if (flag2) flag = DataMapper.updateDiscussionGroup(d_id, name);
+    private static boolean editDiscussionGroupAndEnrollmentForCourse(String name, int prof_id, int course_id, int old_profId) {
+        boolean flag = DataMapper.updateEnroll(course_id, prof_id, old_profId);
+        if (flag) {
+            int d_id = DataMapper.findDiscussionGroupIdByCourseId(course_id);
+            boolean flag2 = DataMapper.updateDGMembers(old_profId, prof_id, d_id);
+            if (flag2) flag = DataMapper.updateDiscussionGroup(d_id, name);
+        }
         return flag;
     }
 

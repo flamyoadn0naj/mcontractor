@@ -360,6 +360,9 @@ public class App {
             else map.put("role","learner");
             map.put("courseId", courseId);
             map.put("name", course.get("name"));
+            Map<Integer, Map<String,String>> classList = DataMapper.getClassList(Integer.parseInt(courseId));
+            map.put("classList", classList);
+            map.put("profId", course.get("prof_id"));
             return new ModelAndView(map,"courseClasslist.ftl");
         }),engine);
 

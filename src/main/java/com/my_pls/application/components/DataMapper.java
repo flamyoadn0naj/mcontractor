@@ -20,7 +20,7 @@ import java.util.function.Function;
 
 public class DataMapper {
     private static int MAXQUIZ = 200;
-    private static Connection conn = MySqlConnection.getConnection();
+    private static Connection conn;
     private static Function<String,String> addQuotes = s -> "\"" + s + "\"";
 
     public static boolean createOrUpdateCourse(String edit, String name, int prof_id, String daysString,
@@ -29,6 +29,7 @@ public class DataMapper {
                                                Integer prereq) {
         boolean flag = false;
         String sqlQuery = "";
+
         if (prereq != null) {
             sqlQuery = "insert into courses (course_name, profId, meeting_days, " +
                     "start_time, end_time, start_date, end_date, credits, total_capacity, enrolled, " +
@@ -54,6 +55,7 @@ public class DataMapper {
         }
 
         try {
+            conn = MySqlConnection.getConnection();
             PreparedStatement pst = conn.prepareStatement(sqlQuery);
             pst.setString(1, name);
             pst.setInt(2, prof_id);
@@ -73,6 +75,7 @@ public class DataMapper {
                 flag = true;
                 updateCourses();
             }
+            conn.close();
         } catch (Exception e) {
             System.out.println("Exception in createOrUpdateCourse " + e);
         }
@@ -81,6 +84,7 @@ public class DataMapper {
     public static Map<Integer, String> findAllProfs(){
         Map<Integer,String> profs = new HashMap<Integer,String>();
         try {
+            conn = MySqlConnection.getConnection();
             PreparedStatement pst = conn.prepareStatement("select profId from courses");
             ResultSet rs = pst.executeQuery();
             while(rs.next()) {
@@ -88,6 +92,7 @@ public class DataMapper {
                 String name = findProfName(id);
                 profs.put(id,name);
             }
+            conn.close();
         } catch (SQLException throwables) {
             System.out.println("Exception at get prof name "+ throwables);
         }
@@ -99,6 +104,7 @@ public class DataMapper {
                                                      String endDate, int credits, int capacity, String obj) {
         int id = -1;
         try {
+            conn = MySqlConnection.getConnection();
             PreparedStatement pst = conn.prepareStatement(
                     "select id from courses where course_name=? and profId=? and meeting_days=? and " +
                             "start_time=? and end_time=? and start_date=? and end_date=? and credits=? and " +
@@ -117,6 +123,7 @@ public class DataMapper {
             if (rs.next()) {
                 id = rs.getInt("id");
             }
+            conn.close();
         } catch (Exception e ) {
             System.out.println("Exception at findCourseIdFromCourseDetails " + e);
         }
@@ -130,6 +137,7 @@ public class DataMapper {
             if (course_id == -1) {
                 sqlQuery = "insert into discussion_groups (name,course_id, privacy) VALUES (?,null,?)";
             }
+            conn = MySqlConnection.getConnection();
             PreparedStatement pst2 = conn.prepareStatement(sqlQuery);
             pst2.setString(1, name);
             if (course_id != -1) {
@@ -137,6 +145,7 @@ public class DataMapper {
                 pst2.setInt(3, privacy);
             } else pst2.setInt(2, privacy);
             i = pst2.executeUpdate();
+            conn.close();
         } catch (Exception e) {
             System.out.println("Exception at addDiscussionGroup " + e);
         }
@@ -146,12 +155,14 @@ public class DataMapper {
     public static int findLastInsertedId(String table) {
         int i = -1;
         try {
+            conn = MySqlConnection.getConnection();
             PreparedStatement pst = conn.prepareStatement(
                     "SELECT MAX(id) AS LastID FROM " + table);
             ResultSet rs = pst.executeQuery();
             if (rs.next()) {
                 i = rs.getInt("LastID");
             }
+            conn.close();
         } catch (Exception e) {
             System.out.println("Exception at addDiscussionGroup " + e);
         }
@@ -161,11 +172,13 @@ public class DataMapper {
     public static boolean addDGmember(int u_id, int dg_id) {
         boolean flag = false;
         try {
+            conn = MySqlConnection.getConnection();
             PreparedStatement pst4 = conn.prepareStatement("insert into dg_members (user_id, dg_id) VALUES (?,?)");
             pst4.setInt(1,u_id);
             pst4.setInt(2,dg_id);
             int j = pst4.executeUpdate();
             if (j != 0) flag = true;
+            conn.close();
         } catch (Exception e) {
             System.out.println("Exception in addDGmember " + e);
         }
@@ -1319,6 +1332,55 @@ public class DataMapper {
             }
         } catch (Exception e) {
             System.out.println("Exception at rateCourse " + e);
+        }
+        return flag;
+    }
+
+    public static Map<Integer, Map<String,String>> getClassList(int courseId) {
+        Map<Integer, Map<String,String>> classList = new HashMap<>();
+        try {
+            PreparedStatement pst = conn.prepareStatement("select userId, First_Name, Last_Name, Email from " +
+                    "enrollments, user_details where enrollments.userId = user_details.Id and courseId="+ courseId);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                String name = rs.getString("First_Name") + " " + rs.getString("Last_Name");
+                String email = rs.getString("Email");
+                int id = rs.getInt("userId");
+                Map<String,String> details = new HashMap<>();
+                details.put("name", name);
+                details.put("email", email);
+                classList.put(id, details);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at getClassList " + e);
+        }
+        return classList;
+    }
+
+    public static int enroll(int course_id, int prof_id) {
+       int i = 0;
+        try {
+            PreparedStatement pst = conn.prepareStatement("insert into enrollments (userId, couseId) VALUES (?,?)");
+            pst.setInt(1, prof_id);
+            pst.setInt(2, course_id);
+            i = pst.executeUpdate();
+        } catch (Exception e) {
+            System.out.println("Exception at enroll " + e);
+        }
+        return i;
+    }
+
+    public static boolean updateEnroll(int course_id, int prof_id, int oldProfId) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("upadte enrollments set userId=? where userId=? and courseId=?");
+            pst.setInt(1, prof_id);
+            pst.setInt(2, oldProfId);
+            pst.setInt(3, course_id);
+            int i = pst.executeUpdate();
+            if (i != 0) flag = true;
+        } catch (Exception e) {
+            System.out.println("Exception at updateEnroll " + e);
         }
         return flag;
     }
