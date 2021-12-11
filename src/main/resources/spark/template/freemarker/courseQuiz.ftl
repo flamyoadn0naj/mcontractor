@@ -17,7 +17,7 @@
         </h2>
         <div style="width: 90%; margin-left: 2%">
             <#if role == "prof">
-                <a href="/course/create-quiz" class="btn btn-primary" style="float: right">Add</a>
+                <a href="/course/${courseId}/create-quiz?courseId=${courseId}" class="btn btn-primary" style="float: right">Add</a>
             </#if>
             <ul class="nav nav-tabs">
                 <li class="nav-item">

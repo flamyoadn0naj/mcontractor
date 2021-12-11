@@ -324,6 +324,37 @@ public class App {
             return new ModelAndView(map,"courseQuiz.ftl");
         }),engine);
 
+        get("/course/:courseId/create-quiz",((request, response) -> {
+//            Session sess = request.session();
+//            String role = sess.attribute("role").toString();
+//            Map<String,String> map = new HashMap<>();
+//            String courseId = request.params(":courseId");
+//            System.out.println(request.queryParams("courseId"));
+//            map.put("role", role);
+            Map<String,Object> map = new HashMap<>();
+            Session sess = request.session();
+            int id = sess.attribute("id");
+            String courseId = request.params(":courseId");
+            Map<String,Object> course = Courses.getCourse(courseId);
+            if((int)course.get("prof_id") == id) map.put("role", "prof");
+            else map.put("role","learner");
+            map.put("courseId", courseId);
+            map.put("name", course.get("name"));
+            map.put("lessons",DataMapper.getLessonsByCourseId(Integer.parseInt(courseId)));
+            return new ModelAndView(map,"createQuiz.ftl");
+        }),engine);
+
+        post("/course/add/:courseId", (request,response)-> {
+            Session sess = request.session();
+            int id = sess.attribute("id");
+            String courseId = request.params(":courseId");;
+            Map<String,Object> course = Courses.getCourse(courseId);
+            if((int)course.get("prof_id") != id) response.redirect("/err");
+            DataMapper.createLesson("New Lesson","Lesson Requirements", Integer.parseInt(request.params(":courseId")));
+            response.redirect("/course/learnMat/"+courseId);
+            return null;
+        });
+
         get("/course/grades/:courseId",((request, response) -> {
             Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
@@ -528,13 +559,7 @@ public class App {
             return new ModelAndView(map,"createCourse.ftl");
         },engine);
 
-        get("/course/create-quiz",((request, response) -> {
-            Session sess = request.session();
-            String role = sess.attribute("role").toString();
-            Map<String,String> map = new HashMap<>();
-            map.put("role", role);
-            return new ModelAndView(map,"createQuiz.ftl");
-        }),engine);
+
 
         get("/enroll",((request, response) -> {
             Session sess = request.session();
