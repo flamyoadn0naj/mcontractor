@@ -1,7 +1,6 @@
 package com.my_pls.application.components;
 
 import com.my_pls.Lesson;
-import com.my_pls.MySqlConnection;
 import com.my_pls.securePassword;
 import com.my_pls.sendEmail;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -20,13 +19,12 @@ import java.util.function.Function;
 
 public class DataMapper {
     private static int MAXQUIZ = 200;
-    private static Connection conn;
     private static Function<String,String> addQuotes = s -> "\"" + s + "\"";
 
     public static boolean createOrUpdateCourse(String edit, String name, int prof_id, String daysString,
                                                String startTime, String endTime, String startDate,
                                                String endDate, int credits, int capacity, String obj,
-                                               Integer prereq) {
+                                               Integer prereq, Connection conn) {
         boolean flag = false;
         String sqlQuery = "";
 
@@ -55,7 +53,6 @@ public class DataMapper {
         }
 
         try {
-            conn = MySqlConnection.getConnection();
             PreparedStatement pst = conn.prepareStatement(sqlQuery);
             pst.setString(1, name);
             pst.setInt(2, prof_id);
@@ -73,26 +70,24 @@ public class DataMapper {
             int i = pst.executeUpdate();
             if (i != 0) {
                 flag = true;
-                updateCourses();
+                updateCourses(conn);
             }
-            conn.close();
         } catch (Exception e) {
             System.out.println("Exception in createOrUpdateCourse " + e);
         }
         return flag;
     }
-    public static Map<Integer, String> findAllProfs(){
+
+    public static Map<Integer, String> findAllProfs(Connection conn){
         Map<Integer,String> profs = new HashMap<Integer,String>();
         try {
-            conn = MySqlConnection.getConnection();
             PreparedStatement pst = conn.prepareStatement("select profId from courses");
             ResultSet rs = pst.executeQuery();
             while(rs.next()) {
                 int id = rs.getInt("profId");
-                String name = findProfName(id);
+                String name = findProfName(id, conn);
                 profs.put(id,name);
             }
-            conn.close();
         } catch (SQLException throwables) {
             System.out.println("Exception at get prof name "+ throwables);
         }
@@ -101,10 +96,10 @@ public class DataMapper {
 
     public static int findCourseIdFromCourseDetails (String name, int prof_id, String daysString,
                                                      String startTime, String endTime, String startDate,
-                                                     String endDate, int credits, int capacity, String obj) {
+                                                     String endDate, int credits, int capacity, String obj,
+                                                     Connection conn) {
         int id = -1;
         try {
-            conn = MySqlConnection.getConnection();
             PreparedStatement pst = conn.prepareStatement(
                     "select id from courses where course_name=? and profId=? and meeting_days=? and " +
                             "start_time=? and end_time=? and start_date=? and end_date=? and credits=? and " +
@@ -123,21 +118,19 @@ public class DataMapper {
             if (rs.next()) {
                 id = rs.getInt("id");
             }
-            conn.close();
         } catch (Exception e ) {
             System.out.println("Exception at findCourseIdFromCourseDetails " + e);
         }
         return id;
     }
 
-    public static int addDiscussionGroup (String name, int course_id, int privacy) {
+    public static int addDiscussionGroup(String name, int course_id, int privacy, Connection conn) {
         int i = -1;
         String sqlQuery = "insert into discussion_groups (name, course_id, privacy) VALUES (?,?,?)";
         try {
             if (course_id == -1) {
                 sqlQuery = "insert into discussion_groups (name,course_id, privacy) VALUES (?,null,?)";
             }
-            conn = MySqlConnection.getConnection();
             PreparedStatement pst2 = conn.prepareStatement(sqlQuery);
             pst2.setString(1, name);
             if (course_id != -1) {
@@ -145,47 +138,42 @@ public class DataMapper {
                 pst2.setInt(3, privacy);
             } else pst2.setInt(2, privacy);
             i = pst2.executeUpdate();
-            conn.close();
         } catch (Exception e) {
             System.out.println("Exception at addDiscussionGroup " + e);
         }
         return i;
     }
 
-    public static int findLastInsertedId(String table) {
+    public static int findLastInsertedId(String table, Connection conn) {
         int i = -1;
         try {
-            conn = MySqlConnection.getConnection();
             PreparedStatement pst = conn.prepareStatement(
                     "SELECT MAX(id) AS LastID FROM " + table);
             ResultSet rs = pst.executeQuery();
             if (rs.next()) {
                 i = rs.getInt("LastID");
             }
-            conn.close();
         } catch (Exception e) {
             System.out.println("Exception at addDiscussionGroup " + e);
         }
         return i;
     }
 
-    public static boolean addDGmember(int u_id, int dg_id) {
+    public static boolean addDGmember(int u_id, int dg_id, Connection conn) {
         boolean flag = false;
         try {
-            conn = MySqlConnection.getConnection();
             PreparedStatement pst4 = conn.prepareStatement("insert into dg_members (user_id, dg_id) VALUES (?,?)");
             pst4.setInt(1,u_id);
             pst4.setInt(2,dg_id);
             int j = pst4.executeUpdate();
             if (j != 0) flag = true;
-            conn.close();
         } catch (Exception e) {
             System.out.println("Exception in addDGmember " + e);
         }
         return flag;
     }
 
-    public static Map<String, Object> findCourseByCourseId (String id) {
+    public static Map<String, Object> findCourseByCourseId(String id, Connection conn) {
         id = id.replaceAll("\\s","");
         Map<String, Object> map = new HashMap<>();
         try {
@@ -215,7 +203,7 @@ public class DataMapper {
         return map;
     }
 
-    public static Map<String, Object> getGroupDetailsByGroupId(int dg_id) {
+    public static Map<String, Object> getGroupDetailsByGroupId(int dg_id, Connection conn) {
         Map<String,Object> details = new HashMap<>();
         try {
             PreparedStatement pst = conn.prepareStatement("select * from discussion_groups where id=" + dg_id);
@@ -236,13 +224,13 @@ public class DataMapper {
         return details;
     }
 
-    public static ArrayList<Map<String, Object>> getMyDiscussionGroups(int id) {
+    public static ArrayList<Map<String, Object>> getMyDiscussionGroups(int id, Connection conn) {
         ArrayList<Map<String,Object>> allGroups = new ArrayList<>();
         try {
             PreparedStatement pst = conn.prepareStatement("select dg_id from dg_members where user_id=" + id);
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
-                Map<String, Object> group = DataMapper.getGroupDetailsByGroupId(rs.getInt("dg_id"));
+                Map<String, Object> group = DataMapper.getGroupDetailsByGroupId(rs.getInt("dg_id"), conn);
                 allGroups.add(group);
             }
         } catch (SQLException throwables) {
@@ -252,7 +240,7 @@ public class DataMapper {
         return allGroups;
     }
 
-    public static ArrayList<Integer> getAllCourseIDsFromRating() {
+    public static ArrayList<Integer> getAllCourseIDsFromRating(Connection conn) {
         ArrayList<Integer> course_ids = new ArrayList<>();
         try {
             PreparedStatement pst = conn.prepareStatement("select course_id from course_ratings GROUP BY course_id");
@@ -266,7 +254,7 @@ public class DataMapper {
         return course_ids;
     }
 
-    public static Map<String,Object> getRatingAndFeedbackOfCourseGivenCourseId(int id, String searchText) {
+    public static Map<String,Object> getRatingAndFeedbackOfCourseGivenCourseId(int id, String searchText, Connection conn) {
         Map<String,Object> ratingsObj = new HashMap<>();
         String sqlQuery = "select course_name, profId, score, feedback from course_ratings, courses where course_id=? and id=?";
         if (searchText.length() > 0) {
@@ -305,7 +293,7 @@ public class DataMapper {
         return ratingsObj;
     }
 
-    public static ArrayList<Integer> getAllUserIDsFromRating() {
+    public static ArrayList<Integer> getAllUserIDsFromRating(Connection conn) {
         ArrayList<Integer> user_ids = new ArrayList<>();
         try {
             PreparedStatement pst = conn.prepareStatement("select userId from user_ratings GROUP BY userId");
@@ -319,7 +307,7 @@ public class DataMapper {
         return user_ids;
     }
 
-    public static Map<String,Object> getRatingAndFeedbackOfUserGivenUserId(int id, String searchText, String filter) {
+    public static Map<String,Object> getRatingAndFeedbackOfUserGivenUserId(int id, String searchText, String filter, Connection conn) {
         Map<String,Object> ratingsObj = new HashMap<>();
         String sqlQuery = "select score, feedback, First_Name, Last_Name, role from user_ratings, user_details where userId="
         + id + " and Id=" + id;
@@ -368,7 +356,7 @@ public class DataMapper {
         return ratingsObj;
     }
 
-    public static String findProfName(int id) {
+    public static String findProfName(int id, Connection conn) {
         String name = "";
         try {
             PreparedStatement pst = conn.prepareStatement(
@@ -383,7 +371,7 @@ public class DataMapper {
         return name;
     }
 
-    public static boolean deleteDisscussionGroupAndmembers (int courseId) {
+    public static boolean deleteDisscussionGroupAndmembers (int courseId, Connection conn) {
         boolean flag = false;
         try {
             PreparedStatement pst = conn.prepareStatement("select id from discussion_groups where course_id=" + courseId);
@@ -405,7 +393,7 @@ public class DataMapper {
         return flag;
     }
 
-    public static boolean deleteCourse(int id) {
+    public static boolean deleteCourse(int id, Connection conn) {
         boolean flag = false;
         try {
             PreparedStatement pst = conn.prepareStatement("delete from courses where id=?");
@@ -418,7 +406,7 @@ public class DataMapper {
         return flag;
     }
 
-    public static Map<Integer, String> viewUsers(String searchText, String filterBy) {
+    public static Map<Integer, String> viewUsers(String searchText, String filterBy, Connection conn) {
         Map<Integer,String> users = new HashMap<>();
         searchText = "%" + searchText + "%";
         searchText = addQuotes.apply(searchText);
@@ -446,7 +434,7 @@ public class DataMapper {
         return users;
     }
 
-    public static boolean authorize(String uid) {
+    public static boolean authorize(String uid, Connection conn) {
         boolean flag = false;
         int id = Integer.parseInt(uid);
         try {
@@ -463,7 +451,7 @@ public class DataMapper {
         return flag;
     }
 
-    public static boolean approveProf(String pid) {
+    public static boolean approveProf(String pid, Connection conn) {
         boolean flag = false;
         int id = Integer.parseInt(pid);
         try {
@@ -485,7 +473,7 @@ public class DataMapper {
         return flag;
     }
 
-    public static boolean deleteReq(String pid) {
+    public static boolean deleteReq(String pid, Connection conn) {
         boolean flag = false;
         int id = Integer.parseInt(pid);
         try {
@@ -501,7 +489,7 @@ public class DataMapper {
         return flag;
     }
 
-    public static Map<Integer,String> viewAllRequests() {
+    public static Map<Integer,String> viewAllRequests(Connection conn) {
         Map<Integer,String> profs = new HashMap<>();
         try {
             PreparedStatement pst = conn.prepareStatement("select * from prof_requests");
@@ -517,7 +505,7 @@ public class DataMapper {
         return profs;
     }
 
-    public static ArrayList<Map<String,String>> viewCourses(String filterstatus) {
+    public static ArrayList<Map<String,String>> viewCourses(String filterstatus, Connection conn) {
         ArrayList<Map<String,String>> courses = new ArrayList<Map<String, String>>();
 
         try {
@@ -533,7 +521,7 @@ public class DataMapper {
             while(rs.next()) {
                 Map<String,String> details = new HashMap<>();
                 details.put("name",rs.getString("course_name"));
-                String prof = DataMapper.findProfName(rs.getInt("profId"));
+                String prof = DataMapper.findProfName(rs.getInt("profId"), conn);
                 details.put("prof",prof);
                 LocalDate startDate = LocalDate.parse(rs.getString("start_date"));
                 String s = startDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
@@ -557,7 +545,7 @@ public class DataMapper {
                 details.put("meeting_days",rs.getString("meeting_days"));
                 String prereq = "None";
                 Integer p = rs.getInt("prereq");
-                if (p != null && p != 0) prereq = String.valueOf(findCourseByCourseId(String.valueOf(p)).get("name"));
+                if (p != null && p != 0) prereq = String.valueOf(findCourseByCourseId(String.valueOf(p), conn).get("name"));
                 details.put("prereq", prereq);
                 courses.add(details);
             }
@@ -568,7 +556,7 @@ public class DataMapper {
         return courses;
     }
 
-    public static boolean register(String fName, String lName, String email, String password) {
+    public static boolean register(String fName, String lName, String email, String password, Connection conn) {
         Random theRandom = new Random();
         theRandom.nextInt(999999);
         String myHash = DigestUtils.md5Hex("" +	theRandom);
@@ -597,7 +585,7 @@ public class DataMapper {
         return flag;
     }
 
-    public static String applyProf(String email) {
+    public static String applyProf(String email, Connection conn) {
         String flag = "false";
         try {
             PreparedStatement pst = conn.prepareStatement(
@@ -623,11 +611,10 @@ public class DataMapper {
         return flag;
     }
 
-    public static boolean forgetPasswordSendEmail(String email) {
+    public static boolean forgetPasswordSendEmail(String email, Connection conn) {
         boolean flag = false;
         try {
             email = URLDecoder.decode(email, "UTF-8");
-            Connection conn = MySqlConnection.getConnection();
             PreparedStatement pst = conn.prepareStatement("select Email, Hash, Active from user_details where Email=?");
             pst.setString(1, email);
             ResultSet rs = pst.executeQuery();
@@ -651,11 +638,10 @@ public class DataMapper {
         return flag;
     }
 
-    public static boolean resendEmailConfirmation(String email) {
+    public static boolean resendEmailConfirmation(String email, Connection conn) {
         boolean flag = false;
         try {
             email = URLDecoder.decode(email, "UTF-8");
-            Connection conn = MySqlConnection.getConnection();
             PreparedStatement pst = conn.prepareStatement("select Hash from user_details where Email=?");
             pst.setString(1, email);
             ResultSet rs = pst.executeQuery();
@@ -674,10 +660,9 @@ public class DataMapper {
         return flag;
     }
 
-    public static boolean changePassword(String confirmCode, String email, String newPassword ) {
+    public static boolean changePassword(String confirmCode, String email, String newPassword, Connection conn) {
         boolean flag = false;
         try {
-            Connection conn = MySqlConnection.getConnection();
             PreparedStatement pst = conn.prepareStatement("select * from user_details where Hash=? and email=? and Active='0'");
             pst.setString(1, confirmCode);
             pst.setString(2, email);
@@ -688,7 +673,7 @@ public class DataMapper {
                 pst1.setString(2, confirmCode);
                 pst1.setString(3, email);
                 int i = pst1.executeUpdate();
-                flag = true;
+                if (i != 0) flag = true;
             }
         } catch(Exception e){
             System.out.println("Error at Forget Password " + e);
@@ -696,7 +681,7 @@ public class DataMapper {
         return flag;
     }
 
-    public static User login(String input_password, String emVal, securePassword pwd_manager) {
+    public static User login(String input_password, String emVal, securePassword pwd_manager, Connection conn) {
         User user = new User();
         try {
             emVal = URLDecoder.decode(emVal, "UTF-8");
@@ -716,7 +701,7 @@ public class DataMapper {
         return user;
     }
 
-    public static int findDiscussionGroupIdByCourseId(int course_id) {
+    public static int findDiscussionGroupIdByCourseId(int course_id, Connection conn) {
         int dg_id = -1;
 
         try {
@@ -729,7 +714,7 @@ public class DataMapper {
         return dg_id;
     }
 
-    public static boolean updateDiscussionGroup(int id, String name) {
+    public static boolean updateDiscussionGroup(int id, String name, Connection conn) {
         boolean flag = false;
         try {
             PreparedStatement pst = conn.prepareStatement("update discussion_groups set name=? where id=?");
@@ -743,7 +728,7 @@ public class DataMapper {
         return flag;
     }
 
-    public static boolean createQuestion(Quiz question1) {
+    public static boolean createQuestion(Quiz question1, Connection conn) {
         boolean flag = false;
         try {
             PreparedStatement pst = conn.prepareStatement("insert into quiz_questions (quizId,question,answer,mark,responseA,responseB,responseC,responseD) VALUES (?,?,?,?,?,?,?,?)");
@@ -763,7 +748,7 @@ public class DataMapper {
         return flag;
     }
 
-    public static boolean updateQuestion(Quiz question1) {
+    public static boolean updateQuestion(Quiz question1, Connection conn) {
         boolean flag = false;
         try {
             PreparedStatement pst = conn.prepareStatement("update quiz_questions set question=?,answer=?,mark=?,responseA=?,responseB=?,responseC=?,responseD=? WHERE quizId=? and questionId=?");
@@ -785,7 +770,7 @@ public class DataMapper {
         return flag;
     }
 
-    public static ArrayList<Quiz> getQuestions(Quiz quiz){
+    public static ArrayList<Quiz> getQuestions(Quiz quiz, Connection conn){
 //        Quiz[] questions = new Quiz[MAXQUIZ]; //= new Quiz[0];
 //        ArrayList<Map<Quiz,Quiz>> questions = new ArrayList<Map<Quiz, Quiz>>();
         ArrayList<Quiz> questions = new ArrayList<Quiz>();
@@ -815,7 +800,7 @@ public class DataMapper {
         return questions;
     }
 
-    public static Map<Integer, Object>  viewQuizzes(int lessonID) {
+    public static Map<Integer, Object>  viewQuizzes(int lessonID, Connection conn) {
 //        ArrayList<Map<String,String>> quizzes = new ArrayList<Map<String, String>>();
         Map<Integer,Object> quizzes = new HashMap<>();
         try {
@@ -865,7 +850,7 @@ public class DataMapper {
 //        return quizzes;
 //    }
 
-    public static boolean createQuiz(Quiz newQuiz) {
+    public static boolean createQuiz(Quiz newQuiz, Connection conn) {
         boolean flag = false;
         try {
             PreparedStatement pst = conn.prepareStatement("insert into quizzes (lessonId,name,completed,enabled) VALUES (?,?,?,?)");
@@ -882,7 +867,7 @@ public class DataMapper {
     }
 
 
-    public static boolean updateDGMembers(int old_prof_id, int new_prof_id, int d_id) {
+    public static boolean updateDGMembers(int old_prof_id, int new_prof_id, int d_id, Connection conn) {
         boolean flag = false;
         try {
             PreparedStatement pst = conn.prepareStatement("update dg_members set user_id=? where dg_id=? and user_id=?");
@@ -898,7 +883,7 @@ public class DataMapper {
         return flag;
     }
 
-    public static void updateCourses(){
+    public static void updateCourses(Connection conn){
         String sql_statement = "Select * from courses where status<>'Completed'";
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
         Date today_date = new Date();
@@ -930,7 +915,7 @@ public class DataMapper {
 
     }
 
-    public static int getUserIdFromEmail(String email) {
+    public static int getUserIdFromEmail(String email, Connection conn) {
         int id = -1;
         try {
             PreparedStatement pst = conn.prepareStatement("select * from user_details where Email=?");
@@ -945,7 +930,7 @@ public class DataMapper {
         return id;
     }
 
-    public static Map<Integer, Map<String, Object>> getAllDisscussionGroups(String searchText, int filter) {
+    public static Map<Integer, Map<String, Object>> getAllDisscussionGroups(String searchText, int filter, Connection conn) {
         boolean flag = false;
         Map<Integer, Map<String, Object>> groups = new HashMap<>();
         String sqlQuery = "select * from discussion_groups where ISNULL(course_id)";
@@ -976,7 +961,7 @@ public class DataMapper {
         return groups;
     }
 
-    public static Map<Integer, Object> getPendingGroupRequests(int id) {
+    public static Map<Integer, Object> getPendingGroupRequests(int id, Connection conn) {
         Map<Integer, Object> groups = new HashMap<>();
         try {
             PreparedStatement pst = conn.prepareStatement("select dg_id from discussion_group_requests where user_id="+ id);
@@ -984,7 +969,7 @@ public class DataMapper {
             while (rs.next()) {
                 Map<String, Object> details = new HashMap<>();
                 int dg_id = rs.getInt("dg_id");
-                details = getGroupDetailsByGroupId(dg_id);
+                details = getGroupDetailsByGroupId(dg_id, conn);
                 groups.put(dg_id, details);
             }
         } catch (Exception e) {
@@ -993,7 +978,7 @@ public class DataMapper {
         return groups;
     }
 
-    public static ArrayList<Lesson> getLessonsByCourseId(int id){
+    public static ArrayList<Lesson> getLessonsByCourseId(int id, Connection conn){
         ArrayList<Lesson> allLessons = new ArrayList<>();
         try {
             PreparedStatement pst = conn.prepareStatement("select * from lessons where courseId="+ id);
@@ -1002,7 +987,7 @@ public class DataMapper {
                 Lesson temp = new Lesson(rs.getInt("Id"),
                         rs.getString("name"),
                         rs.getString("requirements"));
-                temp.materials = getLearningMaterialsByLessonId(rs.getInt("Id"));
+                temp.materials = getLearningMaterialsByLessonId(rs.getInt("Id"), conn);
                 //System.out.println(rs.getString("requirements"));
                 allLessons.add(temp);
             }
@@ -1013,7 +998,7 @@ public class DataMapper {
         return allLessons;
     }
 
-    public static void createOrUpdateLesson(Lesson value, int courseId){
+    public static void createOrUpdateLesson(Lesson value, int courseId, Connection conn){
         //System.out.println("Create or Update lesson");
         try {
             //check if lesson exists by id
@@ -1044,7 +1029,7 @@ public class DataMapper {
             System.out.println(e.getMessage());
         }
     }
-    public static void createLesson(String name, String req, int courseID){
+    public static void createLesson(String name, String req, int courseID, Connection conn){
         try {
             PreparedStatement maxId = conn.prepareStatement("select MAX(Id) from lessons");
             ResultSet rs = maxId.executeQuery();
@@ -1057,7 +1042,7 @@ public class DataMapper {
             System.out.println("Exception at createLesson " + e);
         }
     }
-    public static void deleteLesson(int lessonId){
+    public static void deleteLesson(int lessonId, Connection conn){
         try {
             //drop learning materials
             PreparedStatement pst = conn.prepareStatement("delete from learning_materials where lessonId="+lessonId);
@@ -1073,7 +1058,7 @@ public class DataMapper {
 
     }
 
-    public static List<String> getLearningMaterialsByLessonId(int id){
+    public static List<String> getLearningMaterialsByLessonId(int id, Connection conn){
         List<String> materials = new ArrayList<>();
         try {
             PreparedStatement pst = conn.prepareStatement("select * from learning_materials where lessonId="+ id);
@@ -1087,7 +1072,7 @@ public class DataMapper {
         return materials;
     }
 
-    public static void createLearningMaterial(int lessonId, String name){
+    public static void createLearningMaterial(int lessonId, String name, Connection conn){
         try{
             PreparedStatement pst = conn.prepareStatement("insert into learning_materials (lessonId, content) values ("+lessonId+", \""+name+"\")");
             pst.execute();
@@ -1096,7 +1081,7 @@ public class DataMapper {
         }
     }
 
-    public static void deleteLearningMaterial(int lessonId, String name){
+    public static void deleteLearningMaterial(int lessonId, String name, Connection conn){
         try{
             PreparedStatement pst = conn.prepareStatement("delete from learning_materials where lessonId="+lessonId+" AND content=\""+name+"\"");
             pst.execute();
@@ -1105,7 +1090,7 @@ public class DataMapper {
         }
     }
 
-    public static boolean requestToJoinGroup(int id, int dg_id) {
+    public static boolean requestToJoinGroup(int id, int dg_id, Connection conn) {
         boolean flag = false;
         try {
             PreparedStatement pst = conn.prepareStatement("insert into discussion_group_requests (user_id, dg_id) VALUES (?,?)");
@@ -1121,7 +1106,7 @@ public class DataMapper {
         return flag;
     }
 
-    public static boolean deleteRequestForGroup(int id, int dg_id) {
+    public static boolean deleteRequestForGroup(int id, int dg_id, Connection conn) {
         boolean flag = false;
         try {
             PreparedStatement pst = conn.prepareStatement("delete from discussion_group_requests where user_id=? and dg_id=?");
@@ -1137,7 +1122,7 @@ public class DataMapper {
         return flag;
     }
 
-    public static boolean verifyEmailofUser(String email, String hash) {
+    public static boolean verifyEmailofUser(String email, String hash, Connection conn) {
         boolean flag = false;
         try {
             PreparedStatement pst = conn.prepareStatement("select Email, Hash, Active from user_details where Email=? and Hash=? and Active='0'");
@@ -1158,7 +1143,7 @@ public class DataMapper {
         return flag;
     }
 
-    public static boolean deleteDGMember(int user_id, int dg_id) {
+    public static boolean deleteDGMember(int user_id, int dg_id, Connection conn) {
         boolean flag = false;
         try {
             PreparedStatement pst = conn.prepareStatement("delete from dg_members where user_id=? and dg_id=?");
@@ -1174,7 +1159,7 @@ public class DataMapper {
         return flag;
     }
 
-    public static boolean rateUser(int user_id, int rate_value, String feedback) {
+    public static boolean rateUser(int user_id, int rate_value, String feedback, Connection conn) {
         boolean flag = false;
         try {
             PreparedStatement pst = conn.prepareStatement("insert into user_ratings (userId, score, feedback) VALUES (?,?,?)");
@@ -1191,7 +1176,7 @@ public class DataMapper {
         return flag;
     }
 
-    public static Map<Integer, String> viewAllGroupMembers(int dg_id) {
+    public static Map<Integer, String> viewAllGroupMembers(int dg_id, Connection conn) {
         Map<Integer, String> members = new HashMap<>();
         try {
             PreparedStatement pst = conn.prepareStatement("select user_id, First_Name, Last_Name from " +
@@ -1208,7 +1193,7 @@ public class DataMapper {
         return members;
     }
 
-    public static Map<Integer, String> getAllPendingGroupRequestsOfGroup(int dg_id) {
+    public static Map<Integer, String> getAllPendingGroupRequestsOfGroup(int dg_id, Connection conn) {
         Map<Integer, String> requests = new HashMap<>();
         try {
             PreparedStatement pst = conn.prepareStatement("select user_id, First_Name, Last_Name from " +
@@ -1225,18 +1210,18 @@ public class DataMapper {
         return requests;
     }
 
-    public static Map<Integer, Object> getMyCourses(int id) {
+    public static Map<Integer, Object> getMyCourses(int id, Connection conn) {
         Map<Integer,Object> courses = new HashMap<>();
         try {
             PreparedStatement ps = conn.prepareStatement("select * from enrollments where userId="+ id);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                Map<String, Object> details = findCourseByCourseId(String.valueOf(rs.getInt("courseId")));
-                String prof = DataMapper.findProfName((Integer) details.get("prof_id"));
+                Map<String, Object> details = findCourseByCourseId(String.valueOf(rs.getInt("courseId")), conn);
+                String prof = DataMapper.findProfName((Integer) details.get("prof_id"), conn);
                 details.put("prof",prof);
                 String prereq = "None";
                 Integer p = (Integer) details.get("prereq_course");
-                if (p != null && p != 0) prereq = String.valueOf(findCourseByCourseId(String.valueOf(p)).get("name"));
+                if (p != null && p != 0) prereq = String.valueOf(findCourseByCourseId(String.valueOf(p), conn).get("name"));
                 details.put("prereq", prereq);
                 LocalDate startDate = LocalDate.parse(details.get("start_date").toString());
                 String s = startDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
@@ -1261,7 +1246,7 @@ public class DataMapper {
         return courses;
     }
 
-    public static Map<Integer, Object> getTaughtCourses(int id) {
+    public static Map<Integer, Object> getTaughtCourses(int id, Connection conn) {
         Map<Integer,Object> courses = new HashMap<>();
         try {
             PreparedStatement ps = conn.prepareStatement("select * from courses where profId="+ id);
@@ -1269,7 +1254,7 @@ public class DataMapper {
             while (rs.next()) {
                 Map<String, Object> details = new HashMap<>();
                 details.put("name",rs.getString("course_name"));
-                String prof = DataMapper.findProfName(rs.getInt("profId"));
+                String prof = DataMapper.findProfName(rs.getInt("profId"), conn);
                 details.put("prof",prof);
                 LocalDate startDate = LocalDate.parse(rs.getString("start_date"));
                 String s = startDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
@@ -1294,7 +1279,7 @@ public class DataMapper {
                 String prereq = "None";
                 Integer p = rs.getInt("prereq");
                 if (p != null && p != 0)
-                    prereq = String.valueOf(findCourseByCourseId(String.valueOf(p)).get("name"));
+                    prereq = String.valueOf(findCourseByCourseId(String.valueOf(p), conn).get("name"));
                 details.put("prereq", prereq);
                 courses.put(rs.getInt("id"), details);
             }
@@ -1305,7 +1290,7 @@ public class DataMapper {
         return courses;
     }
 
-    public static boolean updateCourseRequirements(int courseId, String req) {
+    public static boolean updateCourseRequirements(int courseId, String req, Connection conn) {
         boolean flag = false;
         try {
             PreparedStatement pst = conn.prepareStatement("update courses set requirements=? where id=?");
@@ -1319,7 +1304,7 @@ public class DataMapper {
         return flag;
     }
 
-    public static boolean rateCourse(int courseId, int rate_value, String feedback) {
+    public static boolean rateCourse(int courseId, int rate_value, String feedback, Connection conn) {
         boolean flag = false;
         try {
             PreparedStatement pst = conn.prepareStatement("insert into course_ratings (course_id, score, feedback) VALUES (?,?,?)");
@@ -1336,7 +1321,7 @@ public class DataMapper {
         return flag;
     }
 
-    public static Map<Integer, Map<String,String>> getClassList(int courseId) {
+    public static Map<Integer, Map<String,String>> getClassList(int courseId, Connection conn) {
         Map<Integer, Map<String,String>> classList = new HashMap<>();
         try {
             PreparedStatement pst = conn.prepareStatement("select userId, First_Name, Last_Name, Email from " +
@@ -1357,10 +1342,10 @@ public class DataMapper {
         return classList;
     }
 
-    public static int enroll(int course_id, int prof_id) {
+    public static int enroll(int course_id, int prof_id, Connection conn) {
        int i = 0;
         try {
-            PreparedStatement pst = conn.prepareStatement("insert into enrollments (userId, couseId) VALUES (?,?)");
+            PreparedStatement pst = conn.prepareStatement("insert into enrollments (userId, courseId) VALUES (?,?)");
             pst.setInt(1, prof_id);
             pst.setInt(2, course_id);
             i = pst.executeUpdate();
@@ -1370,10 +1355,10 @@ public class DataMapper {
         return i;
     }
 
-    public static boolean updateEnroll(int course_id, int prof_id, int oldProfId) {
+    public static boolean updateEnroll(int course_id, int prof_id, int oldProfId, Connection conn) {
         boolean flag = false;
         try {
-            PreparedStatement pst = conn.prepareStatement("upadte enrollments set userId=? where userId=? and courseId=?");
+            PreparedStatement pst = conn.prepareStatement("update enrollments set userId=? where userId=? and courseId=?");
             pst.setInt(1, prof_id);
             pst.setInt(2, oldProfId);
             pst.setInt(3, course_id);

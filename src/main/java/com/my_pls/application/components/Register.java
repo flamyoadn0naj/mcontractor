@@ -30,7 +30,7 @@ public class Register {
         return map;
     }
 
-    public static Pair postMethodDefaults(Map<String,String> formFields, User user, securePassword pwd_manager) throws UnsupportedEncodingException {
+    public static Pair postMethodDefaults(Map<String, String> formFields, User user, securePassword pwd_manager, Connection conn) throws UnsupportedEncodingException {
         Map<String,Object> map = new HashMap<>();
         map.put("actionLink", "/register");
         map.put("loginErr", "");
@@ -63,7 +63,7 @@ public class Register {
             }
             if (flag) {
                 map.put("loading","true");
-                if (!DataMapper.register(fName, lName, email, password)) {
+                if (!DataMapper.register(fName, lName, email, password, conn)) {
                     map.put("dbErr", "true");
                     map.put("fname",formFields.get("firstName"));
                     map.put("lname",formFields.get("lastName"));

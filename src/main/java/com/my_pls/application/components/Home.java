@@ -1,5 +1,6 @@
 package com.my_pls.application.components;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -12,11 +13,11 @@ public class Home {
     private ArrayList<Map<String,Object>> groups = new ArrayList<>();
     private Map<String,Object> rating = new HashMap<>();
 
-    public Home(int id, String role) {
+    public Home(int id, String role, Connection conn) {
         id = id;
         role = role;
 
-        Map<Integer,Object> allCourses = Courses.getMyCourses(id, role);
+        Map<Integer,Object> allCourses = Courses.getMyCourses(id, role, conn);
         if (allCourses.size() > 5) {
             Iterator it = allCourses.keySet().iterator();
             for (int j = 0; j < 5; j++) {
@@ -25,10 +26,10 @@ public class Home {
             }
         } else courses.putAll(allCourses);
 
-        groups = DataMapper.getMyDiscussionGroups(id);
+        groups = DataMapper.getMyDiscussionGroups(id, conn);
 
         if (groups.size() > 5) groups = new ArrayList<>(groups.subList(0, 5));
-        rating = DataMapper.getRatingAndFeedbackOfUserGivenUserId(id, "", "");
+        rating = DataMapper.getRatingAndFeedbackOfUserGivenUserId(id, "", "", conn);
     }
 
     public Map<Integer,Object> getCourses() {

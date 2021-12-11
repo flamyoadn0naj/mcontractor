@@ -1,13 +1,11 @@
 package com.my_pls.application.components;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.sql.Connection;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,32 +33,32 @@ public class Enrollment {
         return c;
     }
 
-    private static ArrayList<Map<String, Object>> formatCourses(ArrayList<Map<String, Object>> courses) {
+    private static ArrayList<Map<String, Object>> formatCourses(ArrayList<Map<String, Object>> courses, Connection conn) {
         for (Map<String,Object> c: courses) {
             c = checkCapacity(c);
             c = checkStartDate(c);
             int id = Integer.parseInt(c.get("id").toString());
-            Map<String, Object> ratingObj = DataMapper.getRatingAndFeedbackOfCourseGivenCourseId(id, "");
+            Map<String, Object> ratingObj = DataMapper.getRatingAndFeedbackOfCourseGivenCourseId(id, "", conn);
             if (ratingObj.isEmpty()) c.put("noRating", true);
             else {
                 c.put("rating", ratingObj.get("rating"));
                 c.put("unchecked", ratingObj.get("unchecked"));
             }
-            DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm");
-            DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:m a");
-            LocalTime startTime = LocalTime.parse(String.valueOf(c.get("startTime")), df);
-            String s = startTime.format(df2);
-            LocalTime endTime = LocalTime.parse(String.valueOf(c.get("endTime")), df);
-            String e = endTime.format(df2);
-            c.put("startTimeF", s);
-            c.put("endTimeF", e);
+////            DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm");
+////            DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:m a");
+//////            LocalTime startTime = LocalTime.parse(String.valueOf(c.get("startTime")), df);
+////            String s = startTime.format(df2);
+////            LocalTime endTime = LocalTime.parse(String.valueOf(c.get("endTime")), df);
+////            String e = endTime.format(df2);
+//            c.put("startTimeF", s);
+//            c.put("endTimeF", e);
         }
         return courses;
     }
 
-    public static ArrayList<Map<String, Object>> findAllAvailableCourses() {
-        ArrayList<Map<String,String>> current = DataMapper.viewCourses("Current");
-        ArrayList<Map<String,String>> upcoming = DataMapper.viewCourses("Upcoming");
+    public static ArrayList<Map<String, Object>> findAllAvailableCourses(Connection conn) {
+        ArrayList<Map<String,String>> current = DataMapper.viewCourses("Current", conn);
+        ArrayList<Map<String,String>> upcoming = DataMapper.viewCourses("Upcoming", conn);
         ArrayList<Map<String, Object>> all = new ArrayList<>();
 
         for(Map<String, String> m: upcoming) {
@@ -73,7 +71,7 @@ public class Enrollment {
             o.putAll(m);
             all.add(o);
         }
-        all = formatCourses(all);
+        all = formatCourses(all, conn);
         return all;
     }
 }

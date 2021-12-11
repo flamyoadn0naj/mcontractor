@@ -2,28 +2,29 @@ package com.my_pls.application.components;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Rating {
-    public static Map<Integer, Map<String, Object>> getAllUserRatings(String searchText, String filter) {
+    public static Map<Integer, Map<String, Object>> getAllUserRatings(String searchText, String filter, Connection conn) {
         Map<Integer, Map<String, Object>> ratings = new HashMap<>();
-        ArrayList<Integer> user_ids = DataMapper.getAllUserIDsFromRating();
+        ArrayList<Integer> user_ids = DataMapper.getAllUserIDsFromRating(conn);
         for (int u : user_ids) {
-            Map<String, Object> ratingObj = DataMapper.getRatingAndFeedbackOfUserGivenUserId(u, searchText, filter);
+            Map<String, Object> ratingObj = DataMapper.getRatingAndFeedbackOfUserGivenUserId(u, searchText, filter, conn);
             if (!ratingObj.isEmpty()) ratings.put(u, ratingObj);
         }
         return ratings;
     }
 
-    public static Map<Integer, Map<String, Object>> getAllCourseRatings(String searchText) {
+    public static Map<Integer, Map<String, Object>> getAllCourseRatings(String searchText, Connection conn) {
         Map<Integer, Map<String, Object>> ratings = new HashMap<>();
-        ArrayList<Integer> course_ids = DataMapper.getAllCourseIDsFromRating();
+        ArrayList<Integer> course_ids = DataMapper.getAllCourseIDsFromRating(conn);
         for (int c : course_ids) {
-            Map<String, Object> ratingObj = DataMapper.getRatingAndFeedbackOfCourseGivenCourseId(c, searchText);
+            Map<String, Object> ratingObj = DataMapper.getRatingAndFeedbackOfCourseGivenCourseId(c, searchText, conn);
             if (!ratingObj.isEmpty()) {
-                String pname = DataMapper.findProfName((Integer) ratingObj.get("prof_id"));
+                String pname = DataMapper.findProfName((Integer) ratingObj.get("prof_id"), conn);
                 ratingObj.put("prof", pname);
                 ratings.put(c, ratingObj);
             }
@@ -41,19 +42,19 @@ public class Rating {
         return options;
     }
 
-    public static Map<String,Object> getMethodFunctionality(String role) {
+    public static Map<String,Object> getMethodFunctionality(String role, Connection conn) {
         Map<String,Object> map = new HashMap<>();
         map.put("ratings", true);
         map.put("searchOptions", getSearchOptions(""));
         Map<Integer, Map<String, Object>> users = new HashMap<>();
         Map<Integer, Map<String, Object>> courses = new HashMap<>();
         if (role.contentEquals("learner"))
-            users = getAllUserRatings("","prof");
+            users = getAllUserRatings("","prof", conn);
         if (role.contentEquals("prof"))
-            users = getAllUserRatings("","learner");
+            users = getAllUserRatings("","learner", conn);
         if (role.contentEquals("admin")) {
-            users = getAllUserRatings("","");
-            courses = getAllCourseRatings("");
+            users = getAllUserRatings("","", conn);
+            courses = getAllCourseRatings("", conn);
         }
         map.put("users", users);
         map.put("courses", courses);
@@ -62,13 +63,13 @@ public class Rating {
         return map;
     }
 
-    public static boolean addRating(Map<String, String> formFields) {
+    public static boolean addRating(Map<String, String> formFields, Connection conn) {
         boolean flag = false;
         try {
             String feedback = URLDecoder.decode(formFields.get("feedback"), "UTF-8");
             int id = Integer.parseInt(formFields.get("doneRating"));
             int rate_value = Integer.parseInt(formFields.get("Rating"));
-            flag = DataMapper.rateUser(id, rate_value, feedback);
+            flag = DataMapper.rateUser(id, rate_value, feedback, conn);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -76,10 +77,10 @@ public class Rating {
         return flag;
     }
 
-    public static Map<String,Object> postMethodFunctionality(Map<String, String> formFields, String role) {
+    public static Map<String,Object> postMethodFunctionality(Map<String, String> formFields, String role, Connection conn) {
         Map<String,Object> map = new HashMap<>();
-        Map<Integer, Map<String, Object>> users = getAllUserRatings("","");
-        Map<Integer, Map<String, Object>> courses = getAllCourseRatings("");
+        Map<Integer, Map<String, Object>> users = getAllUserRatings("","", conn);
+        Map<Integer, Map<String, Object>> courses = getAllCourseRatings("", conn);
         if (formFields == null) {
             map.put("ratings", true);
             map.put("users", users);
@@ -91,7 +92,7 @@ public class Rating {
                 map.put("rateUser", true);
                 map.put("curr_user", formFields.get("rate"));
             } else if (formFields.containsKey("doneRating")) {
-                boolean addedRating = addRating(formFields);
+                boolean addedRating = addRating(formFields, conn);
                 if (addedRating) {
                     map.put("success", "true");
                     map.put("ratings", true);
@@ -101,8 +102,8 @@ public class Rating {
                     map.put("rateUser", true);
                     map.put("curr_user", formFields.get("rate"));
                 }
-                if (role.contentEquals("learner")) users = getAllUserRatings("", "prof");
-                if (role.contentEquals("prof")) users = getAllUserRatings("", "learner");
+                if (role.contentEquals("learner")) users = getAllUserRatings("", "prof", conn);
+                if (role.contentEquals("prof")) users = getAllUserRatings("", "learner", conn);
                 map.put("users", users);
             }
             else if (formFields.containsKey("userId"))
@@ -113,7 +114,7 @@ public class Rating {
                 String searchVal = formFields.get("search");
                 if (searchVal.contains("course")) {
                     String searchText = formFields.get("searchTextCourse");
-                    courses = getAllCourseRatings(searchText);
+                    courses = getAllCourseRatings(searchText, conn);
                     map.put("searchTextCourse", searchText);
                     map.put("searchOptions", getSearchOptions(""));
                 } else if (searchVal.contains("user"))
@@ -129,7 +130,7 @@ public class Rating {
                     if (role.contentEquals("prof")) filter = "learner";
                     if (role.contentEquals("admin")) filter = formFields.get("filterBy");
 
-                    users = getAllUserRatings(searchText, filter);
+                    users = getAllUserRatings(searchText, filter, conn);
                     map.put("searchText", searchText);
                     map.put("filterKey", filter);
                     map.put("filterVal", Admin.mapFilterKey(filter));

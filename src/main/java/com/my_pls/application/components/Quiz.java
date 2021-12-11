@@ -3,6 +3,7 @@ package com.my_pls.application.components;
 import com.my_pls.Lesson;
 import com.my_pls.MySqlConnection;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,12 +22,12 @@ public class Quiz {
     public String responseD;
     public String answer;
 
-    public static Map<Integer, Object> getQuizzes(int courseId) {
+    public static Map<Integer, Object> getQuizzes(int courseId, Connection conn) {
         Map<Integer,Object> quizzes = new HashMap<>();
 
-        ArrayList<Lesson> lessons = DataMapper.getLessonsByCourseId(courseId);
+        ArrayList<Lesson> lessons = DataMapper.getLessonsByCourseId(courseId, conn);
         for (Lesson lesson:lessons){
-            Map<Integer,Object> MyQuizzes = DataMapper.viewQuizzes(lesson.getId());
+            Map<Integer,Object> MyQuizzes = DataMapper.viewQuizzes(lesson.getId(), conn);
             quizzes.putAll(MyQuizzes);
         }
         return quizzes;

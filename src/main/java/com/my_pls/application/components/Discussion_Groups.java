@@ -4,12 +4,13 @@ package com.my_pls.application.components;
 //import javax.persistence.criteria.CriteriaBuilder;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Discussion_Groups {
-    public static boolean createGroup(Map<String, String> formFields, int user_id) {
+    public static boolean createGroup(Map<String, String> formFields, int user_id, Connection conn) {
         boolean flag = false;
         int privacy = Integer.parseInt(formFields.get("customRadio"));
         String name = null;
@@ -18,11 +19,11 @@ public class Discussion_Groups {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        int i = DataMapper.addDiscussionGroup(name, -1, privacy);
+        int i = DataMapper.addDiscussionGroup(name, -1, privacy, conn);
         if (i != -1) {
-            int d_id = DataMapper.findLastInsertedId("discussion_groups");
+            int d_id = DataMapper.findLastInsertedId("discussion_groups", conn);
             if (d_id != -1) {
-                flag = DataMapper.addDGmember(user_id, d_id);
+                flag = DataMapper.addDGmember(user_id, d_id, conn);
             }
         }
         return flag;
@@ -37,10 +38,10 @@ public class Discussion_Groups {
         return options;
     }
 
-    public static Map<Integer,Map<String, Object>> getGroups(String searchText, int filter, int id) {
-        Map<Integer,Map<String, Object>> allGroups = DataMapper.getAllDisscussionGroups(searchText, filter);
-        ArrayList<Map<String, Object>> myGroups = DataMapper.getMyDiscussionGroups(id);
-        Map<Integer, Object> requestedGroups = DataMapper.getPendingGroupRequests(id);
+    public static Map<Integer,Map<String, Object>> getGroups(String searchText, int filter, int id, Connection conn) {
+        Map<Integer,Map<String, Object>> allGroups = DataMapper.getAllDisscussionGroups(searchText, filter, conn);
+        ArrayList<Map<String, Object>> myGroups = DataMapper.getMyDiscussionGroups(id, conn);
+        Map<Integer, Object> requestedGroups = DataMapper.getPendingGroupRequests(id, conn);
         for (Map<String, Object> g: myGroups) {
             int g_id = (int) g.get("id");
             if (allGroups.containsKey(g_id)) allGroups.remove(g_id);
@@ -70,17 +71,17 @@ public class Discussion_Groups {
         return val;
     }
 
-    public static Map<String, Object> postMethodFunctionality (Map<String, String> formFields, int id) {
+    public static Map<String, Object> postMethodFunctionality (Map<String, String> formFields, int id, Connection conn) {
         Map<String,Object> map = new HashMap<>();
-        ArrayList<Map<String,Object>> groups = DataMapper.getMyDiscussionGroups(141);
+        ArrayList<Map<String,Object>> groups = DataMapper.getMyDiscussionGroups(141, conn);
         Map<Integer, String> searchOptions = getSearchOptions("");
-        Map<Integer,Map<String, Object>> allGroups = getGroups("", -1, id);
-        Map<Integer, Object> requestedGroups = DataMapper.getPendingGroupRequests(id);
+        Map<Integer,Map<String, Object>> allGroups = getGroups("", -1, id, conn);
+        Map<Integer, Object> requestedGroups = DataMapper.getPendingGroupRequests(id, conn);
 
         if (formFields.containsKey("searchText")) {
             String searchText = formFields.get("searchText");
             String filter = formFields.get("filterBy");
-            allGroups = getGroups(searchText, Integer.parseInt(filter), id);
+            allGroups = getGroups(searchText, Integer.parseInt(filter), id, conn);
             searchOptions = getSearchOptions(filter);
             map.put("searchText", searchText);
             map.put("filter", filter);
@@ -90,25 +91,25 @@ public class Discussion_Groups {
 
         if (formFields.containsKey("join")) {
             int groupId = Integer.parseInt(formFields.get("join"));
-            boolean flag = DataMapper.addDGmember(id, groupId);
+            boolean flag = DataMapper.addDGmember(id, groupId, conn);
             map.put("refresh", flag);
         }
 
         if (formFields.containsKey("request")) {
             int groupId = Integer.parseInt(formFields.get("request"));
-            boolean flag = DataMapper.requestToJoinGroup(id, groupId);
+            boolean flag = DataMapper.requestToJoinGroup(id, groupId, conn);
             map.put("refresh", flag);
         }
 
         if (formFields.containsKey("cancel")) {
             int groupId = Integer.parseInt(formFields.get("cancel"));
-            boolean flag = DataMapper.deleteRequestForGroup(id, groupId);
+            boolean flag = DataMapper.deleteRequestForGroup(id, groupId, conn);
             map.put("refresh", flag);
         }
 
         if (formFields.containsKey("leave")) {
             int groupId = Integer.parseInt(formFields.get("leave"));
-            boolean flag = DataMapper.deleteDGMember(id, groupId);
+            boolean flag = DataMapper.deleteDGMember(id, groupId, conn);
             map.put("refresh", flag);
         }
 
@@ -119,10 +120,10 @@ public class Discussion_Groups {
         return map;
     }
 
-    public static String isMemberOfGroup(int user_id, int id) {
+    public static String isMemberOfGroup(int user_id, int id, Connection conn) {
         String member = "no";
-        ArrayList<Map<String, Object>> myGroups = DataMapper.getMyDiscussionGroups(user_id);
-        Map<Integer, Object> requestedGroups = DataMapper.getPendingGroupRequests(user_id);
+        ArrayList<Map<String, Object>> myGroups = DataMapper.getMyDiscussionGroups(user_id, conn);
+        Map<Integer, Object> requestedGroups = DataMapper.getPendingGroupRequests(user_id, conn);
         for (Map<String, Object> g: myGroups) {
             int g_id = (int) g.get("id");
             if (g_id == id) member = "yes";
@@ -133,11 +134,11 @@ public class Discussion_Groups {
         return member;
     }
 
-    public static int findProfofCourse(Map<String, Object> group) {
+    public static int findProfofCourse(Map<String, Object> group, Connection conn) {
         int id = 0;
         if (group.containsKey("course")) {
             int courseId = (int) group.get("course_id");
-            Map<String, Object> course = DataMapper.findCourseByCourseId(String.valueOf(courseId));
+            Map<String, Object> course = DataMapper.findCourseByCourseId(String.valueOf(courseId), conn);
             id = (int) course.get("prof_id");
         }
         return id;
