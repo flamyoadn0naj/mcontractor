@@ -517,6 +517,7 @@ public class App {
             map.put("obj","");
             map.put("profList", DataMapper.findAllProfs());
             map.put("e",-1);
+            map.put("title","Create Course");
             Map<Integer, String> allCourses = CreateCourse.allCourses();
             String e_id = request.queryParams("e");
             if (e_id != null) {
@@ -530,6 +531,7 @@ public class App {
                 map.put("course_id", map.get("prereq_course"));
                 map.put("prereqs", allCourses);
                 map.put("headingChange", true);
+
             } else {
                 LinkedHashMap<String, Boolean> days = CreateCourse.findAllDays();
                 System.out.println(days);
