@@ -307,6 +307,7 @@ public class App {
             response.redirect("/course/learnMat/"+courseId);
             return null;
         });
+
         get("/course/quiz/:courseId",((request, response) -> {
 
              Map<String,Object> map = new HashMap<>();
@@ -340,14 +341,35 @@ public class App {
             else map.put("role","learner");
             map.put("courseId", courseId);
             map.put("name", course.get("name"));
+            map.put("e",-1);
             map.put("lessons",DataMapper.getLessonsByCourseId(Integer.parseInt(courseId)));
+
             return new ModelAndView(map,"createQuiz.ftl");
+        }),engine);
+
+        post("/course/:courseId/create-quiz",((request, response) -> {
+            Map<String,String> formFields = extractFields(request.body());
+            Quiz newQuiz = new Quiz();
+            String courseId = request.params(":courseId");
+            newQuiz.lessonId = Integer.parseInt(formFields.get("linkedLesson"));
+            newQuiz.quizName = URLDecoder.decode(formFields.get("quizName"), "UTF-8");
+            newQuiz.MinMark = Integer.parseInt(formFields.get("minMark"));
+            Map<String,Object> map = new HashMap<>();
+            Session sess = request.session();
+            if (DataMapper.createQuiz(newQuiz)){
+                response.redirect("/course/quiz/"+courseId);
+            }
+            else{
+                response.redirect("/err");
+            }
+            return new ModelAndView(map,"createQuiz.ftl");
+            
         }),engine);
 
         post("/course/add/:courseId", (request,response)-> {
             Session sess = request.session();
             int id = sess.attribute("id");
-            String courseId = request.params(":courseId");;
+            String courseId = request.params(":courseId");
             Map<String,Object> course = Courses.getCourse(courseId);
             if((int)course.get("prof_id") != id) response.redirect("/err");
             DataMapper.createLesson("New Lesson","Lesson Requirements", Integer.parseInt(request.params(":courseId")));
