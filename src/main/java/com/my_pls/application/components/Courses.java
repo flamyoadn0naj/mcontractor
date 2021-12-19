@@ -6,6 +6,8 @@ import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.*;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -61,7 +63,8 @@ public class Courses {
         return allCourses;
     }
 
-    public static Map<String, Object> getCourse(String courseId) {
+    public static Map<String, Object> getCourse(String courseId) throws ParseException {
+        courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
         Map<String,Object> course = DataMapper.findCourseByCourseId(courseId);
         DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm");
         DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:m a");

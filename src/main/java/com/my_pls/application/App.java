@@ -16,6 +16,8 @@ import java.io.*;
 
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.*;
 import java.net.URLDecoder;
 import java.util.zip.ZipEntry;
@@ -201,6 +203,7 @@ public class App {
             Session sess = request.session();
             int id = sess.attribute("id");
             String courseId = request.params(":number");
+            courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
             Map<String,Object> course = Courses.getCourse(courseId);
             if((int)course.get("prof_id") == id) map.put("role", "prof");
             else map.put("role","learner");
@@ -215,6 +218,7 @@ public class App {
             Session sess = request.session();
             int id = sess.attribute("id");
             String courseId = request.params(":number");
+            courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
             Map<String,Object> course = Courses.getCourse(courseId);
             if((int)course.get("prof_id") == id) map.put("role", "prof");
             else response.redirect("/err");
@@ -243,7 +247,8 @@ public class App {
             Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
             int id = sess.attribute("id");
-            String courseId = request.params(":number");;
+            String courseId = request.params(":number");
+            courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
             Map<String,Object> course = DataMapper.findCourseByCourseId(courseId);
             if((int)course.get("prof_id") == id) map.put("role", "prof");
             else map.put("role","learner");
@@ -315,6 +320,7 @@ public class App {
              int id = sess.attribute("id");
              String courseId = request.params(":courseId");
              Map<String,Object> course = Courses.getCourse(courseId);
+            courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
              if((int)course.get("prof_id") == id) map.put("role", "prof");
              else map.put("role","learner");
              map.put("courseId", courseId);
@@ -337,6 +343,7 @@ public class App {
             int id = sess.attribute("id");
             String courseId = request.params(":courseId");
             Map<String,Object> course = Courses.getCourse(courseId);
+            courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
             if((int)course.get("prof_id") == id) map.put("role", "prof");
             else map.put("role","learner");
             map.put("courseId", courseId);
@@ -363,7 +370,7 @@ public class App {
                 response.redirect("/err");
             }
             return new ModelAndView(map,"createQuiz.ftl");
-            
+
         }),engine);
 
         post("/course/add/:courseId", (request,response)-> {
@@ -371,6 +378,7 @@ public class App {
             int id = sess.attribute("id");
             String courseId = request.params(":courseId");
             Map<String,Object> course = Courses.getCourse(courseId);
+            courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
             if((int)course.get("prof_id") != id) response.redirect("/err");
             DataMapper.createLesson("New Lesson","Lesson Requirements", Integer.parseInt(request.params(":courseId")));
             response.redirect("/course/learnMat/"+courseId);
@@ -383,6 +391,7 @@ public class App {
             int id = sess.attribute("id");
             String courseId = request.params(":courseId");
             Map<String,Object> course = Courses.getCourse(courseId);
+            courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
             if((int)course.get("prof_id") == id) map.put("role", "prof");
             else response.redirect("/course/grade/individual/" + courseId);
             map.put("courseId", courseId);
@@ -396,6 +405,7 @@ public class App {
             int id = sess.attribute("id");
             String courseId = request.params(":courseId");
             Map<String,Object> course = Courses.getCourse(courseId);
+            courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
             if((int)course.get("prof_id") == id) map.put("role", "prof");
             else map.put("role","learner");
             map.put("courseId", courseId);
@@ -407,8 +417,10 @@ public class App {
             Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
             int id = sess.attribute("id");
+
             String courseId = request.params(":courseId");
             Map<String,Object> course = Courses.getCourse(courseId);
+            courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
             if((int)course.get("prof_id") == id) map.put("role", "prof");
             else map.put("role","learner");
             map.put("courseId", courseId);
@@ -422,6 +434,7 @@ public class App {
             int id = sess.attribute("id");
             String courseId = request.params(":courseId");
             Map<String,Object> course = Courses.getCourse(courseId);
+            courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
             if((int)course.get("prof_id") == id) map.put("role", "prof");
             else map.put("role","learner");
             Map<String,Object> rating = DataMapper.getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"");
@@ -440,6 +453,7 @@ public class App {
             int id = sess.attribute("id");
             String courseId = request.params(":courseId");
             Map<String,Object> course = Courses.getCourse(courseId);
+            courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
             if((int)course.get("prof_id") == id) map.put("role", "prof");
             else map.put("role","learner");
             Map<String,String> formFields = extractFields(request.body());
