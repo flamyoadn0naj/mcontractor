@@ -5,6 +5,8 @@ import com.my_pls.MySqlConnection;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.*;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -61,6 +63,11 @@ public class Courses {
     }
 
     public static Map<String, Object> getCourse(String courseId, Connection conn) {
+        try {
+            courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         Map<String,Object> course = DataMapper.findCourseByCourseId(courseId, conn);
         DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm");
         DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:m a");

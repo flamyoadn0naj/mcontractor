@@ -853,11 +853,12 @@ public class DataMapper {
     public static boolean createQuiz(Quiz newQuiz, Connection conn) {
         boolean flag = false;
         try {
-            PreparedStatement pst = conn.prepareStatement("insert into quizzes (lessonId,name,completed,enabled) VALUES (?,?,?,?)");
+            PreparedStatement pst = conn.prepareStatement("insert into quizzes (lessonId,name,completed,minimumMarks,enabled) VALUES (?,?,?,?,?)");
             pst.setInt(1, newQuiz.lessonId);
             pst.setString(2, newQuiz.quizName);
             pst.setInt(3, 0);
-            pst.setInt(4, 1);
+            pst.setInt(4,newQuiz.MinMark);
+            pst.setInt(5, 1);
             int i = pst.executeUpdate();
             flag = true;
         } catch(Exception e) {
@@ -990,6 +991,7 @@ public class DataMapper {
                 temp.materials = getLearningMaterialsByLessonId(rs.getInt("Id"), conn);
                 //System.out.println(rs.getString("requirements"));
                 allLessons.add(temp);
+                System.out.println(temp.name);
             }
         } catch (Exception e) {
             System.out.println("Exception at getPendingGroupRequests " + e);
