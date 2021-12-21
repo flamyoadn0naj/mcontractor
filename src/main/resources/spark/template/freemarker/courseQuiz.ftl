@@ -55,15 +55,13 @@
                             <#list quizzes as k,c>
                                 <tr>
 <#--                                    <td>${c.name}</td>-->
-                                    <th scope="row"><a class="text-muted" href="course/quiz/${k}">${c.name}</a></th>
+                                    <th scope="row"><a class="text-muted" href="${courseId}/${k}">${c.name}</a></th>
                                     <td>${c.marks}</td>
                                     <td>${c.minMark}</td>
                                     <td>${c.marks}</td>
                                     <td>
                                         <#if role == "prof">
-                                            <button type="button" class="btn-download" style="float: right">
-                                                <i class="fa fa-edit"></i>
-                                            </button>
+                                            <a href="/course/${courseId}/create-quiz?courseId=${courseId}&quizId=${c.quizId!""}&e=1" class="btn btn-primary" style="float: right"><i class="fa fa-edit"></i></a>
                                             <button type="button" class="btn-download" style="float: right">
                                                 <i class="fa fa-share"></i>
                                             </button>
