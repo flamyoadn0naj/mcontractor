@@ -1037,13 +1037,30 @@ public class DataMapper {
                 temp.materials = getLearningMaterialsByLessonId(rs.getInt("Id"), conn);
                 //System.out.println(rs.getString("requirements"));
                 allLessons.add(temp);
-                System.out.println(temp.name);
             }
         } catch (Exception e) {
             System.out.println("Exception at getPendingGroupRequests " + e);
         }
         //System.out.println(allLessons);
         return allLessons;
+    }
+
+    public static Lesson getLessonById(int id, Connection conn){
+        Lesson lesson = new Lesson(0,null,null);
+        try {
+            PreparedStatement pst = conn.prepareStatement("select * from lessons where Id="+ id);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                Lesson temp = new Lesson(rs.getInt("Id"),
+                        rs.getString("name"),
+                        rs.getString("requirements"));
+                lesson = temp;
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at getPendingGroupRequests " + e);
+        }
+        //System.out.println(allLessons);
+        return lesson;
     }
 
     public static void createOrUpdateLesson(Lesson value, int courseId, Connection conn){

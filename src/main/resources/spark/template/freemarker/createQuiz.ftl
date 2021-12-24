@@ -23,7 +23,9 @@
                 <div class="card-header" id="headingOne">
                     <div class="form-group space-between mb-3">
                         <label class="padding2right col-3" for="1a">Quiz Name:</label>
-                        <input required type="text" name="quizName" class="form-control col-9" id="quizName" value="${quizEdit.quizName!""}">
+
+                        <input required type="text" name="quizName" class="form-control col-9" id="quizName" value="${quizName}">
+
                     </div>
                     <div class="form-group mb-3" style="display: flex">
                         <label class="col-3" for="1b">Associated Lesson:</label>
@@ -89,7 +91,11 @@
 <#--                    </div>-->
                     <div class="form-group mb-3" style="display: flex">
                         <label class="col-3" for="1d">Minimum Mark to Pass</label>
-                        <input required type="number" name="minMark" class="form-control col-9" id="minMark" value=${quizEdit.MinMark!""}>
+<#--                        <#if quizEdit??>-->
+                            <input required type="number" name="minMark" class="form-control col-9" id="minMark" <#if minMark??>value=${minMark}</#if>>
+<#--                        <#else>-->
+<#--                            <input required type="number" name="minMark" class="form-control col-9" id="minMark"}>-->
+<#--                        </#if>-->
                     </div>
 
                     <button type="submit" name="action" value="Save" class="btn btn-primary" style="width:10rem; float:right;">

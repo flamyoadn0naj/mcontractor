@@ -374,16 +374,21 @@ public class App {
             Quiz quizEdit = new Quiz();
             if (edit == null){
                 map.put("e",-1);
+                map.put("quizName","");
+                map.put("minMark",0);
             }else{
+                map.put("e",1);
                 int quizIdInt = Integer.parseInt(quizId);
                 map.put("quizId",quizId);
                 quizEdit =  DataMapper.viewSingleQuiz(quizIdInt,conn);
 //                Lesson l = lessons.get(quizEdit.lessonId);
-//                map.put("currLesson",l.getId());
+                Lesson lesson = DataMapper.getLessonById(quizEdit.lessonId,conn);
                 map.put("currLesson",quizEdit.lessonId);
-//                map.put("currLessonName", l.name);
+                map.put("currLessonName", lesson.name);
+                map.put("quizName",quizEdit.quizName);
+                map.put("minMark",quizEdit.MinMark);
             }
-            map.put("quiz",quizEdit);
+
             map.put("lessons",DataMapper.getLessonsByCourseId(Integer.parseInt(courseId), conn));
             conn.close();
             return new ModelAndView(map,"createQuiz.ftl");
