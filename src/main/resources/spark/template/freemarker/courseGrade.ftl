@@ -31,7 +31,7 @@
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="/course/classlist/${courseId}">Classlist</a>
                 </li>
-                <#if role != "prof">
+                <#if viewRate??>
                     <li class="nav-item">
                         <a class="nav-link" data-toggle="tab" href="/course/rate/${courseId}">Rate</a>
                     </li>

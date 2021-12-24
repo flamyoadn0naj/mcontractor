@@ -214,6 +214,7 @@ public class App {
             else map.put("role","learner");
             map.put("course",course);
             map.put("courseId", courseId);
+            if (Courses.allowRating(course)) map.put("viewRate", true);
             conn.close();
             return new ModelAndView(map,"courseAbout.ftl");
         }),engine);
@@ -243,16 +244,17 @@ public class App {
             else map.put("err", true);
             map.put("course",course);
             map.put("courseId", courseId);
+            if (Courses.allowRating(course)) map.put("viewRate", true);
             conn.close();
             return new ModelAndView(map,"courseAbout.ftl");
         }),engine);
 
-        get("/course/learnMat",((request, response) -> {
-            Map<String,String> map = new HashMap<>();
-            Session sess = request.session();
-            map.put("role", sess.attribute("role"));
-            return new ModelAndView(map,"courseLearnMat.ftl");
-        }),engine);
+//        get("/course/learnMat",((request, response) -> {
+//            Map<String,String> map = new HashMap<>();
+//            Session sess = request.session();
+//            map.put("role", sess.attribute("role"));
+//            return new ModelAndView(map,"courseLearnMat.ftl");
+//        }),engine);
 
         get("/course/learnMat/:number",((request, response) -> {
             Map<String,Object> map = new HashMap<>();
@@ -268,6 +270,7 @@ public class App {
             map.put("lessons",DataMapper.getLessonsByCourseId(Integer.parseInt(courseId), conn));
             map.put("courseNumber",courseId);
             map.put("name", course.get("name"));
+            if (Courses.allowRating(course)) map.put("viewRate", true);
             conn.close();
             return new ModelAndView(map,"courseLearnMatS.ftl");
         }),engine);
@@ -340,13 +343,14 @@ public class App {
              int id = sess.attribute("id");
              String courseId = request.params(":courseId");
              Connection conn = MySqlConnection.getConnection();
+            Map<String,Object> course = Courses.getCourse(courseId, conn);
              courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
-             Map<String,Object> course = Courses.getCourse(courseId, conn);
 
              if((int)course.get("prof_id") == id) map.put("role", "prof");
              else map.put("role","learner");
              map.put("courseId", courseId);
              map.put("name", course.get("name"));
+            if (Courses.allowRating(course)) map.put("viewRate", true);
             Map<Integer, Object>  quizzes = Quiz.getQuizzes(Integer.parseInt(courseId), conn);
                 if (!quizzes.isEmpty()) map.put("quizzes",quizzes);
             conn.close();
@@ -365,14 +369,15 @@ public class App {
             int id = sess.attribute("id");
             Connection conn = MySqlConnection.getConnection();
             String courseId = request.params(":courseId");
-            Map<String,Object> course = Courses.getCourse(courseId, conn);
             courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
+            Map<String,Object> course = Courses.getCourse(courseId, conn);
             if((int)course.get("prof_id") == id) map.put("role", "prof");
             else map.put("role","learner");
             map.put("courseId", courseId);
             map.put("name", course.get("name"));
             map.put("e",-1);
             map.put("lessons",DataMapper.getLessonsByCourseId(Integer.parseInt(courseId), conn));
+            if (Courses.allowRating(course)) map.put("viewRate", true);
             conn.close();
             return new ModelAndView(map,"createQuiz.ftl");
         }),engine);
@@ -381,12 +386,14 @@ public class App {
             Map<String,String> formFields = extractFields(request.body());
             Quiz newQuiz = new Quiz();
             String courseId = request.params(":courseId");
+            Connection conn = MySqlConnection.getConnection();
+            courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
+            Map<String,Object> course = Courses.getCourse(courseId, conn);
             newQuiz.lessonId = Integer.parseInt(formFields.get("linkedLesson"));
             newQuiz.quizName = URLDecoder.decode(formFields.get("quizName"), "UTF-8");
             newQuiz.MinMark = Integer.parseInt(formFields.get("minMark"));
             Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
-            Connection conn = MySqlConnection.getConnection();
             if (DataMapper.createQuiz(newQuiz, conn)){
                 conn.close();
                 response.redirect("/course/quiz/"+courseId);
@@ -395,6 +402,9 @@ public class App {
                 conn.close();
                 response.redirect("/err");
             }
+            map.put("courseId", courseId);
+            map.put("name", course.get("name"));
+            if (Courses.allowRating(course)) map.put("viewRate", true);
             return new ModelAndView(map,"createQuiz.ftl");
 
         }),engine);
@@ -427,6 +437,7 @@ public class App {
             }
             map.put("courseId", courseId);
             map.put("name", course.get("name"));
+            if (Courses.allowRating(course)) map.put("viewRate", true);
             conn.close();
             return new ModelAndView(map,"courseGrade.ftl");
         }),engine);
@@ -443,6 +454,7 @@ public class App {
             else map.put("role","learner");
             map.put("courseId", courseId);
             map.put("name", course.get("name"));
+            if (Courses.allowRating(course)) map.put("viewRate", true);
             conn.close();
             return new ModelAndView(map,"courseGradeIndividual.ftl");
         }),engine);
@@ -463,6 +475,7 @@ public class App {
             Map<Integer, Map<String,String>> classList = DataMapper.getClassList(Integer.parseInt(courseId), conn);
             map.put("classList", classList);
             map.put("profId", course.get("prof_id"));
+            if (Courses.allowRating(course)) map.put("viewRate", true);
             conn.close();
             return new ModelAndView(map,"courseClasslist.ftl");
         }),engine);
@@ -475,15 +488,23 @@ public class App {
             Connection conn = MySqlConnection.getConnection();
             courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
             Map<String,Object> course = Courses.getCourse(courseId, conn);
-            if((int)course.get("prof_id") == id) map.put("role", "prof");
-            else map.put("role","learner");
-            Map<String,Object> rating = DataMapper.getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"", conn);
-            if (!rating.isEmpty()) map.put("course_rate", rating);
-            rating = DataMapper.getRatingAndFeedbackOfUserGivenUserId((int)course.get("prof_id"), "", "", conn);
-            if (!rating.isEmpty()) map.put("prof", rating);
+            if((int)course.get("prof_id") == id) {
+                map.put("role", "prof");
+                Map<Integer, Map<String,String>> classList = DataMapper.getClassList(Integer.parseInt(courseId), conn);
+                classList.remove((int)course.get("prof_id"));
+                map.put("classList", classList);
+            }
+            else {
+                map.put("role","learner");
+                Map<String,Object> rating = DataMapper.getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"", conn);
+                if (!rating.isEmpty()) map.put("course_rate", rating);
+                rating = DataMapper.getRatingAndFeedbackOfUserGivenUserId((int)course.get("prof_id"), "", "", conn);
+                if (!rating.isEmpty()) map.put("prof", rating);
+                map.put("profId", course.get("prof_id"));
+            }
+
             map.put("courseId", courseId);
             map.put("name", course.get("name"));
-            map.put("profId", course.get("prof_id"));
             conn.close();
             return new ModelAndView(map,"courseRate.ftl");
         }),engine);
@@ -495,20 +516,39 @@ public class App {
             String courseId = request.params(":courseId");
             Connection conn = MySqlConnection.getConnection();
             courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
-            Map<String,Object> course = Courses.getCourse(courseId, conn);
-            if((int)course.get("prof_id") == id) map.put("role", "prof");
-            else map.put("role","learner");
             Map<String,String> formFields = extractFields(request.body());
-            boolean flag = Courses.addRating(formFields, courseId, conn);
-            if (flag) map.put("success", true);
-            else map.put("err", true);
-            Map<String,Object> rating = DataMapper.getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"", conn);
-            if (!rating.isEmpty()) map.put("course_rate", rating);
-            rating = DataMapper.getRatingAndFeedbackOfUserGivenUserId((int)course.get("prof_id"), "", "", conn);
-            if (!rating.isEmpty()) map.put("prof", rating);
+            Map<String,Object> course = Courses.getCourse(courseId, conn);
+            if((int)course.get("prof_id") == id) {
+                map.put("role", "prof");
+                if(formFields.containsKey("doneRating")) {
+                    boolean flag = Rating.addRating(formFields, conn);
+                    if (flag) response.redirect("/course/rate/" + courseId);
+                    else {
+                        map.put("err", true);
+                    }
+                }
+                int learner_id = Integer.parseInt(formFields.get("rateLearner"));
+                Map<String, Object> rating = DataMapper.getRatingAndFeedbackOfUserGivenUserId(id,"","",conn);
+                if (!rating.isEmpty()) map.put("learner", rating);
+                map.put("learnerId", learner_id);
+                String name = DataMapper.getNameFromUserId(learner_id, conn);
+                map.put("learner_name", name);
+                map.put("rateLearner", true);
+            }
+            else {
+                map.put("role","learner");
+                boolean flag = Courses.addRating(formFields, courseId, conn);
+                if (flag) map.put("success", true);
+                else map.put("err", true);
+                Map<String,Object> rating = DataMapper.getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"", conn);
+                if (!rating.isEmpty()) map.put("course_rate", rating);
+                rating = DataMapper.getRatingAndFeedbackOfUserGivenUserId((int)course.get("prof_id"), "", "", conn);
+                if (!rating.isEmpty()) map.put("prof", rating);
+                map.put("profId", course.get("prof_id"));
+            }
+
             map.put("courseId", courseId);
             map.put("name", course.get("name"));
-            map.put("profId", course.get("prof_id"));
             conn.close();
             return new ModelAndView(map,"courseRate.ftl");
         }),engine);
@@ -658,6 +698,7 @@ public class App {
             }
             map.put("prereqs", allCourses);
             map.forEach((k,v)->map.put(k,v));
+            map.put("role", "admin");
             conn.close();
             return new ModelAndView(map,"createCourse.ftl");
         },engine);

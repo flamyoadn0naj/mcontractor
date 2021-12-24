@@ -1371,4 +1371,16 @@ public class DataMapper {
         }
         return flag;
     }
+
+    public static String getNameFromUserId(int learner_id, Connection conn) {
+        String name = "";
+        try {
+            PreparedStatement pst = conn.prepareStatement("select First_Name, Last_Name from user_details where Id="+learner_id);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) name = rs.getString("First_Name") + " " + rs.getString("Last_Name");
+        } catch (Exception e) {
+            System.out.println("Exception at getNameFromUserId " + e);
+        }
+        return name;
+    }
 }
