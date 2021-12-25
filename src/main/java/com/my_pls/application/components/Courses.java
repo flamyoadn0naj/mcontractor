@@ -7,8 +7,10 @@ import java.net.URLDecoder;
 import java.sql.*;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class Courses {
@@ -103,5 +105,12 @@ public class Courses {
         }
 
         return flag;
+    }
+
+    public static boolean allowRating(Map<String,Object> course) {
+        LocalDate et = LocalDate.parse(course.get("end_date").toString());
+        long days = ChronoUnit.DAYS.between(LocalDate.now(), et);
+        if (Math.abs(days) <= 7) return true;
+        else return false;
     }
 }

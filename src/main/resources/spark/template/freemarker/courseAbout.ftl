@@ -36,12 +36,13 @@
                     <li class="nav-item">
                         <a class="nav-link" data-toggle="tab" href="/course/classlist/${courseId}">Classlist</a>
                     </li>
-                    <#if role != "prof">
+                    <#if viewRate??>
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="tab" href="/course/rate/${courseId}">Rate</a>
                         </li>
                     </#if>
                 </ul>
+
                 <div id="myTabContent" class="tab-content" style="margin:2%">
                     <div class="tab-pane fade active show" id="about">
                         <form action="/course/about/${courseId}" method="post">
