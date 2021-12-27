@@ -8,6 +8,7 @@ import spark.template.freemarker.FreeMarkerEngine;
 
 //things for file upload
 import javax.servlet.MultipartConfigElement;
+import javax.xml.crypto.Data;
 import java.io.*;
 
 //end things for file upload
@@ -358,12 +359,7 @@ public class App {
         }),engine);
 
         get("/course/:courseId/create-quiz",((request, response) -> {
-//            Session sess = request.session();
-//            String role = sess.attribute("role").toString();
-//            Map<String,String> map = new HashMap<>();
-//            String courseId = request.params(":courseId");
-//            System.out.println(request.queryParams("courseId"));
-//            map.put("role", role);
+
             Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
             int id = sess.attribute("id");
@@ -375,7 +371,28 @@ public class App {
             else map.put("role","learner");
             map.put("courseId", courseId);
             map.put("name", course.get("name"));
-            map.put("e",-1);
+            String edit = request.queryParams("e");
+            String quizId = request.queryParams("quizId");
+            ArrayList<Lesson> lessons = DataMapper.getLessonsByCourseId(Integer.parseInt(courseId), conn);
+            map.put("lessons",lessons);
+            Quiz quizEdit = new Quiz();
+            if (edit == null){
+                map.put("e",-1);
+                map.put("quizName","");
+                map.put("minMark",0);
+            }else{
+                map.put("e",1);
+                int quizIdInt = Integer.parseInt(quizId);
+                map.put("quizId",quizId);
+                quizEdit =  DataMapper.viewSingleQuiz(quizIdInt,conn);
+//                Lesson l = lessons.get(quizEdit.lessonId);
+                Lesson lesson = DataMapper.getLessonById(quizEdit.lessonId,conn);
+                map.put("currLesson",quizEdit.lessonId);
+                map.put("currLessonName", lesson.name);
+                map.put("quizName",quizEdit.quizName);
+                map.put("minMark",quizEdit.MinMark);
+            }
+
             map.put("lessons",DataMapper.getLessonsByCourseId(Integer.parseInt(courseId), conn));
             if (Courses.allowRating(course)) map.put("viewRate", true);
             conn.close();
@@ -409,6 +426,33 @@ public class App {
 
         }),engine);
 
+        get("/course/quiz/:courseId/:quizId",((request, response) -> {
+            Map<String,Object> map = new HashMap<>();
+            Session sess = request.session();
+            int id = sess.attribute("id");
+
+            Connection conn = MySqlConnection.getConnection();
+            String courseId = request.params(":courseId");
+            courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
+            String quizId = request.params(":quizId");
+            quizId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(quizId));
+
+            Map<String,Object> course = Courses.getCourse(courseId, conn);
+
+            if((int)course.get("prof_id") == id) map.put("role", "prof");
+            else map.put("role","learner");
+            map.put("courseId", courseId);
+
+            Map<Integer, Object>  quizzes = Quiz.getQuizzesbyId(Integer.parseInt(quizId), conn);
+            if (!quizzes.isEmpty()) {
+                map.put("quizName", quizzes.get("name"));
+                map.put("quizzes",quizzes);
+
+            }
+            conn.close();
+            return new ModelAndView(map,"courseQuiz.ftl");
+
+        }),engine);
         post("/course/add/:courseId", (request,response)-> {
             Session sess = request.session();
             int id = sess.attribute("id");
@@ -419,6 +463,7 @@ public class App {
             if((int)course.get("prof_id") != id) response.redirect("/err");
             DataMapper.createLesson("New Lesson","Lesson Requirements", Integer.parseInt(request.params(":courseId")), conn);
             response.redirect("/course/learnMat/"+courseId);
+            conn.close();
             return null;
         });
 

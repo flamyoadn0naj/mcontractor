@@ -823,6 +823,52 @@ public class DataMapper {
         }
         return quizzes;
     }
+
+    public static Map<Integer, Object>  viewQuiz(int quizId, Connection conn) {
+//        ArrayList<Map<String,String>> quizzes = new ArrayList<Map<String, String>>();
+        Map<Integer,Object> quizzes = new HashMap<>();
+        try {
+            PreparedStatement pst1 = conn.prepareStatement("select * from quizzes where Id=?");
+            pst1.setInt(1,quizId);
+            ResultSet rs = pst1.executeQuery();
+
+            while(rs.next()) {
+                Map<String, Object> quiz = new HashMap<>();
+                quiz.put("lessonId",rs.getString("lessonId"));
+                quiz.put("quizId",rs.getInt("Id"));
+                quiz.put("name",rs.getString("name"));
+                quiz.put("minMark",rs.getInt("minimumMarks"));
+                quiz.put("status",rs.getInt("enabled"));
+                quiz.put("marks", rs.getInt("totalMarks"));
+                quizzes.put(rs.getInt("Id"),quiz);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at view Quizes "+e);
+        }
+        return quizzes;
+    }
+
+    public static Quiz viewSingleQuiz(int quizId, Connection conn) {
+//        ArrayList<Map<String,String>> quizzes = new ArrayList<Map<String, String>>();
+        Map<Integer,Object> quizzes = new HashMap<>();
+        Quiz singleQuiz = new Quiz();
+        try {
+            PreparedStatement pst1 = conn.prepareStatement("select * from quizzes where Id=?");
+            pst1.setInt(1,quizId);
+            ResultSet rs = pst1.executeQuery();
+
+            while(rs.next()) {
+
+                singleQuiz.lessonId =  rs.getInt("lessonId");
+                singleQuiz.quizId = rs.getInt("Id");
+                singleQuiz.quizName = rs.getString("name");
+                singleQuiz.MinMark = rs.getInt("minimumMarks");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at view Quizes "+e);
+        }
+        return singleQuiz;
+    }
 //    public static Quiz[] getQuizzes(int lessonID){
 //        Quiz[] quizzes = new Quiz[MAXQUIZ]; //= new Quiz[0];
 //        Quiz test = new Quiz();
@@ -991,13 +1037,30 @@ public class DataMapper {
                 temp.materials = getLearningMaterialsByLessonId(rs.getInt("Id"), conn);
                 //System.out.println(rs.getString("requirements"));
                 allLessons.add(temp);
-                System.out.println(temp.name);
             }
         } catch (Exception e) {
             System.out.println("Exception at getPendingGroupRequests " + e);
         }
         //System.out.println(allLessons);
         return allLessons;
+    }
+
+    public static Lesson getLessonById(int id, Connection conn){
+        Lesson lesson = new Lesson(0,null,null);
+        try {
+            PreparedStatement pst = conn.prepareStatement("select * from lessons where Id="+ id);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                Lesson temp = new Lesson(rs.getInt("Id"),
+                        rs.getString("name"),
+                        rs.getString("requirements"));
+                lesson = temp;
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at getPendingGroupRequests " + e);
+        }
+        //System.out.println(allLessons);
+        return lesson;
     }
 
     public static void createOrUpdateLesson(Lesson value, int courseId, Connection conn){

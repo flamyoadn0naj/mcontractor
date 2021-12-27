@@ -32,5 +32,11 @@ public class Quiz {
         }
         return quizzes;
     }
+    public static Map<Integer, Object> getQuizzesbyId(int quizId, Connection conn) {
+        Map<Integer,Object> quizzes = new HashMap<>();
+        Map<Integer,Object> MyQuizzes = DataMapper.viewQuiz(quizId, conn);
+        Object currentQuiz = MyQuizzes.get(quizId);
+        return quizzes;
+    }
 
 }
