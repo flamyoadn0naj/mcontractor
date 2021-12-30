@@ -385,7 +385,6 @@ public class App {
                 int quizIdInt = Integer.parseInt(quizId);
                 map.put("quizId",quizId);
                 quizEdit =  DataMapper.viewSingleQuiz(quizIdInt,conn);
-//                Lesson l = lessons.get(quizEdit.lessonId);
                 Lesson lesson = DataMapper.getLessonById(quizEdit.lessonId,conn);
                 map.put("currLesson",quizEdit.lessonId);
                 map.put("currLessonName", lesson.name);
