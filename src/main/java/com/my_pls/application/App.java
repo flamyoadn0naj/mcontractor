@@ -380,6 +380,7 @@ public class App {
                 map.put("e",-1);
                 map.put("quizName","");
                 map.put("minMark",0);
+                map.put("title", "Create");
             }else{
                 map.put("e",1);
                 int quizIdInt = Integer.parseInt(quizId);
@@ -390,6 +391,7 @@ public class App {
                 map.put("currLessonName", lesson.name);
                 map.put("quizName",quizEdit.quizName);
                 map.put("minMark",quizEdit.MinMark);
+                map.put("title","Modify");
             }
 
             map.put("lessons",DataMapper.getLessonsByCourseId(Integer.parseInt(courseId), conn));

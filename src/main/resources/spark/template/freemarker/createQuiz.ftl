@@ -16,7 +16,7 @@
             ${name}
         </h2>
         <h4 class="card-header border-primary text-black-50 mb-3" style="margin-top: -1.5%">
-            Create Quiz
+            ${title} Quiz
         </h4>
         <form style="display:flex; justify-content:center;" method="post" action="/course/${courseId}/create-quiz?e=${e}">
             <div class="card" style="width: 80%">
