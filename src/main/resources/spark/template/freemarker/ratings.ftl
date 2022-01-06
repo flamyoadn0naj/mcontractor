@@ -46,7 +46,6 @@
                                     <th scope="col">Professor</th>
                                     <th scope="col">Rating</th>
                                     <th scope="col">Feedback</th>
-                                    <th scope="col">Action</th>
                                 </tr>
                                 <#if users??>
                                     <#list users as i,u>
@@ -71,11 +70,6 @@
                                             <td>
                                                 <button type="submit" name="userId" value=${i} class="btn-download">
                                                     <i class="fa fa-eye"></i>
-                                                </button>
-                                            </td>
-                                            <td>
-                                                <button type="submit" class="btn btn-primary text-white" name="rate" value=${i}>
-                                                    Rate
                                                 </button>
                                             </td>
                                         </tr>
@@ -104,7 +98,6 @@
                                         <th scope="col">Professor</th>
                                         <th scope="col">Rating</th>
                                         <th scope="col">Feedback</th>
-                                        <th scope="col">Action</th>
                                     </tr>
                                     <#if users??>
                                         <#list users as i,u>
@@ -129,11 +122,6 @@
                                                 <td>
                                                     <button type="submit" name="userId" value=${i} class="btn-download">
                                                         <i class="fa fa-eye"></i>
-                                                    </button>
-                                                </td>
-                                                <td>
-                                                    <button type="submit" class="btn btn-primary text-white" name="rate" value=${i}>
-                                                        Rate
                                                     </button>
                                                 </td>
                                             </tr>
@@ -207,60 +195,60 @@
                                 <div>No Results Found</div>
                             </#if>
                         </form>
-                        <h3>Courses</h3>
-                        <form action="/ratings" method="post">
-                            <div class="space-between mb-2">
-                                <input class="form-control col-7" required name="searchTextCourse" type="text" placeholder="Search" value="${searchTextCourse!""}">
-                                <button class="btn btn-primary my-2 my-sm-0 col-2" id="course" name="search" value="course" type="submit">Search</button>
-                                <a class="text-white btn btn-primary my-2 my-sm-0 col-2" href="/ratings">
-                                        Clear
-                                </a>
-                            </div>
-                        </form>
-                        <form method="post" action="/ratings" class="mb-3">
-                                <#if courses??>
-                                    <table class="table table-bordered" style="text-align: center">
-                                        <tr class="table-primary">
-                                            <th scope="col">Name</th>
-                                            <th scope="col">Professor</th>
-                                            <th scope="col">Rating</th>
-                                            <th scope="col">Feedback</th>
-                                        </tr>
-                                    <#list courses as i,c>
-                                        <tr>
-                                            <th scope="row">${c.name}</th>
-                                            <td>${c.prof}</td>
-                                            <td>
-                                                <#if c.rating == 0>
-                                                    <span class="fa fa-star large"></span>
-                                                    <span class="fa fa-star large"></span>
-                                                    <span class="fa fa-star large"></span>
-                                                    <span class="fa fa-star large"></span>
-                                                    <span class="fa fa-star large"></span>
-                                                <#else>
-                                                    <#list 1..c.rating as i>
-                                                        <span class="fa fa-star checked large"></span>
-                                                    </#list>
-                                                    <#list 1..c.unchecked as j>
-                                                        <span class="fa fa-star large"></span>
-                                                    </#list>
-                                                </#if>
-                                            </td>
-                                            <td>
-                                                <button type="submit" name="courseId" value=${i} class="btn-download">
-                                                    <i class="fa fa-eye"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </#list>
-                                    </table>
-                                </#if>
-                            <#if courseEmpty??>
-                                <div>No Results Found</div>
-                            </#if>
-                        </form>
-                    </div>
                 </#if>
+                <h3>Courses</h3>
+                <form action="/ratings" method="post">
+                    <div class="space-between mb-2">
+                        <input class="form-control col-7" required name="searchTextCourse" type="text" placeholder="Search" value="${searchTextCourse!""}">
+                        <button class="btn btn-primary my-2 my-sm-0 col-2" id="course" name="search" value="course" type="submit">Search</button>
+                        <a class="text-white btn btn-primary my-2 my-sm-0 col-2" href="/ratings">
+                            Clear
+                        </a>
+                    </div>
+                </form>
+                <form method="post" action="/ratings" class="mb-3">
+                    <#if courses??>
+                        <table class="table table-bordered" style="text-align: center">
+                            <tr class="table-primary">
+                                <th scope="col">Name</th>
+                                <th scope="col">Professor</th>
+                                <th scope="col">Rating</th>
+                                <th scope="col">Feedback</th>
+                            </tr>
+                            <#list courses as i,c>
+                                <tr>
+                                    <th scope="row">${c.name}</th>
+                                    <td>${c.prof}</td>
+                                    <td>
+                                        <#if c.rating == 0>
+                                            <span class="fa fa-star large"></span>
+                                            <span class="fa fa-star large"></span>
+                                            <span class="fa fa-star large"></span>
+                                            <span class="fa fa-star large"></span>
+                                            <span class="fa fa-star large"></span>
+                                        <#else>
+                                            <#list 1..c.rating as i>
+                                                <span class="fa fa-star checked large"></span>
+                                            </#list>
+                                            <#list 1..c.unchecked as j>
+                                                <span class="fa fa-star large"></span>
+                                            </#list>
+                                        </#if>
+                                    </td>
+                                    <td>
+                                        <button type="submit" name="courseId" value=${i} class="btn-download">
+                                            <i class="fa fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </#list>
+                        </table>
+                    </#if>
+                    <#if courseEmpty??>
+                        <div>No Results Found</div>
+                    </#if>
+                </form>
+                </div>
             <#else>
                 <#if feedback??>
                     <a class="text-white" href="/ratings"><button class="btn btn-primary mb-3" style="float: left; width: 10%">

@@ -47,14 +47,13 @@ public class Rating {
         map.put("ratings", true);
         map.put("searchOptions", getSearchOptions(""));
         Map<Integer, Map<String, Object>> users = new HashMap<>();
-        Map<Integer, Map<String, Object>> courses = new HashMap<>();
+        Map<Integer, Map<String, Object>> courses = getAllCourseRatings("", conn);
         if (role.contentEquals("learner"))
             users = getAllUserRatings("","prof", conn);
         if (role.contentEquals("prof"))
             users = getAllUserRatings("","learner", conn);
         if (role.contentEquals("admin")) {
             users = getAllUserRatings("","", conn);
-            courses = getAllCourseRatings("", conn);
         }
         map.put("users", users);
         map.put("courses", courses);
@@ -113,7 +112,12 @@ public class Rating {
             else {
                 String searchVal = formFields.get("search");
                 if (searchVal.contains("course")) {
-                    String searchText = formFields.get("searchTextCourse");
+                    String searchText = null;
+                    try {
+                        searchText = URLDecoder.decode(formFields.get("searchTextCourse"), "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
                     courses = getAllCourseRatings(searchText, conn);
                     map.put("searchTextCourse", searchText);
                     map.put("searchOptions", getSearchOptions(""));

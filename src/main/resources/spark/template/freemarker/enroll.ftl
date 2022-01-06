@@ -45,7 +45,7 @@
                                     <td>${c.state}</td>
                                     <td>${c.credits}</td>
                                     <td>${c.meeting_days}</td>
-                                    <td>${c.startTimeF} - ${c.endTimeF}</td>
+                                    <td>${c.startTime} - ${c.endTime}</td>
                                     <td>
                                         <#if c.rating??>
                                             <#if c.rating == 0>
