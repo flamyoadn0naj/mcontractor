@@ -739,8 +739,7 @@ public class DataMapper {
             pst.setString(5,question1.responseA);
             pst.setString(6, question1.responseB);
             pst.setString(7, question1.responseC);
-            pst.setString(8, question1.responseD);
-            int i = pst.executeUpdate();
+            pst.setString(8, question1.responseD);int i = pst.executeUpdate();
             if (i != 0) flag = true;
         } catch(Exception e) {
             System.out.println("Exception at createQuestion " + e);
@@ -770,27 +769,27 @@ public class DataMapper {
         return flag;
     }
 
-    public static ArrayList<Quiz> getQuestions(Quiz quiz, Connection conn){
+    public static Map<Integer,Object> getQuestions(Quiz quiz, Connection conn){
 //        Quiz[] questions = new Quiz[MAXQUIZ]; //= new Quiz[0];
 //        ArrayList<Map<Quiz,Quiz>> questions = new ArrayList<Map<Quiz, Quiz>>();
-        ArrayList<Quiz> questions = new ArrayList<Quiz>();
+        Map<Integer,Object> questions = new HashMap<>();
         int i=0;
         try{
             PreparedStatement pst1 = conn.prepareStatement("select * from quiz_questions where quizId=?");
             pst1.setInt(1,quiz.quizId);
             ResultSet dbrs = pst1.executeQuery();
             while (dbrs.next()){
-                Quiz question = new Quiz();
-                question.quizId = quiz.quizId;
-                question.questionId = dbrs.getInt("questionId");
-                question.questionText = dbrs.getString("question");
-                question.answer = dbrs.getString("answer");
-                question.mark = dbrs.getInt("mark");
-                question.responseA = dbrs.getString("responseA");
-                question.responseB = dbrs.getString("responseB");
-                question.responseC = dbrs.getString("responseC");
-                question.responseD = dbrs.getString("responseD");
-                questions.add(question);
+                Map<String, Object> question = new HashMap<>();
+                question.put("quizId",quiz.quizId);
+                question.put("questionId",dbrs.getInt("questionId"));
+                question.put("questionText",dbrs.getString("question"));
+                question.put("answer", dbrs.getString("answer"));
+                question.put("mark",dbrs.getInt("mark"));
+                question.put("responseA",dbrs.getString("responseA"));
+                question.put("responseB",dbrs.getString("responseB"));
+                question.put("responseC",dbrs.getString("responseC"));
+                question.put("responseD",dbrs.getString("responseD"));
+                questions.put((Integer) question.get("questionId"),question);
 
             }
 
