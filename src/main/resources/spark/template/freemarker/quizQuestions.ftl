@@ -76,10 +76,6 @@
                                 </tr>
                         </#if>
                     </table>
-<#--                    <#if !quizzes??>-->
-<#--                        <div style="margin-left: 2%"> No Questions Found. Please add questions using the "Add"-->
-<#--                            button.</div>-->
-<#--                    </#if>-->
 
                     <#--                        <tr>-->
                     <#--                            <th scope="row">Quiz 1</th>-->
