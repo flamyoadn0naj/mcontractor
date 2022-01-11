@@ -443,15 +443,16 @@ public class App {
             if((int)course.get("prof_id") == id) map.put("role", "prof");
             else map.put("role","learner");
             map.put("courseId", courseId);
-
-            Map<Integer, Object>  quizzes = Quiz.getQuizzesbyId(Integer.parseInt(quizId), conn);
-            if (!quizzes.isEmpty()) {
-                map.put("quizName", quizzes.get("name"));
-                map.put("quizzes",quizzes);
-
+            Quiz quiz = DataMapper.viewSingleQuiz(Integer.parseInt(quizId),conn);
+            Map<Integer,Object> questions = DataMapper.getQuestions(quiz,conn);
+            map.put("quizName", quiz.quizName);
+            map.put("quiz",quiz);
+            if (!questions.isEmpty()) {
+                map.put("questions",questions);
+                map.put("quizName", quiz.quizName);
             }
             conn.close();
-            return new ModelAndView(map,"courseQuiz.ftl");
+            return new ModelAndView(map,"quizQuestions.ftl");
 
         }),engine);
         post("/course/add/:courseId", (request,response)-> {
