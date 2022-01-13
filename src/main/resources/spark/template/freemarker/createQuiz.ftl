@@ -18,6 +18,28 @@
         <h4 class="card-header border-primary text-black-50 mb-3" style="margin-top: -1.5%">
             ${title} Quiz
         </h4>
+        <ul class="nav nav-tabs mb-3">
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="/course/about/${courseId}">About</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="/course/learnMat/${courseId}">Learning Material</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="/course/quiz/${courseId}">Quizzes</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="/course/grades/${courseId}">Grades</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="/course/classlist/${courseId}">Classlist</a>
+            </li>
+            <#if viewRate??>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="/course/rate/${courseId}">Rate</a>
+                </li>
+            </#if>
+        </ul>
         <form style="display:flex; justify-content:center;" method="post" action="/course/${courseId}/create-quiz?e=${e}">
             <div class="card" style="width: 80%">
                 <div class="card-header" id="headingOne">
