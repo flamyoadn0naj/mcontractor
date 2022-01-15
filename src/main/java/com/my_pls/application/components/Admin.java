@@ -48,13 +48,13 @@ public class Admin {
         String searchText = "";
         boolean flag = false;
 
-        Map<Integer,String> profs = DataMapper.viewAllRequests(conn);
+        Map<Integer,String> profs = Proxy.viewAllRequests(conn);
         map.put("profs",profs);
 
         Map<String,String> searchOptions = getSearchOptions("");
         map.put("searchOptions",searchOptions);
-        if (formFields.containsKey("approve")) flag = DataMapper.approveProf(formFields.get("approve"), conn);
-        if (formFields.containsKey("deny")) flag = DataMapper.deleteReq(formFields.get("deny"), conn);
+        if (formFields.containsKey("approve")) flag = Proxy.approveProf(formFields.get("approve"), conn);
+        if (formFields.containsKey("deny")) flag = Proxy.deleteReq(formFields.get("deny"), conn);
         if (flag) map.put("redirect",true);
         if (formFields.containsKey("approve") || formFields.containsKey("deny") && !flag) map.put("err",true);
         if (formFields.containsKey("searchText")) {
@@ -64,7 +64,7 @@ public class Admin {
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-            Map<Integer, String> users = DataMapper.viewUsers(searchText, filterBy, conn);
+            Map<Integer, String> users = Proxy.viewUsers(searchText, filterBy, conn);
             map.put("searchText",searchText);
             searchOptions = getSearchOptions(filterBy);
             map.put("searchOptions",searchOptions);
@@ -77,9 +77,9 @@ public class Admin {
             }
         }
         if (formFields.containsKey("admin"))
-            if (DataMapper.authorize(formFields.get("admin"), conn)) {
+            if (Proxy.authorize(formFields.get("admin"), conn)) {
                 map.put("success", true);
-                Map<Integer, String> users = DataMapper.viewUsers(searchText, filterBy, conn);
+                Map<Integer, String> users = Proxy.viewUsers(searchText, filterBy, conn);
                 if (!users.isEmpty()) {
                     map.put("users", users);
                 }

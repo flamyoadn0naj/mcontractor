@@ -24,9 +24,9 @@ public class Quiz {
     public static Map<Integer, Object> getQuizzes(int courseId, Connection conn) {
         Map<Integer,Object> quizzes = new HashMap<>();
 
-        ArrayList<Lesson> lessons = DataMapper.getLessonsByCourseId(courseId, conn);
+        ArrayList<Lesson> lessons = Proxy.getLessonsByCourseId(courseId, conn);
         for (Lesson lesson:lessons){
-            Map<Integer,Object> MyQuizzes = DataMapper.viewQuizzes(lesson.getId(), conn);
+            Map<Integer,Object> MyQuizzes = Proxy.viewQuizzes(lesson.getId(), conn);
             quizzes.putAll(MyQuizzes);
         }
         return quizzes;
@@ -35,7 +35,7 @@ public class Quiz {
 
     public static Map<Integer, Object> getQuizzesbyId(int quizId, Connection conn) {
         Map<Integer,Object> quizzes = new HashMap<>();
-        Map<Integer,Object> MyQuizzes = DataMapper.viewQuiz(quizId, conn);
+        Map<Integer,Object> MyQuizzes = Proxy.viewQuiz(quizId, conn);
         Object currentQuiz = MyQuizzes.get(quizId);
         return quizzes;
     }

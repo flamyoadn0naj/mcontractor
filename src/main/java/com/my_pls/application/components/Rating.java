@@ -8,11 +8,41 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Rating {
-    public static Map<Integer, Map<String, Object>> getAllUserRatings(String searchText, String filter, Connection conn) {
+    public static Map<Integer, Map<String, Object>> getAllUserRatings(String searchText, Connection conn) {
         Map<Integer, Map<String, Object>> ratings = new HashMap<>();
-        ArrayList<Integer> user_ids = DataMapper.getAllUserIDsFromRating(conn);
+        ArrayList<Integer> user_ids = Proxy.getAllUserIDsFromRating(conn);
         for (int u : user_ids) {
-            Map<String, Object> ratingObj = DataMapper.getRatingAndFeedbackOfUserGivenUserId(u, searchText, filter, conn);
+            Map<String, Object> ratingObj = Proxy.getRatingAndFeedbackOfUserGivenUserId(u, searchText, "", conn);
+            if (!ratingObj.isEmpty()) ratings.put(u, ratingObj);
+        }
+        return ratings;
+    }
+
+    public static Map<Integer, Map<String, Object>> getAllRatingsProf(String searchText, Connection conn) {
+        Map<Integer, Map<String, Object>> ratings = new HashMap<>();
+        ArrayList<Integer> user_ids = Proxy.getAllUserIDsFromRating(conn);
+        for (int u : user_ids) {
+            Map<String, Object> ratingObj = Proxy.getRatingAndFeedbackOfUserGivenUserId(u, searchText, "prof", conn);
+            if (!ratingObj.isEmpty()) ratings.put(u, ratingObj);
+        }
+        return ratings;
+    }
+
+    public static Map<Integer, Map<String, Object>> getAllUserRatingsLearner(String searchText, Connection conn) {
+        Map<Integer, Map<String, Object>> ratings = new HashMap<>();
+        ArrayList<Integer> user_ids = Proxy.getAllUserIDsFromRating(conn);
+        for (int u : user_ids) {
+            Map<String, Object> ratingObj = Proxy.getRatingAndFeedbackOfUserGivenUserId(u, searchText, "learner", conn);
+            if (!ratingObj.isEmpty()) ratings.put(u, ratingObj);
+        }
+        return ratings;
+    }
+
+    public static Map<Integer, Map<String, Object>> getAllUserRatingsAdmin(String searchText, Connection conn) {
+        Map<Integer, Map<String, Object>> ratings = new HashMap<>();
+        ArrayList<Integer> user_ids = Proxy.getAllUserIDsFromRating(conn);
+        for (int u : user_ids) {
+            Map<String, Object> ratingObj = Proxy.getRatingAndFeedbackOfUserGivenUserId(u, searchText, "admin", conn);
             if (!ratingObj.isEmpty()) ratings.put(u, ratingObj);
         }
         return ratings;
@@ -20,11 +50,11 @@ public class Rating {
 
     public static Map<Integer, Map<String, Object>> getAllCourseRatings(String searchText, Connection conn) {
         Map<Integer, Map<String, Object>> ratings = new HashMap<>();
-        ArrayList<Integer> course_ids = DataMapper.getAllCourseIDsFromRating(conn);
+        ArrayList<Integer> course_ids = Proxy.getAllCourseIDsFromRating(conn);
         for (int c : course_ids) {
-            Map<String, Object> ratingObj = DataMapper.getRatingAndFeedbackOfCourseGivenCourseId(c, searchText, conn);
+            Map<String, Object> ratingObj = Proxy.getRatingAndFeedbackOfCourseGivenCourseId(c, searchText, conn);
             if (!ratingObj.isEmpty()) {
-                String pname = DataMapper.findProfName((Integer) ratingObj.get("prof_id"), conn);
+                String pname = Proxy.findProfName((Integer) ratingObj.get("prof_id"), conn);
                 ratingObj.put("prof", pname);
                 ratings.put(c, ratingObj);
             }
@@ -49,11 +79,11 @@ public class Rating {
         Map<Integer, Map<String, Object>> users = new HashMap<>();
         Map<Integer, Map<String, Object>> courses = getAllCourseRatings("", conn);
         if (role.contentEquals("learner"))
-            users = getAllUserRatings("","prof", conn);
+            users = getAllRatingsProf("", conn);
         if (role.contentEquals("prof"))
-            users = getAllUserRatings("","learner", conn);
+            users = getAllUserRatingsLearner("", conn);
         if (role.contentEquals("admin")) {
-            users = getAllUserRatings("","", conn);
+            users = getAllUserRatings("", conn);
         }
         map.put("users", users);
         map.put("courses", courses);
@@ -68,7 +98,7 @@ public class Rating {
             String feedback = URLDecoder.decode(formFields.get("feedback"), "UTF-8");
             int id = Integer.parseInt(formFields.get("doneRating"));
             int rate_value = Integer.parseInt(formFields.get("Rating"));
-            flag = DataMapper.rateUser(id, rate_value, feedback, conn);
+            flag = Proxy.rateUser(id, rate_value, feedback, conn);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -78,7 +108,7 @@ public class Rating {
 
     public static Map<String,Object> postMethodFunctionality(Map<String, String> formFields, String role, Connection conn) {
         Map<String,Object> map = new HashMap<>();
-        Map<Integer, Map<String, Object>> users = getAllUserRatings("","", conn);
+        Map<Integer, Map<String, Object>> users = getAllUserRatings("", conn);
         Map<Integer, Map<String, Object>> courses = getAllCourseRatings("", conn);
         if (formFields == null) {
             map.put("ratings", true);
@@ -101,8 +131,8 @@ public class Rating {
                     map.put("rateUser", true);
                     map.put("curr_user", formFields.get("rate"));
                 }
-                if (role.contentEquals("learner")) users = getAllUserRatings("", "prof", conn);
-                if (role.contentEquals("prof")) users = getAllUserRatings("", "learner", conn);
+                if (role.contentEquals("learner")) users = getAllUserRatingsLearner("", conn);
+                if (role.contentEquals("prof")) users = getAllRatingsProf("", conn);
                 map.put("users", users);
             }
             else if (formFields.containsKey("userId"))
@@ -130,11 +160,30 @@ public class Rating {
                         e.printStackTrace();
                     }
                     String filter = "";
-                    if (role.contentEquals("learner")) filter = "prof";
-                    if (role.contentEquals("prof")) filter = "learner";
+                    if (role.contentEquals("learner"))
+                        users = getAllRatingsProf("", conn);
+                    if (role.contentEquals("prof"))
+                        users = getAllUserRatingsLearner("", conn);
+
                     if (role.contentEquals("admin")) filter = formFields.get("filterBy");
 
-                    users = getAllUserRatings(searchText, filter, conn);
+                    switch(formFields.get("filterBy")) {
+                    case "all":
+                        users = getAllUserRatings(searchText, conn);
+                        break;
+                    case "admin":
+                        users = getAllUserRatingsAdmin(searchText, conn);
+                        break;
+                    case "prof":
+                        users = getAllRatingsProf(searchText, conn);
+                        break;
+                    case "learner":
+                        users = getAllUserRatingsLearner(searchText, conn);
+                        break;
+                    default:
+                        users = getAllUserRatings(searchText, conn);
+                    }
+
                     map.put("searchText", searchText);
                     map.put("filterKey", filter);
                     map.put("filterVal", Admin.mapFilterKey(filter));

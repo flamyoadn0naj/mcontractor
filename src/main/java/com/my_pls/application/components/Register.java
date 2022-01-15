@@ -1,18 +1,12 @@
 package com.my_pls.application.components;
 
-import com.my_pls.MySqlConnection;
-import com.my_pls.application.App;
 import com.my_pls.securePassword;
-import com.my_pls.sendEmail;
-import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 public class Register {
     public static Map<String, Object> getMethodDefaults() {
@@ -63,7 +57,7 @@ public class Register {
             }
             if (flag) {
                 map.put("loading","true");
-                if (!DataMapper.register(fName, lName, email, password, conn)) {
+                if (!Proxy.register(fName, lName, email, password, conn)) {
                     map.put("dbErr", "true");
                     map.put("fname",formFields.get("firstName"));
                     map.put("lname",formFields.get("lastName"));

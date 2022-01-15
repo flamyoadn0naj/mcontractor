@@ -1,20 +1,12 @@
 package com.my_pls.application.components;
 
-import com.my_pls.MySqlConnection;
-import com.my_pls.application.App;
 import com.my_pls.securePassword;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Date;
-import java.time.format.DateTimeFormatter;
-import java.time.LocalDateTime;
 
 public class Login {
     public static Map<String,Object> getMethodDefaults() {
@@ -44,13 +36,13 @@ public class Login {
                     e.printStackTrace();
                 }
                 String input_password = formFields.get("pass");
-                user = DataMapper.login(input_password, emVal, pwd_manager, conn);
+                user = Proxy.login(input_password, emVal, pwd_manager, conn);
                 if (user.firstName.isEmpty()) {
                     map.put("loginErr", "display:list-item;margin-left:5%");
                     map.put("errorEmail", "");
                     map.put("emailVal", emVal);
                 } else {
-                    DataMapper.updateCourses(conn);
+                    Proxy.updateCourses(conn);
                     map.put("loginErr", "");
                     map.put("errorEmail", "");
                     map.put("emailVal", emVal);

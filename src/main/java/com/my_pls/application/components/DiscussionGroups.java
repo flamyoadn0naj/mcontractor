@@ -19,11 +19,11 @@ public class DiscussionGroups {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        int i = DataMapper.addDiscussionGroup(name, -1, privacy, conn);
+        int i = Proxy.addDiscussionGroup(name, -1, privacy, conn);
         if (i != -1) {
-            int d_id = DataMapper.findLastInsertedId("discussion_groups", conn);
+            int d_id = Proxy.findLastInsertedId("discussion_groups", conn);
             if (d_id != -1) {
-                flag = DataMapper.addDGmember(user_id, d_id, conn);
+                flag = Proxy.addDGmember(user_id, d_id, conn);
             }
         }
         return flag;
@@ -39,9 +39,9 @@ public class DiscussionGroups {
     }
 
     public static Map<Integer,Map<String, Object>> getGroups(String searchText, int filter, int id, Connection conn) {
-        Map<Integer,Map<String, Object>> allGroups = DataMapper.getAllDisscussionGroups(searchText, filter, conn);
-        ArrayList<Map<String, Object>> myGroups = DataMapper.getMyDiscussionGroups(id, conn);
-        Map<Integer, Object> requestedGroups = DataMapper.getPendingGroupRequests(id, conn);
+        Map<Integer,Map<String, Object>> allGroups = Proxy.getAllDisscussionGroups(searchText, filter, conn);
+        ArrayList<Map<String, Object>> myGroups = Proxy.getMyDiscussionGroups(id, conn);
+        Map<Integer, Object> requestedGroups = Proxy.getPendingGroupRequests(id, conn);
         for (Map<String, Object> g: myGroups) {
             int g_id = (int) g.get("id");
             if (allGroups.containsKey(g_id)) allGroups.remove(g_id);
@@ -73,10 +73,10 @@ public class DiscussionGroups {
 
     public static Map<String, Object> postMethodFunctionality(Map<String, String> formFields, int id, Connection conn) {
         Map<String,Object> map = new HashMap<>();
-        ArrayList<Map<String,Object>> groups = DataMapper.getMyDiscussionGroups(id, conn);
+        ArrayList<Map<String,Object>> groups = Proxy.getMyDiscussionGroups(id, conn);
         Map<Integer, String> searchOptions = getSearchOptions("");
         Map<Integer,Map<String, Object>> allGroups = getGroups("", -1, id, conn);
-        Map<Integer, Object> requestedGroups = DataMapper.getPendingGroupRequests(id, conn);
+        Map<Integer, Object> requestedGroups = Proxy.getPendingGroupRequests(id, conn);
 
         if (formFields.containsKey("searchText")) {
             String searchText = null;
@@ -96,25 +96,25 @@ public class DiscussionGroups {
 
         if (formFields.containsKey("join")) {
             int groupId = Integer.parseInt(formFields.get("join"));
-            boolean flag = DataMapper.addDGmember(id, groupId, conn);
+            boolean flag = Proxy.addDGmember(id, groupId, conn);
             map.put("refresh", flag);
         }
 
         if (formFields.containsKey("request")) {
             int groupId = Integer.parseInt(formFields.get("request"));
-            boolean flag = DataMapper.requestToJoinGroup(id, groupId, conn);
+            boolean flag = Proxy.requestToJoinGroup(id, groupId, conn);
             map.put("refresh", flag);
         }
 
         if (formFields.containsKey("cancel")) {
             int groupId = Integer.parseInt(formFields.get("cancel"));
-            boolean flag = DataMapper.deleteRequestForGroup(id, groupId, conn);
+            boolean flag = Proxy.deleteRequestForGroup(id, groupId, conn);
             map.put("refresh", flag);
         }
 
         if (formFields.containsKey("leave")) {
             int groupId = Integer.parseInt(formFields.get("leave"));
-            boolean flag = DataMapper.deleteDGMember(id, groupId, conn);
+            boolean flag = Proxy.deleteDGMember(id, groupId, conn);
             map.put("refresh", flag);
         }
 
@@ -127,8 +127,8 @@ public class DiscussionGroups {
 
     public static String isMemberOfGroup(int user_id, int id, Connection conn) {
         String member = "no";
-        ArrayList<Map<String, Object>> myGroups = DataMapper.getMyDiscussionGroups(user_id, conn);
-        Map<Integer, Object> requestedGroups = DataMapper.getPendingGroupRequests(user_id, conn);
+        ArrayList<Map<String, Object>> myGroups = Proxy.getMyDiscussionGroups(user_id, conn);
+        Map<Integer, Object> requestedGroups = Proxy.getPendingGroupRequests(user_id, conn);
         for (Map<String, Object> g: myGroups) {
             int g_id = (int) g.get("id");
             if (g_id == id) member = "yes";
@@ -143,7 +143,7 @@ public class DiscussionGroups {
         int id = 0;
         if (group.containsKey("course")) {
             int courseId = (int) group.get("course_id");
-            Map<String, Object> course = DataMapper.findCourseByCourseId(String.valueOf(courseId), conn);
+            Map<String, Object> course = Proxy.findCourseByCourseId(String.valueOf(courseId), conn);
             id = (int) course.get("prof_id");
         }
         return id;
