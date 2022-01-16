@@ -8,16 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Rating {
-    public static Map<Integer, Map<String, Object>> getAllUserRatings(String searchText, Connection conn) {
-        Map<Integer, Map<String, Object>> ratings = new HashMap<>();
-        ArrayList<Integer> user_ids = Proxy.getAllUserIDsFromRating(conn);
-        for (int u : user_ids) {
-            Map<String, Object> ratingObj = Proxy.getRatingAndFeedbackOfUserGivenUserId(u, searchText, "", conn);
-            if (!ratingObj.isEmpty()) ratings.put(u, ratingObj);
-        }
-        return ratings;
-    }
-
     public static Map<Integer, Map<String, Object>> getAllRatingsProf(String searchText, Connection conn) {
         Map<Integer, Map<String, Object>> ratings = new HashMap<>();
         ArrayList<Integer> user_ids = Proxy.getAllUserIDsFromRating(conn);
@@ -47,6 +37,17 @@ public class Rating {
         }
         return ratings;
     }
+
+    public static Map<Integer, Map<String, Object>> getAllUserRatings(String searchText, Connection conn) {
+        Map<Integer, Map<String, Object>> ratings = new HashMap<>();
+        ArrayList<Integer> user_ids = Proxy.getAllUserIDsFromRating(conn);
+        for (int u : user_ids) {
+            Map<String, Object> ratingObj = Proxy.getRatingAndFeedbackOfUserGivenUserId(u, searchText, "", conn);
+            if (!ratingObj.isEmpty()) ratings.put(u, ratingObj);
+        }
+        return ratings;
+    }
+
 
     public static Map<Integer, Map<String, Object>> getAllCourseRatings(String searchText, Connection conn) {
         Map<Integer, Map<String, Object>> ratings = new HashMap<>();
