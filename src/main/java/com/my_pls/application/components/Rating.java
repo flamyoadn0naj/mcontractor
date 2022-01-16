@@ -166,7 +166,7 @@ public class Rating {
                         users = getAllUserRatingsLearner("", conn);
 
                     if (role.contentEquals("admin")) filter = formFields.get("filterBy");
-
+//Facade Pattern
                     switch(formFields.get("filterBy")) {
                     case "all":
                         users = getAllUserRatings(searchText, conn);
