@@ -16,7 +16,7 @@ import java.time.format.FormatStyle;
 import java.util.*;
 import java.util.Date;
 import java.util.function.Function;
-
+//Proxy Pattern
 public class Proxy {
     private static int MAXQUIZ = 200;
     private static Function<String,String> addQuotes = s -> "\"" + s + "\"";
