@@ -6,6 +6,7 @@
     <link rel="stylesheet"  href="/css/_variables.scss">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Discussion Groups - MyPLS</title>
 </head>
 <body>
 <#include "navbar.ftl">
@@ -35,12 +36,14 @@
                     <a href="/discussion/create-post/${id}" class="text-white">Create Post</a>
                 </button>
                 <#if !group.course??>
-                    <form method="post" action="/discussion/group-desc/${id}">
-                        <button class="btn btn-primary col-2 text-white" style="float:left; margin-left: 2%"
-                                type="submit" name="leave" value="true">
-                            Leave
-                        </button>
-                    </form>
+                    <#if id != 311>
+                        <form method="post" action="/discussion/group-desc/${id}">
+                            <button class="btn btn-primary col-2 text-white" style="float:left; margin-left: 2%"
+                                    type="submit" name="leave" value="true">
+                                Leave
+                            </button>
+                        </form>
+                    </#if>
                 </#if>
             </#if>
         </div>
@@ -115,22 +118,21 @@
                                         Group Requests
                                     </h4>
                                     <ul class="list-group">
-                                        <#list reqs as k,v>
-                                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                ${v}
-                                                <button class="btn-download" style="float:right;" type="submit" name="add" value=${k}>
-                                                    <i class="fa fa-plus"></i>
-                                                </button>
-                                                <button class="btn-download" style="float:right;" type="submit" name="del" value=${k}>
-                                                    <i class="fa fa-times"></i>
-                                                </button>
-                                            </li>
-                                        </#list>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            Tharindu Cyril Weerasooriya
-                                            <button class="btn-download" style="float:right;" type="submit"><i class="fa fa-plus"></i></button>
-                                            <button class="btn-download" style="float:right;" type="submit"><i class="fa fa-times"></i></button>
-                                        </li>
+                                        <#if reqs??>
+                                            <#list reqs as k,v>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    ${v}
+                                                    <button class="btn-download" style="float:right;" type="submit" name="add" value=${k}>
+                                                        <i class="fa fa-plus"></i>
+                                                    </button>
+                                                    <button class="btn-download" style="float:right;" type="submit" name="del" value=${k}>
+                                                        <i class="fa fa-times"></i>
+                                                    </button>
+                                                </li>
+                                            </#list>
+                                        <#else>
+                                            <div style="text-align: center; margin-top: 2%"> No Requests Found </div>
+                                        </#if>
                                     </ul>
                                 </div>
                             </form>

@@ -6,6 +6,7 @@
     <link rel="stylesheet"  href="/css/_bootswatch.scss">
     <link rel="stylesheet"  href="/css/_variables.scss">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <title>Forgot Password - MyPLS</title>
 </head>
 
 <body>

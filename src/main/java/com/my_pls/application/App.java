@@ -138,6 +138,10 @@ public class App {
                 email = URLDecoder.decode(email,"UTF-8");
                 String hash = request.queryParams("key2");
                 boolean flag = DataMapper.verifyEmailofUser(email, hash, conn);
+                if (flag) {
+                    int id = DataMapper.getUserIdFromEmail(email, conn);
+                    DataMapper.addDGmember(id,311,conn);
+                }
             }
             conn.close();
             return new ModelAndView(map,"verifyRegister.ftl");
@@ -300,7 +304,6 @@ public class App {
                 String k = URLDecoder.decode(element.getKey(),"UTF-8");
                 String v = URLDecoder.decode(element.getValue(),"UTF-8");
                 if(k.equals(v)){
-                    //
                     temp.materials.add(v);
                 }
             }
@@ -892,7 +895,7 @@ public class App {
             map.put("group", group);
             map.put("role", role);
             map.put("members", members);
-            map.put("reqs", requests);
+            if (!requests.isEmpty()) map.put("reqs", requests);
             map.put("id", id);
             conn.close();
             return new ModelAndView(map,"groupDesc.ftl");
