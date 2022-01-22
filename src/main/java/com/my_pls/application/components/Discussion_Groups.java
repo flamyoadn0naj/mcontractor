@@ -15,7 +15,7 @@ public class Discussion_Groups {
         int privacy = Integer.parseInt(formFields.get("customRadio"));
         String name = null;
         try {
-            name = URLDecoder.decode(formFields.get("name"),"UTF-8");
+            name = URLDecoder.decode(formFields.get("name"),"UTF-8").trim();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
