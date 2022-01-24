@@ -447,6 +447,7 @@ public class App {
             Map<Integer,Object> questions = DataMapper.getQuestions(quiz,conn);
             map.put("quizName", quiz.quizName);
             map.put("quiz",quiz);
+            map.put("quizId",quizId);
             if (!questions.isEmpty()) {
                 map.put("questions",questions);
                 map.put("quizName", quiz.quizName);
@@ -455,6 +456,49 @@ public class App {
             return new ModelAndView(map,"quizQuestions.ftl");
 
         }),engine);
+
+        get("/course/create-question",((request, response) -> {
+
+            Map<String,Object> map = new HashMap<>();
+            Session sess = request.session();
+            int id = sess.attribute("id");
+            Connection conn = MySqlConnection.getConnection();
+            String courseId = request.queryParams("courseId");
+            courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
+
+            Map<String,Object> course = Courses.getCourse(courseId, conn);
+
+            if((int)course.get("prof_id") == id) map.put("role", "prof");
+            else
+            {
+                conn.close();
+                response.redirect("/err");
+            }
+            map.put("courseId", courseId);
+            map.put("name", course.get("name"));
+            String edit = request.queryParams("e");
+            String quizId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("quizId")));
+            map.put("quizId",quizId);
+            Map<String, Object> question = null;
+            Quiz quiz = DataMapper.viewSingleQuiz(Integer.parseInt(quizId),conn);
+            map.put("tot",quiz.totalMark);
+            map.put("min",quiz.MinMark);
+            if (edit == null || edit.contains("-1")){
+                map.put("e",-1);
+                map.put("questionName","");
+                map.put("mark",0);
+                map.put("title", "Create");
+            }else{
+                map.put("e",1);
+                String questionId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId")));
+                question = DataMapper.getQuestion(Integer.parseInt(questionId), conn);
+                map.put("title","Modify "+question.get("questionText"));
+            }
+            map.put("question",question);
+            conn.close();
+            return new ModelAndView(map,"question.ftl");
+        }),engine);
+
         post("/course/add/:courseId", (request,response)-> {
             Session sess = request.session();
             int id = sess.attribute("id");

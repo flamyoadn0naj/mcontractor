@@ -15,6 +15,7 @@ public class Quiz {
     public int questionId;
     public int mark;
     public int MinMark;
+    public int totalMark;
     public String questionText;
     public String responseA;
     public String responseB;
