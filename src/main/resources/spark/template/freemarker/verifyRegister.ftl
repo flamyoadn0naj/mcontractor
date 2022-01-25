@@ -3,6 +3,7 @@
     <link rel="stylesheet"  href="/css/_bootswatch.scss">
     <link rel="stylesheet"  href="/css/_variables.scss">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <title>Verify Your Account - MyPLS</title>
 </head>
 <body>
 <#--    <#assign resend = false>-->

@@ -279,13 +279,15 @@ public class DataMapper {
                 prof = rs.getInt("profId");
 
             }
-            if(feedback.size() > 0) rating = rating / feedback.size();
-            int unchecked = 5 - rating;
-            ratingsObj.put("rating", rating);
-            ratingsObj.put("feedback", feedback);
-            ratingsObj.put("name", name);
-            ratingsObj.put("unchecked", unchecked);
-            ratingsObj.put("prof_id", prof);
+            if(feedback.size() > 0) {
+                rating = rating / feedback.size();
+                int unchecked = 5 - rating;
+                ratingsObj.put("rating", rating);
+                ratingsObj.put("feedback", feedback);
+                ratingsObj.put("name", name);
+                ratingsObj.put("unchecked", unchecked);
+                ratingsObj.put("prof_id", prof);
+            }
         } catch (Exception e) {
             System.out.println("Exception in getRatingAndFeedbackOfCourseGivenCourseId");
             System.out.println(e.getMessage());
