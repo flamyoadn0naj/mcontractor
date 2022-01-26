@@ -792,13 +792,39 @@ public class DataMapper {
                 question.put("responseC",dbrs.getString("responseC"));
                 question.put("responseD",dbrs.getString("responseD"));
                 questions.put((Integer) question.get("questionId"),question);
-
             }
 
         } catch(Exception e) {
             System.out.println("Exception at getQuestions " + e);
         }
         return questions;
+    }
+
+
+    public static Map<String, Object> getQuestion(int QuestionId, Connection conn) {
+
+        Map<String, Object> question = new HashMap<>();
+
+        try {
+            PreparedStatement pst1 = conn.prepareStatement("select * from quiz_questions where questionId=?");
+            pst1.setInt(1, QuestionId);
+            ResultSet dbrs = pst1.executeQuery();
+            while (dbrs.next()) {
+                question.put("quizId", dbrs.getInt("quizId"));
+                question.put("questionId", dbrs.getInt("questionId"));
+                question.put("questionText", dbrs.getString("question"));
+                question.put("answer", dbrs.getString("answer"));
+                question.put("mark", dbrs.getInt("mark"));
+                question.put("responseA", dbrs.getString("responseA"));
+                question.put("responseB", dbrs.getString("responseB"));
+                question.put("responseC", dbrs.getString("responseC"));
+                question.put("responseD", dbrs.getString("responseD"));
+            }
+
+        } catch (Exception e) {
+            System.out.println("Exception at getQuestions " + e);
+        }
+        return question;
     }
 
     public static Map<Integer, Object>  viewQuizzes(int lessonID, Connection conn) {
@@ -864,6 +890,7 @@ public class DataMapper {
                 singleQuiz.quizId = rs.getInt("Id");
                 singleQuiz.quizName = rs.getString("name");
                 singleQuiz.MinMark = rs.getInt("minimumMarks");
+                singleQuiz.totalMark = rs.getInt("totalMarks");
             }
         } catch (Exception e) {
             System.out.println("Exception at view Quizes "+e);
