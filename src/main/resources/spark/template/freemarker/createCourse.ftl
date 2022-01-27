@@ -6,7 +6,7 @@
     <link rel="stylesheet"  href="/css/_variables.scss">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <title>${title} - MyPLS</title>
+    <title>Create Course - MyPLS</title>
 </head>
 <body>
 <#include "navbar.ftl">
@@ -25,6 +25,11 @@
         <form style="display:flex; justify-content:center;" method="post" action="/courses/create-course?e=${e}">
             <div class="card" style="width: 80%">
                 <div class="card-header" id="headingOne">
+                    <#if nameErr??>
+                        <div class="invalid-feedback mb-2" style="display:block;margin-left:1%">
+                            The course name can not be spaces or empty.
+                        </div>
+                    </#if>
                     <div class="form-group space-between mb-3">
                         <label class="padding2right col-3" for="1a">Name:</label>
                         <input required type="text" name="name" class="form-control col-9" id="name"  value="${name}">

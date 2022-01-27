@@ -66,6 +66,11 @@ public class CreateCourse {
                 map.put("end_time","");
                 flag = false;
             }
+            if(name.length() == 0) {
+                flag = false;
+                map.put("nameErr", true);
+                map.put("name", "");
+            }
             if (!edit.contentEquals("-1")) {
                 if(LocalDate.parse(endDate).isBefore(LocalDate.parse(startDate))) {
                     map.put("errDate", "true");
