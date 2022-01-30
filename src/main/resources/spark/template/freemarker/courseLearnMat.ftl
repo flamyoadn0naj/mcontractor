@@ -66,7 +66,7 @@
                                     <#if role == "prof">
                                         <div class="mb-3">
                                             <b>Requirements:</b>
-                                            <input style="width: 80%" name="req1" type="text" id="req1" value="The student must get at least 80 marks in Quiz 1.">
+                                            <input style="width: 80%" name="req1" pattern="\S.*\S" id="req1" value="The student must get at least 80 marks in Quiz 1.">
                                         </div>
                                     <#else>
                                         <div class="mb-3"> <b>Requirements:</b> The student must get at least 80 marks in Quiz 1.</div>

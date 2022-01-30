@@ -59,7 +59,7 @@
                     </div>
                     <div class="form-group mb-3" style="display: flex">
                         <label class="col-3" for="1c">Learning Objectives</label>
-                        <input required type="text" name="obj" class="form-control col-9" id="obj"  value="${obj}">
+                        <input required pattern="\S.*\S" name="obj" class="form-control col-9" id="obj"  value="${obj}">
                     </div>
                     <div class="form-group" style="display: flex">
                         <label class="col-3">Meeting Days</label>

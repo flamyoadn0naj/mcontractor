@@ -65,7 +65,7 @@
                                     <span class="text-primary small" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                                         <#if role == "prof">
 
-                                            <input name="name" type="text" id="name" value="${lesson.name}">
+                                            <input name="name" pattern="\S.*\S" id="name" value="${lesson.name}">
                                         <#else>
                                             ${lesson.name}
                                         </#if>
@@ -84,7 +84,7 @@
                                         <#if role == "prof">
                                             <div class="mb-3">
                                                 <b>Requirements:</b>
-                                                <input style="width: 80%" name="req" type="text" id="req" value="${lesson.requirements}">
+                                                <input style="width: 80%" name="req" pattern="\S.*\S" id="req" value="${lesson.requirements}">
                                                 <input style="display:none" name="lessonId" type="text" id="lessonId" value="${lesson.id}">
                                             </div>
                                         <#else>
