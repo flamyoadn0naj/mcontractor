@@ -537,7 +537,7 @@ public class DataMapper {
                 details.put("enrolled", String.valueOf(rs.getInt("enrolled")));
                 details.put("credits", String.valueOf(rs.getInt("credits")));
                 DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm");
-                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:m a");
+                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("hh:mm a");
                 LocalTime startTime = LocalTime.parse(String.valueOf(rs.getString("start_time")), df);
                 String st = startTime.format(df2);
                 LocalTime endTime = LocalTime.parse(String.valueOf(rs.getString("end_time")), df);
@@ -1361,7 +1361,7 @@ public class DataMapper {
                 details.put("enrolled", rs.getInt("enrolled"));
                 details.put("credits", rs.getInt("credits"));
                 DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm");
-                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:m a");
+                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("hh:mm a");
                 LocalTime startTime = LocalTime.parse(String.valueOf(rs.getString("start_time")), df);
                 String st = startTime.format(df2);
                 LocalTime endTime = LocalTime.parse(String.valueOf(rs.getString("end_time")), df);
