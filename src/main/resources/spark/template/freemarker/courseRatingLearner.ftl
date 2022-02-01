@@ -50,7 +50,7 @@
                 </div>
                 <div class="mb-3" style="display: flex;margin-bottom: 2%">
                     <label style="margin-right: 2%" for="marks">Feedback</label>
-                    <input required type="text" name="feedback" class="form-control col-10" id="feedback">
+                    <input required pattern="\S.*\S" name="feedback" class="form-control col-10" id="feedback">
                 </div>
                 <button
                         type="submit"
@@ -104,7 +104,7 @@
                 </div>
                 <div class="mb-3" style="display: flex;margin-bottom: 2%">
                     <label style="margin-right: 2%" for="marks">Feedback</label>
-                    <input required type="text" name="feedback" class="form-control col-10" id="feedback">
+                    <input required pattern="\S.*\S" name="feedback" class="form-control col-10" id="feedback">
                 </div>
                 <button
                         type="submit"

@@ -54,7 +54,7 @@
                             <#if role == "prof">
                                 <div class="mb-3">
                                     <b>Requirements:</b>
-                                    <input required style="width: 80%" name="req" type="text" id="req" value="${course.requirements}">
+                                    <input required style="width: 80%" name="req" pattern="\S.*\S" id="req" value="${course.requirements}">
                                 </div>
                             <#else>
                                 <p class="mb-3"><b>Requirements:</b>${course.requirements}</p>

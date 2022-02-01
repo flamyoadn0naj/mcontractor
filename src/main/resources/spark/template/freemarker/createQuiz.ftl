@@ -46,7 +46,7 @@
                     <div class="form-group space-between mb-3">
                         <label class="padding2right col-3" for="1a">Quiz Name:</label>
 
-                        <input required type="text" name="quizName" class="form-control col-9" id="quizName" value="${quizName}">
+                        <input required pattern="\S.*\S" name="quizName" class="form-control col-9" id="quizName" value="${quizName}">
 
                     </div>
                     <div class="form-group mb-3" style="display: flex">

@@ -53,11 +53,11 @@
             <div style="display:flex; justify-content:space-between;">
                 <div class="form-group">
                     <label for="firstName">First Name</label>
-                    <input required type="text" name="firstName" class="form-control" id="firstName" placeholder="First Name" value=${fname}>
+                    <input required pattern="\S.*\S"" name="firstName" class="form-control" id="firstName" placeholder="First Name" value=${fname}>
                 </div>
                 <div class="form-group">
                     <label for="lastName">Last Name</label>
-                    <input required type="text" name="lastName" class="form-control" id="lastName" placeholder="Last Name" value=${lname!""}>
+                    <input required pattern="\S.*\S" name="lastName" class="form-control" id="lastName" placeholder="Last Name" value=${lname!""}>
                 </div>
             </div>
         </#if>

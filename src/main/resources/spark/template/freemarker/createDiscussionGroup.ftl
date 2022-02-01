@@ -24,7 +24,7 @@
             <div class="card" style="width: 80%; border: none; margin-top: 2%">
                 <div class="form-group space-between mb-3">
                     <label class="padding2right col-3" for="1a">Name:</label>
-                    <input required type="text" name="name" class="form-control col-9" id="name" value="">
+                    <input required pattern="\S.*\S" name="name" class="form-control col-9" id="name" value="">
                 </div>
                 <div class="form-group mb-3" style="display: flex">
                     <label class="padding2right col-4" for="1a">Do you want the group to be private?</label>
