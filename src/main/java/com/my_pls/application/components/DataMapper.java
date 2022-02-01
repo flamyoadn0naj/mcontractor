@@ -731,6 +731,7 @@ public class DataMapper {
     }
 
     public static boolean createQuestion(Quiz question1, Connection conn) {
+        question1.answer = question1.answer.toUpperCase();
         boolean flag = false;
         try {
             PreparedStatement pst = conn.prepareStatement("insert into quiz_questions (quizId,question,answer,mark,responseA,responseB,responseC,responseD) VALUES (?,?,?,?,?,?,?,?)");
@@ -751,6 +752,7 @@ public class DataMapper {
 
     public static boolean updateQuestion(Quiz question1, Connection conn) {
         boolean flag = false;
+        question1.answer = question1.answer.toUpperCase();
         try {
             PreparedStatement pst = conn.prepareStatement("update quiz_questions set question=?,answer=?,mark=?,responseA=?,responseB=?,responseC=?,responseD=? WHERE quizId=? and questionId=?");
 

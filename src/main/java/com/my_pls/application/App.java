@@ -495,12 +495,53 @@ public class App {
                 map.put("e",1);
                 String questionId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId")));
                 question = DataMapper.getQuestion(Integer.parseInt(questionId), conn);
+                sess.attribute("questionId",question);
                 map.put("title","Modify "+question.get("questionText"));
             }
             map.put("question",question);
             conn.close();
             return new ModelAndView(map,"question.ftl");
         }),engine);
+
+        post("/course/create-question",((request, response) -> {
+
+            Map<String,Object> map = new HashMap<>();
+            Session sess = request.session();
+            int id = sess.attribute("id");
+
+            Map<String,String> formFields = extractFields(request.body());
+            Quiz newQuiz = new Quiz();
+            String courseId = request.queryParams("courseId");
+            courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
+            Connection conn = MySqlConnection.getConnection();
+
+            String edit = request.queryParams("e");
+            String quizId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("quizId")));
+            newQuiz.questionText = URLDecoder.decode(formFields.get("QText"), "UTF-8");
+            newQuiz.mark = Integer.parseInt(formFields.get("marks"));
+            newQuiz.quizId = Integer.parseInt(quizId);
+            newQuiz.responseA = URLDecoder.decode(formFields.get("QA"), "UTF-8");
+            newQuiz.responseB = URLDecoder.decode(formFields.get("QB"), "UTF-8");
+            newQuiz.responseC = URLDecoder.decode(formFields.get("QC"), "UTF-8");
+            newQuiz.responseD = URLDecoder.decode(formFields.get("QD"), "UTF-8");
+            newQuiz.answer = URLDecoder.decode(formFields.get("ans"), "UTF-8");
+            if (edit == null || edit.contains("-1"))
+            {
+                DataMapper.createQuestion(newQuiz,conn);
+            }
+            else
+            {
+                int questionId = Integer.parseInt(formFields.get("questionId"));
+                newQuiz.questionId = questionId;
+                sess.removeAttribute("questionId");
+                DataMapper.updateQuestion(newQuiz,conn);
+            }
+            conn.close();
+            response.redirect("/course/quiz/"+courseId+"/"+quizId);
+            return null;
+
+        }),engine);
+
 
         post("/course/add/:courseId", (request,response)-> {
             Session sess = request.session();
