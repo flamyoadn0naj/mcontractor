@@ -415,18 +415,17 @@ public class App {
             newQuiz.MinMark = Integer.parseInt(formFields.get("minMark"));
             Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
-            if (DataMapper.createQuiz(newQuiz, conn)){
-                conn.close();
-                response.redirect("/course/quiz/"+courseId);
+            String edit = request.queryParams("e");
+            if (edit == null || edit.contains("-1")) {
+                DataMapper.createQuiz(newQuiz, conn);
+            } else{
+                newQuiz.quizId = Integer.parseInt(formFields.get("quizId"));
+                DataMapper.updateQuiz(newQuiz, conn);
             }
-            else{
-                conn.close();
-                response.redirect("/err");
-            }
-            map.put("courseId", courseId);
-            map.put("name", course.get("name"));
-            if (Courses.allowRating(course)) map.put("viewRate", true);
-            return new ModelAndView(map,"createQuiz.ftl");
+            conn.close();
+            response.redirect("/course/quiz/"+courseId);
+
+            return null;
 
         }),engine);
 

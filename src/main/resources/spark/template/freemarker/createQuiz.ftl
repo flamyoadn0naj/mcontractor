@@ -47,7 +47,7 @@
                         <label class="padding2right col-3" for="1a">Quiz Name:</label>
 
                         <input required pattern="\S.*\S" name="quizName" class="form-control col-9" id="quizName" value="${quizName}">
-
+                        <input style="display:none" name="quizId" type="text" id="quizId" <#if quizId ??>value=${quizId!""}</#if>>
                     </div>
                     <div class="form-group mb-3" style="display: flex">
                         <label class="col-3" for="1b">Associated Lesson:</label>
@@ -61,6 +61,7 @@
                             </#if>
                         </select>
                     </div>
+
 <#--                    <div class="form-group" style="display: flex">-->
 <#--                        <label class="col-3">Meeting Days</label>-->
 <#--                        <#if days??>-->
