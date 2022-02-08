@@ -79,7 +79,7 @@
 <#--                                    </div>-->
 
                                     <div class="form-group space-between">
-                                        <label class="padding2right" for="1a">Question</label>
+                                        <label class="padding2right" for="QText">Question</label>
                                         <input required type="text" name="QText" class="form-control" id="QText"  <#if question ??>value=${question.questionText!""}</#if> >
                                     </div>
 
