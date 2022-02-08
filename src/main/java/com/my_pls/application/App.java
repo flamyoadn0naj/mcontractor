@@ -421,6 +421,7 @@ public class App {
             } else{
                 newQuiz.quizId = Integer.parseInt(formFields.get("quizId"));
                 DataMapper.updateQuiz(newQuiz, conn);
+                DataMapper.updateTotalMark(newQuiz,conn);
             }
             conn.close();
             response.redirect("/course/quiz/"+courseId);
@@ -517,6 +518,7 @@ public class App {
             String edit = request.queryParams("e");
             String quizId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("quizId")));
             newQuiz.questionText = URLDecoder.decode(formFields.get("QText"), "UTF-8");
+            System.out.println(newQuiz.questionText);
             newQuiz.mark = Integer.parseInt(formFields.get("marks"));
             newQuiz.quizId = Integer.parseInt(quizId);
             newQuiz.responseA = URLDecoder.decode(formFields.get("QA"), "UTF-8");
@@ -527,6 +529,7 @@ public class App {
             if (edit == null || edit.contains("-1"))
             {
                 DataMapper.createQuestion(newQuiz,conn);
+                DataMapper.updateTotalMark(newQuiz,conn);
             }
             else
             {
@@ -534,6 +537,7 @@ public class App {
                 newQuiz.questionId = questionId;
                 sess.removeAttribute("questionId");
                 DataMapper.updateQuestion(newQuiz,conn);
+                DataMapper.updateTotalMark(newQuiz,conn);
             }
             conn.close();
             response.redirect("/course/quiz/"+courseId+"/"+quizId);

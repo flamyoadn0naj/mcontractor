@@ -783,7 +783,10 @@ public class DataMapper {
             pst.setInt(3,question1.MinMark);
             pst.setInt(4,question1.quizId);
             int i = pst.executeUpdate();
-            if (i != 0) flag = true;
+            if (i != 0) {
+                flag = true;
+                pst.close();
+            }
         } catch(Exception e) {
             System.out.println("Exception at createQuestion " + e);
         }
@@ -802,7 +805,15 @@ public class DataMapper {
                 Map<String, Object> question = new HashMap<>();
                 mark = mark + dbrs.getInt("mark");
             }
-
+            dbrs.close();
+            pst1.close();
+            PreparedStatement pst2 = conn.prepareStatement("update quizzes set totalMarks=? WHERE Id=?");
+            pst2.setInt(1,mark);
+            pst2.setInt(2,quiz.quizId);
+            int i = pst2.executeUpdate();
+            if (i != 0) {
+                pst2.close();
+            }
 
         } catch(Exception e) {
             System.out.println("Exception at update mark " + e);
