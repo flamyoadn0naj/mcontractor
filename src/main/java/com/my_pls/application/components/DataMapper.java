@@ -731,6 +731,7 @@ public class DataMapper {
     }
 
     public static boolean createQuestion(Quiz question1, Connection conn) {
+        question1.answer = question1.answer.toUpperCase();
         boolean flag = false;
         try {
             PreparedStatement pst = conn.prepareStatement("insert into quiz_questions (quizId,question,answer,mark,responseA,responseB,responseC,responseD) VALUES (?,?,?,?,?,?,?,?)");
@@ -751,6 +752,7 @@ public class DataMapper {
 
     public static boolean updateQuestion(Quiz question1, Connection conn) {
         boolean flag = false;
+        question1.answer = question1.answer.toUpperCase();
         try {
             PreparedStatement pst = conn.prepareStatement("update quiz_questions set question=?,answer=?,mark=?,responseA=?,responseB=?,responseC=?,responseD=? WHERE quizId=? and questionId=?");
 
@@ -771,9 +773,55 @@ public class DataMapper {
         return flag;
     }
 
+    public static boolean updateQuiz(Quiz question1, Connection conn) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("update quizzes set lessonId=?,name=?,minimumMarks=? WHERE Id=?");
+
+            pst.setInt(1, question1.lessonId);
+            pst.setString(2,question1.quizName);
+            pst.setInt(3,question1.MinMark);
+            pst.setInt(4,question1.quizId);
+            int i = pst.executeUpdate();
+            if (i != 0) {
+                flag = true;
+                pst.close();
+            }
+        } catch(Exception e) {
+            System.out.println("Exception at createQuestion " + e);
+        }
+        return flag;
+    }
+
+    public static int updateTotalMark(Quiz quiz, Connection conn){
+
+        Map<Integer,Object> questions = new HashMap<>();
+        int mark=0;
+        try{
+            PreparedStatement pst1 = conn.prepareStatement("select * from quiz_questions where quizId=?");
+            pst1.setInt(1,quiz.quizId);
+            ResultSet dbrs = pst1.executeQuery();
+            while (dbrs.next()){
+                Map<String, Object> question = new HashMap<>();
+                mark = mark + dbrs.getInt("mark");
+            }
+            dbrs.close();
+            pst1.close();
+            PreparedStatement pst2 = conn.prepareStatement("update quizzes set totalMarks=? WHERE Id=?");
+            pst2.setInt(1,mark);
+            pst2.setInt(2,quiz.quizId);
+            int i = pst2.executeUpdate();
+            if (i != 0) {
+                pst2.close();
+            }
+
+        } catch(Exception e) {
+            System.out.println("Exception at update mark " + e);
+        }
+        return mark;
+    }
     public static Map<Integer,Object> getQuestions(Quiz quiz, Connection conn){
-//        Quiz[] questions = new Quiz[MAXQUIZ]; //= new Quiz[0];
-//        ArrayList<Map<Quiz,Quiz>> questions = new ArrayList<Map<Quiz, Quiz>>();
+
         Map<Integer,Object> questions = new HashMap<>();
         int i=0;
         try{
