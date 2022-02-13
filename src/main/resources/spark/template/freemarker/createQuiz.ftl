@@ -47,11 +47,11 @@
                         <label class="padding2right col-3" for="1a">Quiz Name:</label>
 
                         <input required pattern="\S.*\S" name="quizName" class="form-control col-9" id="quizName" value="${quizName}">
-                        <input style="display:none" name="quizId" type="text" id="quizId" <#if quizId ??>value=${quizId!""}</#if>>
+<#--                        <input readonly style="display:none" name="quizId" type="text" id="quizId" value=${quizId!""}>-->
                     </div>
                     <div class="form-group mb-3" style="display: flex">
                         <label class="col-3" for="1b">Associated Lesson:</label>
-                        <select class="form-control col-9" name="linkedLesson" id="exampleSelect1" style="margin-right: 2%">
+                        <select required class="form-control col-9" name="linkedLesson" id="exampleSelect1" style="margin-right: 2%">
                             <option value=-1>None</option>
                             <#list lessons as lesson>
                                 <option value=${lesson.id}>${lesson.name}</option>
@@ -121,7 +121,7 @@
 <#--                        </#if>-->
                     </div>
 
-                    <button type="submit" name="action" value="Save" class="btn btn-primary" style="width:10rem; float:right;">
+                    <button type="submit" name="action" value="${quizId!-1}" class="btn btn-primary" style="width:10rem; float:right;">
                         Save
                     </button>
                 </div>

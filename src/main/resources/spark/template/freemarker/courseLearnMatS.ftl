@@ -50,7 +50,7 @@
                     <form action="/upload/${courseNumber}/${lesson.id}" method="post" enctype="multipart/form-data">
                         <label for="uploadFile" style="float:left; margin-top:10px; margin-left:5px; margin-right:1em;" name="lessonId" value="${lesson.id}"><b>Upload file for ${lesson.name}:</b></label>
                         <input type="file" class="small" id="inputGroupFile02" style="float: left;margin-top:10px;" name="uploadFile" value ="">
-                        <button type="submit" class="btn-download" style="float: left; margin-top: 8px; margin-left:-2em;" name="uploadButton" value=""><i class="fa fa-upload"></i></button>
+                        <button type="submit" class="btn-download" style="float: right; margin-top: 8px" name="uploadButton" value=""><i class="fa fa-upload"></i></button>
                     </form>
                 </div>
                 </#if>

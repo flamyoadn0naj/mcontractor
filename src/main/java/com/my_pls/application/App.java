@@ -419,7 +419,7 @@ public class App {
             if (edit == null || edit.contains("-1")) {
                 DataMapper.createQuiz(newQuiz, conn);
             } else{
-                newQuiz.quizId = Integer.parseInt(formFields.get("quizId"));
+                newQuiz.quizId = Integer.parseInt(formFields.get("action"));
                 DataMapper.updateQuiz(newQuiz, conn);
                 DataMapper.updateTotalMark(newQuiz,conn);
             }
@@ -486,6 +486,7 @@ public class App {
             Quiz quiz = DataMapper.viewSingleQuiz(Integer.parseInt(quizId),conn);
             map.put("tot",quiz.totalMark);
             map.put("min",quiz.MinMark);
+            map.put("lessonId", quiz.lessonId);
             if (edit == null || edit.contains("-1")){
                 map.put("e",-1);
                 map.put("questionName","");
@@ -533,7 +534,7 @@ public class App {
             }
             else
             {
-                int questionId = Integer.parseInt(formFields.get("questionId"));
+                int questionId = Integer.parseInt(formFields.get("action"));
                 newQuiz.questionId = questionId;
                 sess.removeAttribute("questionId");
                 DataMapper.updateQuestion(newQuiz,conn);
@@ -1046,7 +1047,7 @@ public class App {
             Map<String,String> formFields = extractFields(request.body());
             Connection conn = MySqlConnection.getConnection();
             Map<String, Object> map = Admin.postMethodFunctionality(formFields, conn);
-            if (map.containsKey("redirect") && (boolean) map.get(redirect)) {
+            if (map.containsKey("redirect") && (boolean) map.get("redirect")) {
                 conn.close();
                 response.redirect("/approval");
             }

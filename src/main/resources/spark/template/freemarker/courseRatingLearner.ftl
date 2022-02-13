@@ -55,7 +55,7 @@
                 <button
                         type="submit"
                         name="doneRating"
-                        class="btn btn-primary mb-3 col-2"
+                        class="btn btn-primary mb-3"
                         value="${courseId}"
                         style="float: right"
                 >
@@ -109,7 +109,7 @@
                 <button
                         type="submit"
                         name="doneRatingProf"
-                        class="btn btn-primary mb-3 col-2"
+                        class="btn btn-primary mb-3"
                         value="${profId}"
                         style="float: right"
                 >

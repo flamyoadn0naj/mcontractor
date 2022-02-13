@@ -62,7 +62,7 @@
                     <button
                             type="submit"
                             name="doneRating"
-                            class="btn btn-primary mb-3 col-2"
+                            class="btn btn-primary mb-3"
                             value="${learnerId}"
                             style="float: right"
                     >
@@ -79,7 +79,7 @@
                         <tr>
                             <th scope="row">${v.name}</th>
                             <td>
-                                <button type="submit" name="rateLearner" class="btn btn-primary mb-3 col-2" value="${k}">
+                                <button type="submit" name="rateLearner" class="btn btn-primary mb-3" value="${k}">
                                     Rate
                                 </button>
                             </td>
