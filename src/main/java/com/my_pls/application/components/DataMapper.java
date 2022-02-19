@@ -1369,7 +1369,7 @@ public class DataMapper {
                 LocalDate endDate = LocalDate.parse(details.get("end_date").toString());
                 String e = endDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
                 DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm");
-                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:m a");
+                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:mm a");
                 LocalTime startTime = LocalTime.parse(String.valueOf(details.get("start_time").toString()), df);
                 String st = startTime.format(df2);
                 LocalTime endTime = LocalTime.parse(String.valueOf(details.get("end_time").toString()), df);
