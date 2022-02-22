@@ -482,44 +482,48 @@ public class App {
             String edit = request.queryParams("e");
             String quizId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("quizId")));
             map.put("quizId",quizId);
-            Map<String, Object> question = null;
+
             Quiz quiz = DataMapper.viewSingleQuiz(Integer.parseInt(quizId),conn);
             map.put("tot",quiz.totalMark);
             map.put("min",quiz.MinMark);
             map.put("lessonId", quiz.lessonId);
             if (edit == null || edit.contains("-1")){
                 map.put("e",-1);
-                map.put("questionName","");
                 map.put("mark",0);
                 map.put("title", "Create");
             }else{
                 map.put("e",1);
                 String questionId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId")));
-                question = DataMapper.getQuestion(Integer.parseInt(questionId), conn);
+                Map<String, Object> question = DataMapper.getQuestion(Integer.parseInt(questionId), conn);
+                Object questionText = question.get("questionText");
                 sess.attribute("questionId",question);
-                map.put("title","Modify "+question.get("questionText"));
+                map.put("title","Modify "+questionText);
+                map.put("questionText",questionText);
+                map.put("question",question);
+                map.put("questionId",questionId);
             }
-            map.put("question",question);
+
             conn.close();
             return new ModelAndView(map,"question.ftl");
         }),engine);
 
         post("/course/create-question",((request, response) -> {
-
             Map<String,Object> map = new HashMap<>();
+            Map<String,String> formFields = extractFields(request.body());
             Session sess = request.session();
             int id = sess.attribute("id");
 
-            Map<String,String> formFields = extractFields(request.body());
             Quiz newQuiz = new Quiz();
             String courseId = request.queryParams("courseId");
             courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
             Connection conn = MySqlConnection.getConnection();
-
+            System.out.println(formFields);
             String edit = request.queryParams("e");
+
             String quizId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("quizId")));
+
             newQuiz.questionText = URLDecoder.decode(formFields.get("QText"), "UTF-8");
-            System.out.println(newQuiz.questionText);
+
             newQuiz.mark = Integer.parseInt(formFields.get("marks"));
             newQuiz.quizId = Integer.parseInt(quizId);
             newQuiz.responseA = URLDecoder.decode(formFields.get("QA"), "UTF-8");
