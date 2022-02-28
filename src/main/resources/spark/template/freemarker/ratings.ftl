@@ -44,7 +44,7 @@
                         <div style="margin-top: 2%">
                             <table class="table table-bordered">
                                 <tr class="table-primary">
-                                    <th scope="col">Professor</th>
+                                    <th scope="col">Learner</th>
                                     <th scope="col">Rating</th>
                                     <th scope="col">Feedback</th>
                                 </tr>
