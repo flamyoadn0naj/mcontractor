@@ -384,7 +384,8 @@ public class App {
                 map.put("quizName","");
                 map.put("minMark",0);
                 map.put("title", "Create");
-            }else{
+            }
+            if (edit.contains("1")){
                 map.put("e",1);
                 int quizIdInt = Integer.parseInt(quizId);
                 map.put("quizId",quizId);
@@ -395,6 +396,11 @@ public class App {
                 map.put("quizName",quizEdit.quizName);
                 map.put("minMark",quizEdit.MinMark);
                 map.put("title","Modify");
+            }
+            if (edit.contains("d")){
+                quizEdit.quizId = Integer.parseInt(quizId);
+                DataMapper.deleteQuiz(quizEdit,conn);
+                response.redirect("/course/quiz/"+courseId+"/");
             }
 
             map.put("lessons",DataMapper.getLessonsByCourseId(Integer.parseInt(courseId), conn));
