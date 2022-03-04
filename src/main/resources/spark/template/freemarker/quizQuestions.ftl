@@ -57,7 +57,9 @@
                                     <td>${c.mark}</td>
                                     <td>
                                         <#if role == "prof">
+
                                             <a href="/course/create-question?quizId=${c.quizId}&questionId=${k}&courseId=${courseId}&e=1" class="btn btn-primary" style="float: left"><i class="fa fa-edit"></i></a>
+                                            <a href="/course/create-question?quizId=${c.quizId}&questionId=${k}&courseId=${courseId}&e=d" class="btn btn-primary" style="float: left"><i class="fa fa-trash"></i></a>
                                         <#else>
                                             <#if c.status == 1>
                                                 <button type="button" class="btn btn-primary">Take</button>

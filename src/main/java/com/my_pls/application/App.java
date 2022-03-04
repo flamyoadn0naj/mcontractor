@@ -491,7 +491,8 @@ public class App {
                 map.put("e",-1);
                 map.put("mark",0);
                 map.put("title", "Create");
-            }else{
+            }
+            if (edit.contains("1")){
                 map.put("e",1);
                 String questionId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId")));
                 Map<String, Object> question = DataMapper.getQuestion(Integer.parseInt(questionId), conn);
@@ -501,6 +502,11 @@ public class App {
                 map.put("questionText",questionText);
                 map.put("question",question);
                 map.put("questionId",questionId);
+            }
+            if (edit.contains("d")){
+                quiz.questionId = Integer.parseInt(String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId"))));
+                DataMapper.deleteQuestion(quiz,conn);
+                response.redirect("/course/quiz/"+courseId+"/"+quizId);
             }
 
             conn.close();

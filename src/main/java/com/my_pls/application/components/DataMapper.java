@@ -773,6 +773,19 @@ public class DataMapper {
         return flag;
     }
 
+    public static boolean deleteQuestion(Quiz question1, Connection conn) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("delete from quiz_questions where questionId=?");
+            pst.setInt(1, question1.questionId);
+            int i = pst.executeUpdate();
+            if (i != 0) flag = true;
+        } catch(Exception e) {
+            System.out.println("Exception at deleteQuestion " + e);
+        }
+        return flag;
+    }
+
     public static boolean updateQuiz(Quiz question1, Connection conn) {
         boolean flag = false;
         try {
