@@ -26,7 +26,8 @@ public class Home {
         } else courses.putAll(allCourses);
 
         groups = DataMapper.getMyDiscussionGroups(id);
-        if (groups.size() > 5) groups = (ArrayList<Map<String, Object>>) groups.subList(0, 5);
+
+        if (groups.size() > 5) groups = new ArrayList<>(groups.subList(0, 5));
         rating = DataMapper.getRatingAndFeedbackOfUserGivenUserId(id, "", "");
     }
 

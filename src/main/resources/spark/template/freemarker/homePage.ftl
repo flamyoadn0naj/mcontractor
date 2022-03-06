@@ -6,6 +6,7 @@
     <link rel="stylesheet"  href="/css/_variables.scss">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Homepage - MyPLS</title>
 </head>
 <body>
     <#include  "navbar.ftl">
@@ -34,7 +35,7 @@
                     <#if courses??>
                     <ul class="list-group list-group-flush">
                         <#list courses as k,c>
-                            <li class="list-group-item"><a class="text-muted" href="course/about/${k}">${c.name}</a></li>
+                            <li class="list-group-item"><a class="text-muted" style="font-weight: bold" href="course/about/${k}">${c.name}</a></li>
                         </#list>
                     </ul>
                     <#else>

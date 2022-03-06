@@ -54,24 +54,7 @@ public class App {
         uploadDir.mkdir(); // create the upload directory if it doesn't exist
         //folder is at the same hierarchy level as main
         staticFiles.externalLocation("uploadFolder");
-////        Quiz testQ = new Quiz();
-////        testQ.lessonId = 111;
-//////        testQ.quizName = "test1";
-//////        DataMapper.createQuiz(testQ);
-////        DataMapper.viewQuizzes(111);
-////        testQ.quizId = 11;
-////        testQ.questionId = 1;
-////        testQ.questionText = "First Q123";
-////        testQ.lessonId = 111;
-////        testQ.answer = "C";
-////        testQ.mark = 50;
-////        testQ.responseA = "shello1";
-////        testQ.responseB = "hsello1";
-////        testQ.responseC = "helslo123";
-////        testQ.responseD = "hesllo1234";
-//////        DataMapper.createQuestion(testQ);
-//////        DataMapper.getQuestions(testQ);
-//        if (DataMapper.updateQuestion(testQ)) System.out.println("done");
+
         internalServerError((request, response) -> {
             response.redirect("/err");
             return "{\"message\":\"Server Error\"}";
@@ -203,7 +186,12 @@ public class App {
                 ArrayList<Map<String,Object>> groups = home.getGroups();
                 if (!courses.isEmpty()) map.put("courses", home.getCourses());
                 if(!groups.isEmpty()) map.put("groups", home.getGroups());
-                if (!rating.isEmpty()) map.put("rating", home.getRating());
+                if (!rating.isEmpty()) {
+                    map.put("rating", home.getRating());
+                    if (((ArrayList<String>) rating.get("feedback")).size() > 5) {
+                        map.put("seeMore", true);
+                    }
+                }
             }
             return new ModelAndView(map,"homePage.ftl");
         }),engine);
@@ -319,29 +307,75 @@ public class App {
             response.redirect("/course/learnMat/"+courseId);
             return null;
         });
-        get("/course/quiz/:courseId",((request, response) -> {
-            Map<String,Object> map = new HashMap<>();
-            Session sess = request.session();
 
-            int courseId = 111; //sess.attribute("id");
-            map.put("role", sess.attribute("role"));
-            Map<Integer, Object>  quizzes = Quiz.getQuizzes(courseId);
-            if (!quizzes.isEmpty()) map.put("quizzes",quizzes);
+        get("/course/quiz/:courseId",((request, response) -> {
+
+             Map<String,Object> map = new HashMap<>();
+             Session sess = request.session();
+             int id = sess.attribute("id");
+             String courseId = request.params(":courseId");
+             Map<String,Object> course = Courses.getCourse(courseId);
+             if((int)course.get("prof_id") == id) map.put("role", "prof");
+             else map.put("role","learner");
+             map.put("courseId", courseId);
+             map.put("name", course.get("name"));
+            Map<Integer, Object>  quizzes = Quiz.getQuizzes(Integer.parseInt(courseId));
+                if (!quizzes.isEmpty()) map.put("quizzes",quizzes);
 
             return new ModelAndView(map,"courseQuiz.ftl");
-
-            // Map<String,Object> map = new HashMap<>();
-            // Session sess = request.session();
-            // int id = sess.attribute("id");
-            // String courseId = request.params(":courseId");
-            // Map<String,Object> course = Courses.getCourse(courseId);
-            // if((int)course.get("prof_id") == id) map.put("role", "prof");
-            // else map.put("role","learner");
-            // map.put("courseId", courseId);
-            // map.put("name", course.get("name"));
-            // return new ModelAndView(map,"courseQuiz.ftl");
-
         }),engine);
+
+        get("/course/:courseId/create-quiz",((request, response) -> {
+//            Session sess = request.session();
+//            String role = sess.attribute("role").toString();
+//            Map<String,String> map = new HashMap<>();
+//            String courseId = request.params(":courseId");
+//            System.out.println(request.queryParams("courseId"));
+//            map.put("role", role);
+            Map<String,Object> map = new HashMap<>();
+            Session sess = request.session();
+            int id = sess.attribute("id");
+            String courseId = request.params(":courseId");
+            Map<String,Object> course = Courses.getCourse(courseId);
+            if((int)course.get("prof_id") == id) map.put("role", "prof");
+            else map.put("role","learner");
+            map.put("courseId", courseId);
+            map.put("name", course.get("name"));
+            map.put("e",-1);
+            map.put("lessons",DataMapper.getLessonsByCourseId(Integer.parseInt(courseId)));
+
+            return new ModelAndView(map,"createQuiz.ftl");
+        }),engine);
+
+        post("/course/:courseId/create-quiz",((request, response) -> {
+            Map<String,String> formFields = extractFields(request.body());
+            Quiz newQuiz = new Quiz();
+            String courseId = request.params(":courseId");
+            newQuiz.lessonId = Integer.parseInt(formFields.get("linkedLesson"));
+            newQuiz.quizName = URLDecoder.decode(formFields.get("quizName"), "UTF-8");
+            newQuiz.MinMark = Integer.parseInt(formFields.get("minMark"));
+            Map<String,Object> map = new HashMap<>();
+            Session sess = request.session();
+            if (DataMapper.createQuiz(newQuiz)){
+                response.redirect("/course/quiz/"+courseId);
+            }
+            else{
+                response.redirect("/err");
+            }
+            return new ModelAndView(map,"createQuiz.ftl");
+            
+        }),engine);
+
+        post("/course/add/:courseId", (request,response)-> {
+            Session sess = request.session();
+            int id = sess.attribute("id");
+            String courseId = request.params(":courseId");
+            Map<String,Object> course = Courses.getCourse(courseId);
+            if((int)course.get("prof_id") != id) response.redirect("/err");
+            DataMapper.createLesson("New Lesson","Lesson Requirements", Integer.parseInt(request.params(":courseId")));
+            response.redirect("/course/learnMat/"+courseId);
+            return null;
+        });
 
         get("/course/grades/:courseId",((request, response) -> {
             Map<String,Object> map = new HashMap<>();
@@ -390,8 +424,35 @@ public class App {
             Map<String,Object> course = Courses.getCourse(courseId);
             if((int)course.get("prof_id") == id) map.put("role", "prof");
             else map.put("role","learner");
+            Map<String,Object> rating = DataMapper.getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"");
+            if (!rating.isEmpty()) map.put("course_rate", rating);
+            rating = DataMapper.getRatingAndFeedbackOfUserGivenUserId((int)course.get("prof_id"), "", "");
+            if (!rating.isEmpty()) map.put("prof", rating);
             map.put("courseId", courseId);
             map.put("name", course.get("name"));
+            map.put("profId", course.get("prof_id"));
+            return new ModelAndView(map,"courseRate.ftl");
+        }),engine);
+
+        post("/course/rate/:courseId",((request, response) -> {
+            Session sess = request.session();
+            Map<String,Object> map = new HashMap<>();
+            int id = sess.attribute("id");
+            String courseId = request.params(":courseId");
+            Map<String,Object> course = Courses.getCourse(courseId);
+            if((int)course.get("prof_id") == id) map.put("role", "prof");
+            else map.put("role","learner");
+            Map<String,String> formFields = extractFields(request.body());
+            boolean flag = Courses.addRating(formFields, courseId);
+            if (flag) map.put("success", true);
+            else map.put("err", true);
+            Map<String,Object> rating = DataMapper.getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"");
+            if (!rating.isEmpty()) map.put("course_rate", rating);
+            rating = DataMapper.getRatingAndFeedbackOfUserGivenUserId((int)course.get("prof_id"), "", "");
+            if (!rating.isEmpty()) map.put("prof", rating);
+            map.put("courseId", courseId);
+            map.put("name", course.get("name"));
+            map.put("profId", course.get("prof_id"));
             return new ModelAndView(map,"courseRate.ftl");
         }),engine);
 
@@ -419,10 +480,6 @@ public class App {
             Map<String,Object> map = new HashMap<>();
             if (formFields.containsKey("filterBy")) map = Courses.getMethodDefaults(formFields.get("filterBy"));
             else map = Courses.getMethodDefaults("");
-//            if (formFields.containsKey("pre-reqs")) {
-//                System.out.println(formFields);
-//                map.put("prereq", true);
-//            }
             Map<String, Object> finalMap = map;
             map.forEach((k, v)-> finalMap.put(k,v));
             map.put("role",role);
@@ -482,6 +539,7 @@ public class App {
             map.put("obj","");
             map.put("profList", DataMapper.findAllProfs());
             map.put("e",-1);
+            map.put("title","Create Course");
             Map<Integer, String> allCourses = CreateCourse.allCourses();
             String e_id = request.queryParams("e");
             if (e_id != null) {
@@ -495,6 +553,7 @@ public class App {
                 map.put("course_id", map.get("prereq_course"));
                 map.put("prereqs", allCourses);
                 map.put("headingChange", true);
+
             } else {
                 LinkedHashMap<String, Boolean> days = CreateCourse.findAllDays();
                 System.out.println(days);
@@ -524,13 +583,7 @@ public class App {
             return new ModelAndView(map,"createCourse.ftl");
         },engine);
 
-        get("/course/create-quiz",((request, response) -> {
-            Session sess = request.session();
-            String role = sess.attribute("role").toString();
-            Map<String,String> map = new HashMap<>();
-            map.put("role", role);
-            return new ModelAndView(map,"createQuiz.ftl");
-        }),engine);
+
 
         get("/enroll",((request, response) -> {
             Session sess = request.session();

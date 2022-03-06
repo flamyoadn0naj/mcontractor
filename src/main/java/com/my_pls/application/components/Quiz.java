@@ -1,5 +1,6 @@
 package com.my_pls.application.components;
 
+import com.my_pls.Lesson;
 import com.my_pls.MySqlConnection;
 
 import java.util.ArrayList;
@@ -20,12 +21,14 @@ public class Quiz {
     public String responseD;
     public String answer;
 
-    public static Map<Integer, Object> getQuizzes(int lessonId) {
+    public static Map<Integer, Object> getQuizzes(int courseId) {
         Map<Integer,Object> quizzes = new HashMap<>();
-        Map<Integer,Object> MyQuizzes = DataMapper.viewQuizzes(lessonId);
 
-        quizzes.putAll(MyQuizzes);
-
+        ArrayList<Lesson> lessons = DataMapper.getLessonsByCourseId(courseId);
+        for (Lesson lesson:lessons){
+            Map<Integer,Object> MyQuizzes = DataMapper.viewQuizzes(lesson.getId());
+            quizzes.putAll(MyQuizzes);
+        }
         return quizzes;
     }
 

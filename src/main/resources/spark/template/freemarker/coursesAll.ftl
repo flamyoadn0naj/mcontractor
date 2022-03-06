@@ -6,6 +6,7 @@
     <link rel="stylesheet"  href="/css/_variables.scss">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Courses - MyPLS</title>
 </head>
 <body>
 <#include "navbar.ftl">
@@ -14,7 +15,7 @@
         <h2 class="card-header border-primary text-black-50 mb-3">
             Courses
         </h2>
-        <div style="width: 90%; margin-left: 2%">
+        <div style="width: 96%; margin-left: 2%">
             <ul class="nav nav-tabs mb-3">
                 <li class="nav-item">
                     <a class="nav-link active" data-toggle="tab" href="/courses/all">All Courses</a>
@@ -49,41 +50,47 @@
                     </div>
                 </div>
             </form>
-            <table class="table table-bordered">
-                <tr class="table-primary">
-                    <th scope="col">Name</th>
-                    <th scope="col">Professor</th>
-                    <th scope="col">Prerequisites</th>
-                    <th scope="col">Start Date</th>
-                    <th scope="col">End Date</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Actions</th>
-                </tr>
-                <#if courses??>
-                    <#list courses as c>
-                        <tr>
-                            <th scope="row"><div class="text-muted">${c.name}</div></th>
-                            <td>${c.prof}</td>
-                            <td style="text-align: center">${c.prereq}</td>
-                            <td>${c.startDate}</td>
-                            <td>${c.endDate}</td>
-                            <td>${c.status}</td>
-                            <#if c.status == "Upcoming">
-                                <td>
-                                    <a class="btn-download padding2right" href="/courses/all?edit=${c.id}"><i class="fa fa-edit"></i></a>
-                                    <a class="btn-download" href="/courses/all?del=${c.id}"><i class="fa fa-trash"></i></a>
-                                </td>
-                            <#elseif c.status == "Current">
-                                <td>
-                                    <a class="btn-download padding2right" href="/courses/all?edit=+${c.id}"><i class="fa fa-edit"></i></a>
-                                </td>
-                            <#else >
-                                <td></td>
-                            </#if>
-                        </tr>
-                    </#list>
-                </#if>
-            </table>
+            <div class="table-responsive text-nowrap">
+                <table class="table table-bordered w-auto">
+                    <tr class="table-primary">
+                        <th scope="col" style="position: sticky">Name</th>
+                        <th scope="col">Professor</th>
+                        <th scope="col">Prerequisites</th>
+                        <th scope="col">Start Date</th>
+                        <th scope="col">End Date</th>
+                        <th scope="col">Meeting Days</th>
+                        <th scope="col">Meeting Time</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                    <#if courses??>
+                        <#list courses as c>
+                            <tr>
+                                <th scope="row" style="position: sticky"><div class="text-muted">${c.name}</div></th>
+                                <td >${c.prof}</td>
+                                <td style="text-align: center">${c.prereq}</td>
+                                <td>${c.startDate}</td>
+                                <td>${c.endDate}</td>
+                                <td>${c.meeting_days}</td>
+                                <td>${c.startTime} - ${c.endTime}</td>
+                                <td>${c.status}</td>
+                                <#if c.status == "Upcoming">
+                                    <td>
+                                        <a class="btn-download padding2right" href="/courses/all?edit=${c.id}"><i class="fa fa-edit"></i></a>
+                                        <a class="btn-download" href="/courses/all?del=${c.id}"><i class="fa fa-trash"></i></a>
+                                    </td>
+                                <#elseif c.status == "Current">
+                                    <td>
+                                        <a class="btn-download padding2right" href="/courses/all?edit=${c.id}"><i class="fa fa-edit"></i></a>
+                                    </td>
+                                <#else >
+                                    <td></td>
+                                </#if>
+                            </tr>
+                        </#list>
+                    </#if>
+                </table>
+            </div>
             <#if !courses??>
                 <div style="margin-left: 2%"> No Results Found</div>
             </#if>

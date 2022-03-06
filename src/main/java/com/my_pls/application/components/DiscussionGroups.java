@@ -72,7 +72,7 @@ public class DiscussionGroups {
 
     public static Map<String, Object> postMethodFunctionality (Map<String, String> formFields, int id) {
         Map<String,Object> map = new HashMap<>();
-        ArrayList<Map<String,Object>> groups = DataMapper.getMyDiscussionGroups(141);
+        ArrayList<Map<String,Object>> groups = DataMapper.getMyDiscussionGroups(id);
         Map<Integer, String> searchOptions = getSearchOptions("");
         Map<Integer,Map<String, Object>> allGroups = getGroups("", -1, id);
         Map<Integer, Object> requestedGroups = DataMapper.getPendingGroupRequests(id);
