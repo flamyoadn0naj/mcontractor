@@ -4,6 +4,7 @@ import com.my_pls.securePassword;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ public class ForgetPassword {
         return map;
     }
 
-    public static Map<String,Object> postMethodDefaults(String pageType, Map<String,String> formFields, securePassword pwd_manager) {
+    public static Map<String,Object> postMethodDefaults(String pageType, Map<String, String> formFields, securePassword pwd_manager, Connection conn) {
         Map<String,Object> map = new HashMap<>();
         if (pageType.equals("email")) {
             map.put("errorPassMatch", "");
@@ -30,7 +31,7 @@ public class ForgetPassword {
                 map.put("success", "false");
                 map.put("succMsg", "");
             } else {
-                boolean flag = DataMapper.forgetPasswordSendEmail(email);
+                boolean flag = DataMapper.forgetPasswordSendEmail(email, conn);
                 if(!flag) {
                     map.put("errorEmail", "display:block;margin-left:5%; width:90%");
                     map.put("emailVal", "");
@@ -60,7 +61,7 @@ public class ForgetPassword {
             if (formFields.get("pass").equals(formFields.get("retPass")) && formFields.get("pass").length() >= 6 && confirmCode.length() == 4) {
                 String newPassword = formFields.get("pass");
                 newPassword = pwd_manager.hashPassword(newPassword);
-                boolean flag = DataMapper.changePassword(confirmCode, email, newPassword);
+                boolean flag = DataMapper.changePassword(confirmCode, email, newPassword, conn);
                 if (flag) {
                     map.put("errorPassMatch", "");
                     map.put("success", "true");

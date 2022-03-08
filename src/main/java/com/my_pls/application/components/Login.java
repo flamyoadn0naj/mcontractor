@@ -30,7 +30,7 @@ public class Login {
     }
 
 
-    public static Pair postMethodDefaults(Map<String, Object> map, Map<String,String> formFields, User user, securePassword pwd_manager) {
+    public static Pair postMethodDefaults(Map<String, Object> map, Map<String, String> formFields, User user, securePassword pwd_manager, Connection conn) {
         if (formFields.size() > 0) {
             if (!formFields.get("email").contains("rit.edu")) {
                 map.put("errorEmail", "display:list-item;margin-left:5%");
@@ -44,13 +44,13 @@ public class Login {
                     e.printStackTrace();
                 }
                 String input_password = formFields.get("pass");
-                user = DataMapper.login(input_password, emVal, pwd_manager);
+                user = DataMapper.login(input_password, emVal, pwd_manager, conn);
                 if (user.firstName.isEmpty()) {
                     map.put("loginErr", "display:list-item;margin-left:5%");
                     map.put("errorEmail", "");
                     map.put("emailVal", emVal);
                 } else {
-                    DataMapper.updateCourses();
+                    DataMapper.updateCourses(conn);
                     map.put("loginErr", "");
                     map.put("errorEmail", "");
                     map.put("emailVal", emVal);

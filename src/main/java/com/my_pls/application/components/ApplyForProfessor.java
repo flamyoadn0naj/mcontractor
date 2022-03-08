@@ -35,12 +35,12 @@ public class ApplyForProfessor {
         return map;
     }
 
-    public static Map<String, Object> postMethodFunctionality(Map<String,String> formFields,
-                                                              String fname, String lname, String email) {
+    public static Map<String, Object> postMethodFunctionality(Map<String, String> formFields,
+                                                              String fname, String lname, String email, Connection conn) {
         Map<String,Object> map = checkForErrors(fname, lname, formFields);
         boolean err = (boolean) map.get("applyProfErr");
         if (!err) {
-            String applied = DataMapper.applyProf(email);
+            String applied = DataMapper.applyProf(email, conn);
             if (applied.equals("true")) {
                 map.put("success", true);
                 map.put("disable",true);

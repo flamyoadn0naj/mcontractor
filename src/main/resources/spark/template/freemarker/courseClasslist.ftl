@@ -45,31 +45,44 @@
                         <th scope="col">Email</th>
                         <th scope="col">Role</th>
                     </tr>
-                    <tr>
-                        <th scope="row">Maheen Riaz Contractor</th>
-                        <td>mc1927@rit.edu</td>
-                        <td>Student</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Tharindu Cyril Weerasooriya</th>
-                        <td>tw3318@rit.edu</td>
-                        <td>Student</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Malcolm Lambrecht</th>
-                        <td>jml1769@rit.edu</td>
-                        <td>Student</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Saad Hassan</th>
-                        <td>sh2513@rit.edu</td>
-                        <td>Student</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">AbdulMutalib Wahaishi</th>
-                        <td>tawvse@rit.edu</td>
-                        <td>Professor</td>
-                    </tr>
+                    <#list classList as k,v>
+                        <tr>
+                            <th scope="row">${v.name}</th>
+                            <td>${v.email}</td>
+                            <td>
+                            <#if k == profId>
+                            Professor
+                            <#else>
+                            Learner
+                            </#if>
+                            </td>
+                        </tr>
+                    </#list>
+<#--                    <tr>-->
+<#--                        <th scope="row">Maheen Riaz Contractor</th>-->
+<#--                        <td>mc1927@rit.edu</td>-->
+<#--                        <td>Student</td>-->
+<#--                    </tr>-->
+<#--                    <tr>-->
+<#--                        <th scope="row">Tharindu Cyril Weerasooriya</th>-->
+<#--                        <td>tw3318@rit.edu</td>-->
+<#--                        <td>Student</td>-->
+<#--                    </tr>-->
+<#--                    <tr>-->
+<#--                        <th scope="row">Malcolm Lambrecht</th>-->
+<#--                        <td>jml1769@rit.edu</td>-->
+<#--                        <td>Student</td>-->
+<#--                    </tr>-->
+<#--                    <tr>-->
+<#--                        <th scope="row">Saad Hassan</th>-->
+<#--                        <td>sh2513@rit.edu</td>-->
+<#--                        <td>Student</td>-->
+<#--                    </tr>-->
+<#--                    <tr>-->
+<#--                        <th scope="row">AbdulMutalib Wahaishi</th>-->
+<#--                        <td>tawvse@rit.edu</td>-->
+<#--                        <td>Professor</td>-->
+<#--                    </tr>-->
                 </table>
                 </div>
             </div>
