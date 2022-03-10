@@ -87,15 +87,13 @@
                             </#list>
                         </#if>
                         </div>
-                        <div class="mb-2" style="margin-left: 10%">
+                        <div class="mb-2" style="margin-left: 10%; overflow-y: scroll; height: 230px">
                             <ul class="list-group list-group-flush">
                             <#list rating.feedback as f>
-                                <#if f?counter < 5>
-                                    <li class="list-group-item" style="display: flex">
+                                <li class="list-group-item" style="display: flex">
                                     <div> ${f?counter}. </div>
                                     <div style="margin-left: 4%">${f}</div>
-                                    </li>
-                                </#if>
+                                </li>
                             </#list>
                             </ul>
                         </div>
