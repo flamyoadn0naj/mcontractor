@@ -31,9 +31,11 @@
         </h2>
         <div  style="width: 95%">
             <#if status == "yes">
+                <form method="get" action="/discussion/create-post/${id}">
                 <button class="btn btn-primary col-2 text-white" style="float:right" type="submit">
-                    <a href="/discussion/create-post/${id}" class="text-white">Create Post</a>
+                    Create Post
                 </button>
+                </form>
                 <#if !group.course??>
                     <form method="post" action="/discussion/group-desc/${id}">
                         <button class="btn btn-primary col-2 text-white" style="float:left; margin-left: 2%"

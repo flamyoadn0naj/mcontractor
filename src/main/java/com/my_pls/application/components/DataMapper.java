@@ -1,5 +1,6 @@
 package com.my_pls.application.components;
 
+import com.my_pls.DiscussionPost;
 import com.my_pls.Lesson;
 import com.my_pls.securePassword;
 import com.my_pls.sendEmail;
@@ -1382,5 +1383,33 @@ public class DataMapper {
             System.out.println("Exception at getNameFromUserId " + e);
         }
         return name;
+    }
+
+    public static ArrayList<DiscussionPost> getDGPostsById(int dgId, Connection conn){
+        ArrayList<DiscussionPost> allPosts = new ArrayList<>();
+        try {
+            PreparedStatement pst = conn.prepareStatement("select * from lessons where courseId="+ dgId);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                Lesson temp = new Lesson(rs.getInt("Id"),
+                        rs.getString("name"),
+                        rs.getString("requirements"));
+                temp.materials = getLearningMaterialsByLessonId(rs.getInt("Id"), conn);
+                //System.out.println(rs.getString("requirements"));
+                //allPosts.add(temp);
+                System.out.println(temp.name);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at getPendingGroupRequests " + e);
+        }
+        //System.out.println(allLessons);
+        return allPosts;
+    }
+
+    public static void createDGPost(int groupId, int userId, String postName, String postContent){
+        //group_id
+        //user_id
+        //post_content
+        //post_time
     }
 }

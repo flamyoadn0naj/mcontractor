@@ -317,6 +317,8 @@ public class App {
 
             }else if(formFields.containsKey("deleteLMButton")){
                 DataMapper.deleteLearningMaterial(temp.getId(),URLDecoder.decode(formFields.get("deleteLMButton"),"UTF-8"), conn);
+            }else if(formFields.containsKey("shareButton")){
+                System.out.println("Share lesson!");
             }
             conn.close();
             response.redirect("/course/learnMat/"+courseId);
@@ -877,11 +879,26 @@ public class App {
             return new ModelAndView(map,"groupDesc.ftl");
         },engine);
 
-        get("/discussion/create-post",((request, response) -> {
+        get("/discussion/create-post/:dgId",((request, response) -> {
+            //need course and user Id
             Session sess = request.session();
             String role = sess.attribute("role").toString();
             Map<String,String> map = new HashMap<>();
             map.put("role", role);
+            map.put("dgName", "Test Name"); //CHANGE
+            map.put("dgId",URLDecoder.decode(request.params(":dgId"),"UTF-8"));
+            return new ModelAndView(map,"discussionPost.ftl");
+        }),engine);
+
+        post("/discussion/create-post/:dgId",((request, response) -> {
+            Session sess = request.session();
+            String role = sess.attribute("role").toString();
+            Map<String,String> map = new HashMap<>();
+            map.put("role", role);
+            map.put("dgName", "Test Name"); //CHANGE
+            map.put("dgId",URLDecoder.decode(request.params(":dgId"),"UTF-8"));
+            Map<String,String> formFields = extractFields(request.body());
+            System.out.println(formFields);
             return new ModelAndView(map,"discussionPost.ftl");
         }),engine);
 
