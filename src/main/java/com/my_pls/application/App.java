@@ -8,6 +8,7 @@ import spark.template.freemarker.FreeMarkerEngine;
 
 //things for file upload
 import javax.servlet.MultipartConfigElement;
+import javax.xml.crypto.Data;
 import java.io.*;
 
 //end things for file upload
@@ -137,6 +138,10 @@ public class App {
                 email = URLDecoder.decode(email,"UTF-8");
                 String hash = request.queryParams("key2");
                 boolean flag = DataMapper.verifyEmailofUser(email, hash, conn);
+                if (flag) {
+                    int id = DataMapper.getUserIdFromEmail(email, conn);
+                    DataMapper.addDGmember(id,311,conn);
+                }
             }
             conn.close();
             return new ModelAndView(map,"verifyRegister.ftl");
@@ -299,7 +304,6 @@ public class App {
                 String k = URLDecoder.decode(element.getKey(),"UTF-8");
                 String v = URLDecoder.decode(element.getValue(),"UTF-8");
                 if(k.equals(v)){
-                    //System.out.println("Adding: "+v);
                     temp.materials.add(v);
                 }
             }
@@ -360,12 +364,7 @@ public class App {
         }),engine);
 
         get("/course/:courseId/create-quiz",((request, response) -> {
-//            Session sess = request.session();
-//            String role = sess.attribute("role").toString();
-//            Map<String,String> map = new HashMap<>();
-//            String courseId = request.params(":courseId");
-//            System.out.println(request.queryParams("courseId"));
-//            map.put("role", role);
+
             Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
             int id = sess.attribute("id");
@@ -377,7 +376,29 @@ public class App {
             else map.put("role","learner");
             map.put("courseId", courseId);
             map.put("name", course.get("name"));
-            map.put("e",-1);
+            String edit = request.queryParams("e");
+            String quizId = request.queryParams("quizId");
+            ArrayList<Lesson> lessons = DataMapper.getLessonsByCourseId(Integer.parseInt(courseId), conn);
+            map.put("lessons",lessons);
+            Quiz quizEdit = new Quiz();
+            if (edit == null){
+                map.put("e",-1);
+                map.put("quizName","");
+                map.put("minMark",0);
+                map.put("title", "Create");
+            }else{
+                map.put("e",1);
+                int quizIdInt = Integer.parseInt(quizId);
+                map.put("quizId",quizId);
+                quizEdit =  DataMapper.viewSingleQuiz(quizIdInt,conn);
+                Lesson lesson = DataMapper.getLessonById(quizEdit.lessonId,conn);
+                map.put("currLesson",quizEdit.lessonId);
+                map.put("currLessonName", lesson.name);
+                map.put("quizName",quizEdit.quizName);
+                map.put("minMark",quizEdit.MinMark);
+                map.put("title","Modify");
+            }
+
             map.put("lessons",DataMapper.getLessonsByCourseId(Integer.parseInt(courseId), conn));
             if (Courses.allowRating(course)) map.put("viewRate", true);
             conn.close();
@@ -396,20 +417,137 @@ public class App {
             newQuiz.MinMark = Integer.parseInt(formFields.get("minMark"));
             Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
-            if (DataMapper.createQuiz(newQuiz, conn)){
-                conn.close();
-                response.redirect("/course/quiz/"+courseId);
+            String edit = request.queryParams("e");
+            if (edit == null || edit.contains("-1")) {
+                DataMapper.createQuiz(newQuiz, conn);
+            } else{
+                newQuiz.quizId = Integer.parseInt(formFields.get("action"));
+                DataMapper.updateQuiz(newQuiz, conn);
+                DataMapper.updateTotalMark(newQuiz,conn);
             }
-            else{
+            conn.close();
+            response.redirect("/course/quiz/"+courseId);
+
+            return null;
+
+        }),engine);
+
+        get("/course/quiz/:courseId/:quizId",((request, response) -> {
+            Map<String,Object> map = new HashMap<>();
+            Session sess = request.session();
+            int id = sess.attribute("id");
+
+            Connection conn = MySqlConnection.getConnection();
+            String courseId = request.params(":courseId");
+            courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
+            String quizId = request.params(":quizId");
+            quizId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(quizId));
+
+            Map<String,Object> course = Courses.getCourse(courseId, conn);
+
+            if((int)course.get("prof_id") == id) map.put("role", "prof");
+            else map.put("role","learner");
+            map.put("courseId", courseId);
+            Quiz quiz = DataMapper.viewSingleQuiz(Integer.parseInt(quizId),conn);
+            Map<Integer,Object> questions = DataMapper.getQuestions(quiz,conn);
+            map.put("quizName", quiz.quizName);
+            map.put("quiz",quiz);
+            map.put("quizId",quizId);
+            if (!questions.isEmpty()) {
+                map.put("questions",questions);
+                map.put("quizName", quiz.quizName);
+            }
+            conn.close();
+            return new ModelAndView(map,"quizQuestions.ftl");
+
+        }),engine);
+
+        get("/course/create-question",((request, response) -> {
+
+            Map<String,Object> map = new HashMap<>();
+            Session sess = request.session();
+            int id = sess.attribute("id");
+            Connection conn = MySqlConnection.getConnection();
+            String courseId = request.queryParams("courseId");
+            courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
+
+            Map<String,Object> course = Courses.getCourse(courseId, conn);
+
+            if((int)course.get("prof_id") == id) map.put("role", "prof");
+            else
+            {
                 conn.close();
                 response.redirect("/err");
             }
             map.put("courseId", courseId);
             map.put("name", course.get("name"));
-            if (Courses.allowRating(course)) map.put("viewRate", true);
-            return new ModelAndView(map,"createQuiz.ftl");
+            String edit = request.queryParams("e");
+            String quizId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("quizId")));
+            map.put("quizId",quizId);
+            Map<String, Object> question = null;
+            Quiz quiz = DataMapper.viewSingleQuiz(Integer.parseInt(quizId),conn);
+            map.put("tot",quiz.totalMark);
+            map.put("min",quiz.MinMark);
+            map.put("lessonId", quiz.lessonId);
+            if (edit == null || edit.contains("-1")){
+                map.put("e",-1);
+                map.put("questionName","");
+                map.put("mark",0);
+                map.put("title", "Create");
+            }else{
+                map.put("e",1);
+                String questionId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId")));
+                question = DataMapper.getQuestion(Integer.parseInt(questionId), conn);
+                sess.attribute("questionId",question);
+                map.put("title","Modify "+question.get("questionText"));
+            }
+            map.put("question",question);
+            conn.close();
+            return new ModelAndView(map,"question.ftl");
+        }),engine);
+
+        post("/course/create-question",((request, response) -> {
+
+            Map<String,Object> map = new HashMap<>();
+            Session sess = request.session();
+            int id = sess.attribute("id");
+
+            Map<String,String> formFields = extractFields(request.body());
+            Quiz newQuiz = new Quiz();
+            String courseId = request.queryParams("courseId");
+            courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
+            Connection conn = MySqlConnection.getConnection();
+
+            String edit = request.queryParams("e");
+            String quizId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("quizId")));
+            newQuiz.questionText = URLDecoder.decode(formFields.get("QText"), "UTF-8");
+            System.out.println(newQuiz.questionText);
+            newQuiz.mark = Integer.parseInt(formFields.get("marks"));
+            newQuiz.quizId = Integer.parseInt(quizId);
+            newQuiz.responseA = URLDecoder.decode(formFields.get("QA"), "UTF-8");
+            newQuiz.responseB = URLDecoder.decode(formFields.get("QB"), "UTF-8");
+            newQuiz.responseC = URLDecoder.decode(formFields.get("QC"), "UTF-8");
+            newQuiz.responseD = URLDecoder.decode(formFields.get("QD"), "UTF-8");
+            newQuiz.answer = URLDecoder.decode(formFields.get("ans"), "UTF-8");
+            if (edit == null || edit.contains("-1"))
+            {
+                DataMapper.createQuestion(newQuiz,conn);
+                DataMapper.updateTotalMark(newQuiz,conn);
+            }
+            else
+            {
+                int questionId = Integer.parseInt(formFields.get("action"));
+                newQuiz.questionId = questionId;
+                sess.removeAttribute("questionId");
+                DataMapper.updateQuestion(newQuiz,conn);
+                DataMapper.updateTotalMark(newQuiz,conn);
+            }
+            conn.close();
+            response.redirect("/course/quiz/"+courseId+"/"+quizId);
+            return null;
 
         }),engine);
+
 
         post("/course/add/:courseId", (request,response)-> {
             Session sess = request.session();
@@ -421,6 +559,7 @@ public class App {
             if((int)course.get("prof_id") != id) response.redirect("/err");
             DataMapper.createLesson("New Lesson","Lesson Requirements", Integer.parseInt(request.params(":courseId")), conn);
             response.redirect("/course/learnMat/"+courseId);
+            conn.close();
             return null;
         });
 
@@ -847,7 +986,7 @@ public class App {
             map.put("group", group);
             map.put("role", role);
             map.put("members", members);
-            map.put("reqs", requests);
+            if (!requests.isEmpty()) map.put("reqs", requests);
             map.put("id", id);
             conn.close();
             return new ModelAndView(map,"groupDesc.ftl");
@@ -925,7 +1064,7 @@ public class App {
             Map<String,String> formFields = extractFields(request.body());
             Connection conn = MySqlConnection.getConnection();
             Map<String, Object> map = Admin.postMethodFunctionality(formFields, conn);
-            if (map.containsKey("redirect") && (boolean) map.get(redirect)) {
+            if (map.containsKey("redirect") && (boolean) map.get("redirect")) {
                 conn.close();
                 response.redirect("/approval");
             }

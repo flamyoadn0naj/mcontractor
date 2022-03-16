@@ -6,6 +6,7 @@
     <link rel="stylesheet"  href="/css/_variables.scss">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Enroll - MyPLS</title>
 </head>
 <body>
 <#include "navbar.ftl">
@@ -45,7 +46,7 @@
                                     <td>${c.state}</td>
                                     <td>${c.credits}</td>
                                     <td>${c.meeting_days}</td>
-                                    <td>${c.startTimeF} - ${c.endTimeF}</td>
+                                    <td>${c.startTime} - ${c.endTime}</td>
                                     <td>
                                         <#if c.rating??>
                                             <#if c.rating == 0>

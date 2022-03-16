@@ -6,6 +6,7 @@
     <link rel="stylesheet"  href="/css/_variables.scss">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Course Rate - MyPLS</title>
 </head>
 <body>
 <div class="space-between" style=" margin: 2% 0 0 7%">
@@ -49,12 +50,12 @@
                 </div>
                 <div class="mb-3" style="display: flex;margin-bottom: 2%">
                     <label style="margin-right: 2%" for="marks">Feedback</label>
-                    <input required type="text" name="feedback" class="form-control col-10" id="feedback">
+                    <input required pattern="\S.*\S" name="feedback" class="form-control col-10" id="feedback">
                 </div>
                 <button
                         type="submit"
                         name="doneRating"
-                        class="btn btn-primary mb-3 col-2"
+                        class="btn btn-primary mb-3"
                         value="${courseId}"
                         style="float: right"
                 >
@@ -103,12 +104,12 @@
                 </div>
                 <div class="mb-3" style="display: flex;margin-bottom: 2%">
                     <label style="margin-right: 2%" for="marks">Feedback</label>
-                    <input required type="text" name="feedback" class="form-control col-10" id="feedback">
+                    <input required pattern="\S.*\S" name="feedback" class="form-control col-10" id="feedback">
                 </div>
                 <button
                         type="submit"
                         name="doneRatingProf"
-                        class="btn btn-primary mb-3 col-2"
+                        class="btn btn-primary mb-3"
                         value="${profId}"
                         style="float: right"
                 >

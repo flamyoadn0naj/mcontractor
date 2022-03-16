@@ -15,7 +15,7 @@ public class DiscussionGroups {
         int privacy = Integer.parseInt(formFields.get("customRadio"));
         String name = null;
         try {
-            name = URLDecoder.decode(formFields.get("name"),"UTF-8");
+            name = URLDecoder.decode(formFields.get("name"),"UTF-8").trim();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -79,7 +79,12 @@ public class DiscussionGroups {
         Map<Integer, Object> requestedGroups = DataMapper.getPendingGroupRequests(id, conn);
 
         if (formFields.containsKey("searchText")) {
-            String searchText = formFields.get("searchText");
+            String searchText = null;
+            try {
+                searchText = URLDecoder.decode(formFields.get("searchText"), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
             String filter = formFields.get("filterBy");
             allGroups = getGroups(searchText, Integer.parseInt(filter), id, conn);
             searchOptions = getSearchOptions(filter);

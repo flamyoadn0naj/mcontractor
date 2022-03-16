@@ -37,8 +37,8 @@ public class Register {
         String email = URLDecoder.decode(formFields.get("email"),"UTF-8");
         String password = formFields.get("pass");
         password = pwd_manager.hashPassword(password);
-        String fName = URLDecoder.decode(formFields.get("firstName"),"UTF-8");
-        String lName = URLDecoder.decode(formFields.get("lastName"), "UTF-8");
+        String fName = URLDecoder.decode(formFields.get("firstName"),"UTF-8").trim();
+        String lName = URLDecoder.decode(formFields.get("lastName"), "UTF-8").trim();
 
 
         if (formFields.size() > 0) {

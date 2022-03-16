@@ -30,7 +30,7 @@ public class CreateCourse {
             String endTime = URLDecoder.decode(formFields.get("end_time"), "UTF-8");
             String startDate = formFields.get("start_date");
             String endDate = formFields.get("end_date");
-            String name = URLDecoder.decode(formFields.get("name"), "UTF-8");
+            String name = URLDecoder.decode(formFields.get("name"), "UTF-8").trim();
             prof_id = Integer.parseInt(formFields.get("prof"));
             String obj = URLDecoder.decode(formFields.get("obj"), "UTF-8");
             ArrayList<String> days = new ArrayList<String>();
@@ -65,6 +65,11 @@ public class CreateCourse {
                 map.put("start_time","");
                 map.put("end_time","");
                 flag = false;
+            }
+            if(name.length() == 0) {
+                flag = false;
+                map.put("nameErr", true);
+                map.put("name", "");
             }
             if (!edit.contentEquals("-1")) {
                 if(LocalDate.parse(endDate).isBefore(LocalDate.parse(startDate))) {

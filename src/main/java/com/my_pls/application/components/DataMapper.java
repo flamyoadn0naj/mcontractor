@@ -280,13 +280,15 @@ public class DataMapper {
                 prof = rs.getInt("profId");
 
             }
-            if(feedback.size() > 0) rating = rating / feedback.size();
-            int unchecked = 5 - rating;
-            ratingsObj.put("rating", rating);
-            ratingsObj.put("feedback", feedback);
-            ratingsObj.put("name", name);
-            ratingsObj.put("unchecked", unchecked);
-            ratingsObj.put("prof_id", prof);
+            if(feedback.size() > 0) {
+                rating = rating / feedback.size();
+                int unchecked = 5 - rating;
+                ratingsObj.put("rating", rating);
+                ratingsObj.put("feedback", feedback);
+                ratingsObj.put("name", name);
+                ratingsObj.put("unchecked", unchecked);
+                ratingsObj.put("prof_id", prof);
+            }
         } catch (Exception e) {
             System.out.println("Exception in getRatingAndFeedbackOfCourseGivenCourseId");
             System.out.println(e.getMessage());
@@ -536,7 +538,7 @@ public class DataMapper {
                 details.put("enrolled", String.valueOf(rs.getInt("enrolled")));
                 details.put("credits", String.valueOf(rs.getInt("credits")));
                 DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm");
-                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:m a");
+                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("hh:mm a");
                 LocalTime startTime = LocalTime.parse(String.valueOf(rs.getString("start_time")), df);
                 String st = startTime.format(df2);
                 LocalTime endTime = LocalTime.parse(String.valueOf(rs.getString("end_time")), df);
@@ -730,6 +732,7 @@ public class DataMapper {
     }
 
     public static boolean createQuestion(Quiz question1, Connection conn) {
+        question1.answer = question1.answer.toUpperCase();
         boolean flag = false;
         try {
             PreparedStatement pst = conn.prepareStatement("insert into quiz_questions (quizId,question,answer,mark,responseA,responseB,responseC,responseD) VALUES (?,?,?,?,?,?,?,?)");
@@ -740,8 +743,7 @@ public class DataMapper {
             pst.setString(5,question1.responseA);
             pst.setString(6, question1.responseB);
             pst.setString(7, question1.responseC);
-            pst.setString(8, question1.responseD);
-            int i = pst.executeUpdate();
+            pst.setString(8, question1.responseD);int i = pst.executeUpdate();
             if (i != 0) flag = true;
         } catch(Exception e) {
             System.out.println("Exception at createQuestion " + e);
@@ -751,6 +753,7 @@ public class DataMapper {
 
     public static boolean updateQuestion(Quiz question1, Connection conn) {
         boolean flag = false;
+        question1.answer = question1.answer.toUpperCase();
         try {
             PreparedStatement pst = conn.prepareStatement("update quiz_questions set question=?,answer=?,mark=?,responseA=?,responseB=?,responseC=?,responseD=? WHERE quizId=? and questionId=?");
 
@@ -771,34 +774,106 @@ public class DataMapper {
         return flag;
     }
 
-    public static ArrayList<Quiz> getQuestions(Quiz quiz, Connection conn){
-//        Quiz[] questions = new Quiz[MAXQUIZ]; //= new Quiz[0];
-//        ArrayList<Map<Quiz,Quiz>> questions = new ArrayList<Map<Quiz, Quiz>>();
-        ArrayList<Quiz> questions = new ArrayList<Quiz>();
+    public static boolean updateQuiz(Quiz question1, Connection conn) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("update quizzes set lessonId=?,name=?,minimumMarks=? WHERE Id=?");
+
+            pst.setInt(1, question1.lessonId);
+            pst.setString(2,question1.quizName);
+            pst.setInt(3,question1.MinMark);
+            pst.setInt(4,question1.quizId);
+            int i = pst.executeUpdate();
+            if (i != 0) {
+                flag = true;
+                pst.close();
+            }
+        } catch(Exception e) {
+            System.out.println("Exception at createQuestion " + e);
+        }
+        return flag;
+    }
+
+    public static int updateTotalMark(Quiz quiz, Connection conn){
+
+        Map<Integer,Object> questions = new HashMap<>();
+        int mark=0;
+        try{
+            PreparedStatement pst1 = conn.prepareStatement("select * from quiz_questions where quizId=?");
+            pst1.setInt(1,quiz.quizId);
+            ResultSet dbrs = pst1.executeQuery();
+            while (dbrs.next()){
+                Map<String, Object> question = new HashMap<>();
+                mark = mark + dbrs.getInt("mark");
+            }
+            dbrs.close();
+            pst1.close();
+            PreparedStatement pst2 = conn.prepareStatement("update quizzes set totalMarks=? WHERE Id=?");
+            pst2.setInt(1,mark);
+            pst2.setInt(2,quiz.quizId);
+            int i = pst2.executeUpdate();
+            if (i != 0) {
+                pst2.close();
+            }
+
+        } catch(Exception e) {
+            System.out.println("Exception at update mark " + e);
+        }
+        return mark;
+    }
+    public static Map<Integer,Object> getQuestions(Quiz quiz, Connection conn){
+
+        Map<Integer,Object> questions = new HashMap<>();
         int i=0;
         try{
             PreparedStatement pst1 = conn.prepareStatement("select * from quiz_questions where quizId=?");
             pst1.setInt(1,quiz.quizId);
             ResultSet dbrs = pst1.executeQuery();
             while (dbrs.next()){
-                Quiz question = new Quiz();
-                question.quizId = quiz.quizId;
-                question.questionId = dbrs.getInt("questionId");
-                question.questionText = dbrs.getString("question");
-                question.answer = dbrs.getString("answer");
-                question.mark = dbrs.getInt("mark");
-                question.responseA = dbrs.getString("responseA");
-                question.responseB = dbrs.getString("responseB");
-                question.responseC = dbrs.getString("responseC");
-                question.responseD = dbrs.getString("responseD");
-                questions.add(question);
-
+                Map<String, Object> question = new HashMap<>();
+                question.put("quizId",quiz.quizId);
+                question.put("questionId",dbrs.getInt("questionId"));
+                question.put("questionText",dbrs.getString("question"));
+                question.put("answer", dbrs.getString("answer"));
+                question.put("mark",dbrs.getInt("mark"));
+                question.put("responseA",dbrs.getString("responseA"));
+                question.put("responseB",dbrs.getString("responseB"));
+                question.put("responseC",dbrs.getString("responseC"));
+                question.put("responseD",dbrs.getString("responseD"));
+                questions.put((Integer) question.get("questionId"),question);
             }
 
         } catch(Exception e) {
             System.out.println("Exception at getQuestions " + e);
         }
         return questions;
+    }
+
+
+    public static Map<String, Object> getQuestion(int QuestionId, Connection conn) {
+
+        Map<String, Object> question = new HashMap<>();
+
+        try {
+            PreparedStatement pst1 = conn.prepareStatement("select * from quiz_questions where questionId=?");
+            pst1.setInt(1, QuestionId);
+            ResultSet dbrs = pst1.executeQuery();
+            while (dbrs.next()) {
+                question.put("quizId", dbrs.getInt("quizId"));
+                question.put("questionId", dbrs.getInt("questionId"));
+                question.put("questionText", dbrs.getString("question"));
+                question.put("answer", dbrs.getString("answer"));
+                question.put("mark", dbrs.getInt("mark"));
+                question.put("responseA", dbrs.getString("responseA"));
+                question.put("responseB", dbrs.getString("responseB"));
+                question.put("responseC", dbrs.getString("responseC"));
+                question.put("responseD", dbrs.getString("responseD"));
+            }
+
+        } catch (Exception e) {
+            System.out.println("Exception at getQuestions " + e);
+        }
+        return question;
     }
 
     public static Map<Integer, Object>  viewQuizzes(int lessonID, Connection conn) {
@@ -823,6 +898,53 @@ public class DataMapper {
             System.out.println("Exception at view Quizes "+e);
         }
         return quizzes;
+    }
+
+    public static Map<Integer, Object>  viewQuiz(int quizId, Connection conn) {
+//        ArrayList<Map<String,String>> quizzes = new ArrayList<Map<String, String>>();
+        Map<Integer,Object> quizzes = new HashMap<>();
+        try {
+            PreparedStatement pst1 = conn.prepareStatement("select * from quizzes where Id=?");
+            pst1.setInt(1,quizId);
+            ResultSet rs = pst1.executeQuery();
+
+            while(rs.next()) {
+                Map<String, Object> quiz = new HashMap<>();
+                quiz.put("lessonId",rs.getString("lessonId"));
+                quiz.put("quizId",rs.getInt("Id"));
+                quiz.put("name",rs.getString("name"));
+                quiz.put("minMark",rs.getInt("minimumMarks"));
+                quiz.put("status",rs.getInt("enabled"));
+                quiz.put("marks", rs.getInt("totalMarks"));
+                quizzes.put(rs.getInt("Id"),quiz);
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at view Quizes "+e);
+        }
+        return quizzes;
+    }
+
+    public static Quiz viewSingleQuiz(int quizId, Connection conn) {
+//        ArrayList<Map<String,String>> quizzes = new ArrayList<Map<String, String>>();
+        Map<Integer,Object> quizzes = new HashMap<>();
+        Quiz singleQuiz = new Quiz();
+        try {
+            PreparedStatement pst1 = conn.prepareStatement("select * from quizzes where Id=?");
+            pst1.setInt(1,quizId);
+            ResultSet rs = pst1.executeQuery();
+
+            while(rs.next()) {
+
+                singleQuiz.lessonId =  rs.getInt("lessonId");
+                singleQuiz.quizId = rs.getInt("Id");
+                singleQuiz.quizName = rs.getString("name");
+                singleQuiz.MinMark = rs.getInt("minimumMarks");
+                singleQuiz.totalMark = rs.getInt("totalMarks");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at view Quizes "+e);
+        }
+        return singleQuiz;
     }
 //    public static Quiz[] getQuizzes(int lessonID){
 //        Quiz[] quizzes = new Quiz[MAXQUIZ]; //= new Quiz[0];
@@ -992,13 +1114,30 @@ public class DataMapper {
                 temp.materials = getLearningMaterialsByLessonId(rs.getInt("Id"), conn);
                 //System.out.println(rs.getString("requirements"));
                 allLessons.add(temp);
-                System.out.println(temp.name);
             }
         } catch (Exception e) {
             System.out.println("Exception at getPendingGroupRequests " + e);
         }
         //System.out.println(allLessons);
         return allLessons;
+    }
+
+    public static Lesson getLessonById(int id, Connection conn){
+        Lesson lesson = new Lesson(0,null,null);
+        try {
+            PreparedStatement pst = conn.prepareStatement("select * from lessons where Id="+ id);
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                Lesson temp = new Lesson(rs.getInt("Id"),
+                        rs.getString("name"),
+                        rs.getString("requirements"));
+                lesson = temp;
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at getPendingGroupRequests " + e);
+        }
+        //System.out.println(allLessons);
+        return lesson;
     }
 
     public static void createOrUpdateLesson(Lesson value, int courseId, Connection conn){
@@ -1231,7 +1370,7 @@ public class DataMapper {
                 LocalDate endDate = LocalDate.parse(details.get("end_date").toString());
                 String e = endDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
                 DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm");
-                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:m a");
+                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:mm a");
                 LocalTime startTime = LocalTime.parse(String.valueOf(details.get("start_time").toString()), df);
                 String st = startTime.format(df2);
                 LocalTime endTime = LocalTime.parse(String.valueOf(details.get("end_time").toString()), df);
@@ -1271,7 +1410,7 @@ public class DataMapper {
                 details.put("enrolled", rs.getInt("enrolled"));
                 details.put("credits", rs.getInt("credits"));
                 DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm");
-                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:m a");
+                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("hh:mm a");
                 LocalTime startTime = LocalTime.parse(String.valueOf(rs.getString("start_time")), df);
                 String st = startTime.format(df2);
                 LocalTime endTime = LocalTime.parse(String.valueOf(rs.getString("end_time")), df);

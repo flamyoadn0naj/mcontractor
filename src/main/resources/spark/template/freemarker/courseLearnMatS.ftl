@@ -6,6 +6,7 @@
     <link rel="stylesheet"  href="/css/_variables.scss">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Course Lessons - MyPLS</title>
 </head>
 <body>
 <#include "navbar.ftl">
@@ -49,7 +50,7 @@
                     <form action="/upload/${courseNumber}/${lesson.id}" method="post" enctype="multipart/form-data">
                         <label for="uploadFile" style="float:left; margin-top:10px; margin-left:5px; margin-right:1em;" name="lessonId" value="${lesson.id}"><b>Upload file for ${lesson.name}:</b></label>
                         <input type="file" class="small" id="inputGroupFile02" style="float: left;margin-top:10px;" name="uploadFile" value ="">
-                        <button type="submit" class="btn-download" style="float: left; margin-top: 8px; margin-left:-2em;" name="uploadButton" value=""><i class="fa fa-upload"></i></button>
+                        <button type="submit" class="btn-download" style="float: right; margin-top: 8px" name="uploadButton" value=""><i class="fa fa-upload"></i></button>
                     </form>
                 </div>
                 </#if>
@@ -64,7 +65,7 @@
                                     <span class="text-primary small" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                                         <#if role == "prof">
 
-                                            <input name="name" type="text" id="name" value="${lesson.name}">
+                                            <input name="name" pattern="\S.*\S" id="name" value="${lesson.name}">
                                         <#else>
                                             ${lesson.name}
                                         </#if>
@@ -83,7 +84,7 @@
                                         <#if role == "prof">
                                             <div class="mb-3">
                                                 <b>Requirements:</b>
-                                                <input style="width: 80%" name="req" type="text" id="req" value="${lesson.requirements}">
+                                                <input style="width: 80%" name="req" pattern="\S.*\S" id="req" value="${lesson.requirements}">
                                                 <input style="display:none" name="lessonId" type="text" id="lessonId" value="${lesson.id}">
                                             </div>
                                         <#else>

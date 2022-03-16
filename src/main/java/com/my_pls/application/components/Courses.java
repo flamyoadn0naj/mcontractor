@@ -77,6 +77,7 @@ public class Courses {
         String s = startTime.format(df2);
         LocalTime endTime = LocalTime.parse(String.valueOf(course.get("end_time")), df);
         String e = endTime.format(df2);
+
         course.put("start_time", s);
         course.put("end_time", e);
         course.put("prof_name", DataMapper.findProfName((Integer) course.get("prof_id"), conn));

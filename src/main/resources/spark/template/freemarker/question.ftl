@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet"  href="/css/_bootswatch.scss">
+    <link rel="stylesheet"  href="/css/_variables.scss">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Edit Question - MyPLS</title>
+</head>
+<body>
+<#include "navbar.ftl">
+<div style="display: flex;justify-content: center">
+    <div class="card text-black mb-3" style="width:100%; border: none">
+        <h2 class="card-header border-primary text-black-50 mb-3">
+            ${title}
+        </h2>
+        <div style="width: 90%; margin-left: 2%">
+            <#if role == "prof">
+                <a href="/course/create-question?courseId=${courseId}&lessonId=${courseId}&quizId=${quizId}&e=-1" class="btn btn-primary col-1" style="float: right; margin-left: 2%">Add</a>
+                <a href="/course/quiz/${courseId}" class="btn btn-primary col-1"
+                   style="float:
+                right">Back</a>
+            </#if>
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="/course/about/${courseId}">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="/course/learnMat/${courseId}">Learning Material</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="/course/quiz/${courseId}">Quizzes</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="/course/grades/${courseId}">Grades</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="/course/classlist/${courseId}">Classlist</a>
+                </li>
+                <#if viewRate??>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="/course/rate/${courseId}">Rate</a>
+                    </li>
+                </#if>
+            </ul>
+
+            <form style="display:flex; justify-content:center;" method="post" action="/course/create-question?courseId=${courseId}&lessonId=${lessonId}&quizId=${quizId}&e=${e}">
+
+                            <div class="card" style="width: 90%">
+                                <div class="card-header" id="headingOne">
+                                    <h5>
+                                        <div class="space-between">
+                                            <div style="display: flex">
+                                                <label style="margin-right: 2%" for="total">Total Marks</label>
+                                                <div>
+                                                    ${tot!0}
+                                                </div>
+                                            </div>
+
+                                            <div style="display: flex">
+                                                <label style="margin-right: 2%" for="min">Minimum Score</label>
+                                                <div>
+                                                    ${min!0}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h5>
+                                    <hr>
+                                    <h6 class="space-between">
+<#--                                        <div class="form-group space-between mb-3">-->
+<#--                                            <label class="padding2right col-3" for="1a">Question:</label>-->
+
+<#--                                            <input required type="text" name="questionText" class="form-control col-9" id="questionText" <#if question ??>value=${question.questionText!""}</#if>>-->
+
+<#--                                        </div>-->
+                                        <div style="display: flex">
+                                            <label style="margin-right: 2%" for="marks">Marks</label>
+                                            <input required type="number" name="marks" class="form-control col-3" id="marks"  <#if question ??>value=${question.mark!""}</#if> >
+                                        </div>
+                                    </h6>
+<#--                                    <div class="form-group mb3">-->
+<#--                                        <input required type="text" name="QText" class="form-control" id="1"  <#if question ??>value=${question.questionText!""}</#if> >-->
+<#--                                    </div>-->
+
+                                    <div class="form-group space-between">
+                                        <label class="padding2right" for="QText">Question</label>
+                                        <input required type="text" name="QText" class="form-control" id="QText"  <#if question ??>value=${question.questionText!""}</#if> >
+                                    </div>
+
+                                    <div class="form-group space-between">
+                                        <label class="padding2right" for="1a">A</label>
+                                        <input required type="text" name="QA" class="form-control" id="QA"  <#if question ??>value=${question.responseA!""}</#if> >
+                                    </div>
+                                    <div class="form-group space-between">
+                                        <label class="padding2right" for="1b">B</label>
+                                        <input required type="text" name="QB" class="form-control" id="QB"  <#if question ??>value=${question.responseB!""}</#if> >
+                                    </div>
+                                    <div class="form-group space-between">
+                                        <label class="padding2right" for="1c">C</label>
+                                        <input required type="text" name="QC" class="form-control" id="QC"  <#if question ??>value=${question.responseC!""}</#if> >
+                                    </div>
+                                    <div class="form-group space-between mb3">
+                                        <label class="padding2right" for="1d">D</label>
+                                        <input required type="text" name="QD" class="form-control" id="QD"  <#if question ??>value=${question.responseD!""}</#if> >
+                                    </div>
+                                    <div class="form-group space-between">
+                                        <label class="padding2right" for="ans1">Answer</label>
+                                        <input required type="text" name="ans" class="form-control" id="ans"  <#if question ??>value=${question.answer!""}</#if> >
+<#--                                        <input style="display:none" name="questionId" type="text" id="questionId" <#if question ??>value=${question.questionId!""}</#if>>-->
+                                    </div>
+                                    <button type="submit"
+                                            name="action"
+                                            class="btn btn-primary"
+                                            id="submit"
+                                            style="width:10rem; float:right;"
+                                            <#if question??>
+                                            value=${question.questionId!-1}
+                                            </#if> >
+                                        Save
+                                    </button>
+<#--                                    <#if question ??>-->
+<#--                                    <button type="submit" name="action" value="Save" class="btn btn-primary" style="width:10rem; float:right;">-->
+<#--                                        Save-->
+<#--                                    </button>-->
+<#--                                    <#else>-->
+<#--                                    <button type="submit" name="action" value="AddQ" class="btn btn-primary" style="width:10rem; float:right; margin-right: 2%">-->
+<#--                                        Add Question-->
+<#--                                    </button>-->
+<#--                                    </#if>-->
+                                </div>
+                            </div>
+                        </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
