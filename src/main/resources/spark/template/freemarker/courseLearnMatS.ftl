@@ -94,7 +94,8 @@
                                             <#list lesson.materials as material>
 
                                                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                    <p style="text-decoration: underline" name=${material} value="${material}">${material}</p>
+
+                                                    <input readonly style="border:none; text-decoration: underline" name="${material}" value="${material}">
                                                     <div>
                                                         <button type="submit" class="btn-download" name="dlButton" value="${material}"><i class="fa fa-download" ></i></button>
                                                          <#if role == "prof">

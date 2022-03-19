@@ -323,6 +323,20 @@ public class App {
                 DataMapper.deleteLearningMaterial(temp.getId(),URLDecoder.decode(formFields.get("deleteLMButton"),"UTF-8"), conn);
             }else if(formFields.containsKey("shareButton")){
                 System.out.println("Share lesson!");
+                DataMapper.createDGPostLesson(
+                        DataMapper.getDGIdByCourseId(Integer.parseInt(courseId),conn)
+                        ,sess.attribute("id"),
+                        URLDecoder.decode(formFields.get("name"),"UTF-8"),
+                        "Check out this lesson!",
+                        "/course/learnMat/"+courseId,
+                        conn);
+                ;
+                //DataMapper.createDGPost(Integer.parseInt(
+                //                    URLDecoder.decode(request.params(":dgId"),"UTF-8")),
+                //                    sess.attribute("id"),
+                //                    URLDecoder.decode(formFields.get("name"), "UTF-8"),
+                //                    URLDecoder.decode(formFields.get("content"),"UTF-8"),
+                //                    conn);
             }
             conn.close();
             response.redirect("/course/learnMat/"+courseId);
@@ -988,6 +1002,7 @@ public class App {
             map.put("members", members);
             if (!requests.isEmpty()) map.put("reqs", requests);
             map.put("id", id);
+            map.put("posts",DataMapper.getDGPostsById(Integer.parseInt(URLDecoder.decode(request.params(":id"),"UTF-8")),conn));
             conn.close();
             return new ModelAndView(map,"groupDesc.ftl");
         }),engine);
@@ -1020,17 +1035,21 @@ public class App {
 
         get("/discussion/create-post/:dgId",((request, response) -> {
             //need course and user Id
+            Connection conn = MySqlConnection.getConnection();
             Session sess = request.session();
             String role = sess.attribute("role").toString();
             Map<String,String> map = new HashMap<>();
             map.put("role", role);
             map.put("dgName", "Test Name"); //CHANGE
             map.put("dgId",URLDecoder.decode(request.params(":dgId"),"UTF-8"));
+            conn.close();
+
             return new ModelAndView(map,"discussionPost.ftl");
         }),engine);
 
         post("/discussion/create-post/:dgId",((request, response) -> {
             Session sess = request.session();
+            Connection conn = MySqlConnection.getConnection();
             String role = sess.attribute("role").toString();
             Map<String,String> map = new HashMap<>();
             map.put("role", role);
@@ -1038,6 +1057,14 @@ public class App {
             map.put("dgId",URLDecoder.decode(request.params(":dgId"),"UTF-8"));
             Map<String,String> formFields = extractFields(request.body());
             System.out.println(formFields);
+            DataMapper.createDGPost(Integer.parseInt(
+                    URLDecoder.decode(request.params(":dgId"),"UTF-8")),
+                    sess.attribute("id"),
+                    URLDecoder.decode(formFields.get("name"), "UTF-8"),
+                    URLDecoder.decode(formFields.get("content"),"UTF-8"),
+                    conn);
+            conn.close();
+            response.redirect("/discussion/group-desc/"+request.params(":dgId"));
             return new ModelAndView(map,"discussionPost.ftl");
         }),engine);
 

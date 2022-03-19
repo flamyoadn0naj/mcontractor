@@ -9,12 +9,12 @@ public class DiscussionPost {
         this.dgId = dgId;
     }
 
-    public int getUserId() {
-        return userId;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPostName() {
@@ -41,20 +41,30 @@ public class DiscussionPost {
         this.postDate = postDate;
     }
 
-    int userId;
+    String username;
     int dgId;
 
     String postName;
     String postContent;
 
+    public String getPostAttachment() {
+        return postAttachment;
+    }
+
+    public void setPostAttachment(String postAttachment) {
+        this.postAttachment = postAttachment;
+    }
+
+    String postAttachment;
     String postDate;
 
-    public DiscussionPost(int dgId, int userId, String postName, String postContent, String postDate){
+    public DiscussionPost(int dgId, String username, String postName, String postContent, String postDate, String postAttachment){
         this.dgId =dgId;
-        this.userId =userId;
+        this.username =username;
         this.postName =postName;
         this.postContent =postContent;
         this.postDate =postDate;
+        this.postAttachment =postAttachment;
 
     }
 }

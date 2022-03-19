@@ -23,7 +23,7 @@
                 <div class="card-header" id="headingOne">
                         <h6 class="space-between">
                              <span class="text-primary mb-3" style="margin-right: 2%">
-                                Name:
+                                Title:
                             </span>
                             <input required type="text" name="name" class="form-control" id="name">
                         </h6>
