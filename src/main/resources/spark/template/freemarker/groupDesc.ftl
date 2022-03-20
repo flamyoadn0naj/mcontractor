@@ -173,33 +173,35 @@
                 </div>
 
                 <div style="width: 25%; margin-left: 2%; margin-top: 1%">
-                    <#if group.privacy??>
-                        <form method="post" action="/discussion/group-desc/${id}">
-                            <div id="myTabContent" class="tab-content" style="margin:2%">
-                                <h4 class="card-header border-primary text-black-50 mb-3">
-                                    Group Requests
-                                </h4>
+                    <#if !group.course??>
+                        <#if group.privacy??>
+                            <form method="post" action="/discussion/group-desc/${id}">
+                                <div id="myTabContent" class="tab-content" style="margin:2%">
+                                    <h4 class="card-header border-primary text-black-50 mb-3">
+                                        Group Requests
+                                    </h4>
 
-                                <ul class="list-group">
-                                    <#if reqs??>
-                                        <#list reqs as k,v>
-                                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                ${v}
-                                                <div style="display: flex; float: right">
-                                                    <button class="btn-success btn" style="float:right;" type="submit" name="add" value=${k}>
-                                                        <i class="fa fa-plus"></i>
-                                                    </button>
-                                                    <button class="btn-danger btn" style="float:right; margin-left: 10%" type="submit" name="del" value=${k}>
-                                                        <i class="fa fa-times"></i>
-                                                    </button>
-                                                </div>
-                                            </li>
-                                        </#list>
-                                    </#if>
+                                    <ul class="list-group">
+                                        <#if reqs??>
+                                            <#list reqs as k,v>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    ${v}
+                                                    <div style="display: flex; float: right">
+                                                        <button class="btn-success btn" style="float:right;" type="submit" name="add" value=${k}>
+                                                            <i class="fa fa-plus"></i>
+                                                        </button>
+                                                        <button class="btn-danger btn" style="float:right; margin-left: 10%" type="submit" name="del" value=${k}>
+                                                            <i class="fa fa-times"></i>
+                                                        </button>
+                                                    </div>
+                                                </li>
+                                            </#list>
+                                        </#if>
 
-                                </ul>
-                            </div>
-                        </form>
+                                    </ul>
+                                </div>
+                            </form>
+                        </#if>
                     </#if>
                     <div id="myTabContent" class="tab-content" style="margin:2%">
                         <h4 class="card-header border-primary text-black-50 mb-3">
