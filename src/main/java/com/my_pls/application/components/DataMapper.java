@@ -1,5 +1,6 @@
 package com.my_pls.application.components;
 
+import com.my_pls.DiscussionPost;
 import com.my_pls.Lesson;
 import com.my_pls.securePassword;
 import com.my_pls.sendEmail;
@@ -1545,5 +1546,73 @@ public class DataMapper {
             System.out.println("Exception at getNameFromUserId " + e);
         }
         return name;
+    }
+
+    public static ArrayList<DiscussionPost> getDGPostsById(int dgId, Connection conn){
+        ArrayList<DiscussionPost> allPosts = new ArrayList<>();
+        try {
+            PreparedStatement pst = conn.prepareStatement("select * from discussion_group_content where group_id="+ dgId +" ORDER BY post_time DESC");
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                DiscussionPost temp = new DiscussionPost(
+                        rs.getInt("group_id"),
+                        DataMapper.getNameFromUserId(rs.getInt("user_id"),conn),
+                        rs.getString("post_name"),
+                        rs.getString("post_content"),
+                        rs.getString("post_time"),
+                        rs.getString("post_attachment"));
+                allPosts.add(temp);
+                System.out.println(temp.getPostAttachment());
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at getPendingGroupRequests " + e);
+        }
+        //System.out.println(allLessons);
+        return allPosts;
+    }
+
+    public static void createDGPost(int groupId, int userId, String postName, String postContent, Connection conn){
+        try{
+            PreparedStatement pst = conn.prepareStatement("insert into discussion_group_content (group_id, user_id, post_time, post_name, post_content) VALUES (?,?,?,?,?)");
+            pst.setInt(1, groupId);
+            pst.setInt(2, userId);
+            pst.setString(3, String.valueOf(java.time.LocalDateTime.now()));//GET TIME HERE
+            pst.setString(4, postName);
+            pst.setString(5, postContent);
+            pst.execute();
+        } catch( Exception e) {
+            System.out.println("Exception at createDGPostLesson " + e);
+        }
+    }
+
+    public static void createDGPostLesson(int groupId, int userId, String postName, String postContent, String postAttachment, Connection conn){
+        try{
+            PreparedStatement pst = conn.prepareStatement("insert into discussion_group_content (group_id, user_id, post_time, post_name, post_content, post_attachment) VALUES (?,?,?,?,?,?)");
+            pst.setInt(1, groupId);
+            pst.setInt(2, userId);
+            pst.setString(3, String.valueOf(java.time.LocalDateTime.now()));//GET TIME HERE
+            pst.setString(4, postName);
+            pst.setString(5, postContent);
+            pst.setString(6, postAttachment);
+            pst.execute();
+        } catch( Exception e) {
+            System.out.println("Exception at createDGPostLesson " + e);
+        }
+
+    }
+
+    public static int getDGIdByCourseId(int courseId,Connection conn){
+        try{
+            PreparedStatement pst = conn.prepareStatement("select id from discussion_groups where course_id=?");
+            pst.setInt(1, courseId);
+            ResultSet rs = pst.executeQuery();
+            while(rs.next()){
+                return rs.getInt("id");
+            }
+
+        } catch( Exception e) {
+            System.out.println("Exception at createDGPostLesson " + e);
+        }
+        return 0;
     }
 }

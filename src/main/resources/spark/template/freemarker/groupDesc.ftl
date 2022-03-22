@@ -32,9 +32,11 @@
         </h2>
         <div  style="width: 95%">
             <#if status == "yes">
+                <form method="get" action="/discussion/create-post/${id}">
                 <button class="btn btn-primary col-2 text-white" style="float:right" type="submit">
-                    <a href="/discussion/create-post/${id}" class="text-white">Create Post</a>
+                    Create Post
                 </button>
+                </form>
                 <#if !group.course??>
                     <#if id != 311>
                         <form method="post" action="/discussion/group-desc/${id}">
@@ -58,53 +60,32 @@
 
                             <div class="tab-pane fade active show" id="learnMat">
                                 <div id="accordion">
+                                    <#list posts as post>
                                     <div class="card mb-3">
                                         <div class="card-header" id="headingOne">
                                             <h5 class="mb-0">
                                                 <div class="space-between">
                                         <span class="text-primary col-6" >
-                                            Test
+                                            ${post.postName}
                                         </span>
                                                     <span class="text-muted col-6">
-                                            Posted By: Saad Hassan
+                                            Posted By: ${post.username}
                                         </span>
                                                 </div>
                                             </h5>
                                         </div>
                                         <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
                                             <div class="card-body">
-                                                This is an test example for post "test".
+                                                <#if post.postAttachment??>
+                                                    <button class="btn btn-primary col-2 text-white" style="float:right" type="button">
+                                                        <a style="color: white" href="${post.postAttachment}">View Lesson</a>
+                                                    </button>
+                                                </#if>
+                                                ${post.postContent}
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="card">
-                                        <div class="card-header" id="headingTwo">
-                                            <h5 class="mb-0">
-                                                <div class="space-between">
-                                        <span class="text-primary col-6">
-                                            Notes
-                                        </span>
-                                                    <span class="text-muted col-6">
-                                            Posted By: Maheen Contractor
-                                        </span>
-                                                </div>
-                                            </h5>
-                                        </div>
-                                        <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordion">
-                                            <div class="card-body">
-                                                <div class="mb-3"> Here are some notes for today's session.</div>
-                                                <ul class="list-group">
-                                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                        Notes1.pdf
-                                                    </li>
-                                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                        Notes2.pdf
-
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    </#list>
                                 </div>
                             </div>
                         </div>
@@ -160,53 +141,32 @@
 
                         <div class="tab-pane fade active show" id="learnMat">
                             <div id="accordion">
-                                <div class="card mb-3">
-                                    <div class="card-header" id="headingOne">
-                                        <h5 class="mb-0">
-                                            <div class="space-between">
+                                <#list posts as post>
+                                    <div class="card mb-3">
+                                        <div class="card-header" id="headingOne">
+                                            <h5 class="mb-0">
+                                                <div class="space-between">
                                         <span class="text-primary col-6" >
-                                            Test
+                                            ${post.postName}
                                         </span>
-                                                <span class="text-muted col-6">
-                                            Posted By: Saad Hassan
+                                                    <span class="text-muted col-6">
+                                            Posted By: ${post.username}
                                         </span>
+                                                </div>
+                                            </h5>
+                                        </div>
+                                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+                                            <div class="card-body">
+                                                <#if post.postAttachment??>
+                                                    <button class="btn btn-primary col-2 text-white" style="float:right" type="button">
+                                                        <a style="color: white" href="${post.postAttachment}">View Lesson</a>
+                                                    </button>
+                                                </#if>
+                                                ${post.postContent}
                                             </div>
-                                        </h5>
-                                    </div>
-                                    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
-                                        <div class="card-body">
-                                            This is an test example for post "test".
                                         </div>
                                     </div>
-                                </div>
-                                <div class="card">
-                                    <div class="card-header" id="headingTwo">
-                                        <h5 class="mb-0">
-                                            <div class="space-between">
-                                        <span class="text-primary col-6">
-                                            Notes
-                                        </span>
-                                                <span class="text-muted col-6">
-                                            Posted By: Maheen Contractor
-                                        </span>
-                                            </div>
-                                        </h5>
-                                    </div>
-                                    <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordion">
-                                        <div class="card-body">
-                                            <div class="mb-3"> Here are some notes for today's session.</div>
-                                            <ul class="list-group">
-                                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                    Notes1.pdf
-                                                </li>
-                                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                    Notes2.pdf
-
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
+                                </#list>
                             </div>
                         </div>
                     </div>

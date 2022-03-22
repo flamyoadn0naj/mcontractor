@@ -73,8 +73,8 @@
                                         <#if role == "prof">
                                             <div style="float: right">
                                                 <button type="submit" class="btn btn-primary" style="float: right;" name="saveButton" value=${lesson.id}>Save</button>
-                                                <button class="btn-download" style="float: right" name="deleteButton" value=${lesson.id}><i class="fa fa-trash"></i></button>
-
+                                                <button class="btn-download" style="float: right; margin-top:5px;" name="deleteButton" value=${lesson.id}><i class="fa fa-trash"></i></button>
+                                                <button type="submit" class="btn-download" name="shareButton" value="true" style="margin-top:5px;"><i class="fa fa-share"></i></button>
                                             </div>
                                         </#if>
                                     </h5>
@@ -94,7 +94,8 @@
                                             <#list lesson.materials as material>
 
                                                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                    <p  style="text-decoration: underline;"name=${material}  value="${material}">${material}</p>
+
+                                                    <input readonly style="border:none; text-decoration: underline" name="${material}" value="${material}">
                                                     <div>
                                                         <button type="submit" class="btn-download" name="dlButton" value="${material}"><i class="fa fa-download" ></i></button>
                                                          <#if role == "prof">
