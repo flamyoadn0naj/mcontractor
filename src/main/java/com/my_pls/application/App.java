@@ -391,32 +391,36 @@ public class App {
             map.put("courseId", courseId);
             map.put("name", course.get("name"));
             String edit = request.queryParams("e");
+
             String quizId = request.queryParams("quizId");
             ArrayList<Lesson> lessons = DataMapper.getLessonsByCourseId(Integer.parseInt(courseId), conn);
             map.put("lessons",lessons);
             Quiz quizEdit = new Quiz();
-            if (edit == null){
-                map.put("e",-1);
-                map.put("quizName","");
-                map.put("minMark",0);
-                map.put("title", "Create");
-            }
-            if (edit.contains("1")){
-                map.put("e",1);
-                int quizIdInt = Integer.parseInt(quizId);
-                map.put("quizId",quizId);
-                quizEdit =  DataMapper.viewSingleQuiz(quizIdInt,conn);
-                Lesson lesson = DataMapper.getLessonById(quizEdit.lessonId,conn);
-                map.put("currLesson",quizEdit.lessonId);
-                map.put("currLessonName", lesson.name);
-                map.put("quizName",quizEdit.quizName);
-                map.put("minMark",quizEdit.MinMark);
-                map.put("title","Modify");
-            }
-            if (edit.contains("d")){
-                quizEdit.quizId = Integer.parseInt(quizId);
-                DataMapper.deleteQuiz(quizEdit,conn);
-                response.redirect("/course/quiz/"+courseId+"/");
+            if (edit == null) edit="-1";
+            switch (edit){
+                case "1":
+                    map.put("e",1);
+                    int quizIdInt = Integer.parseInt(quizId);
+                    map.put("quizId",quizId);
+                    quizEdit =  DataMapper.viewSingleQuiz(quizIdInt,conn);
+                    Lesson lesson = DataMapper.getLessonById(quizEdit.lessonId,conn);
+                    map.put("currLesson",quizEdit.lessonId);
+                    map.put("currLessonName", lesson.name);
+                    map.put("quizName",quizEdit.quizName);
+                    map.put("minMark",quizEdit.MinMark);
+                    map.put("title","Modify");
+                    break;
+                case "d":
+                    quizEdit.quizId = Integer.parseInt(quizId);
+                    DataMapper.deleteQuiz(quizEdit,conn);
+                    response.redirect("/course/quiz/"+courseId+"/");
+                    break;
+                case "-1":
+                    map.put("e",-1);
+                    map.put("quizName","");
+                    map.put("minMark",0);
+                    map.put("title", "Create");
+                    break;
             }
 
             map.put("lessons",DataMapper.getLessonsByCourseId(Integer.parseInt(courseId), conn));
@@ -509,27 +513,53 @@ public class App {
             map.put("tot",quiz.totalMark);
             map.put("min",quiz.MinMark);
             map.put("lessonId", quiz.lessonId);
-            if (edit == null || edit.contains("-1")){
-                map.put("e",-1);
-                map.put("mark",0);
-                map.put("title", "Create");
+
+            if (edit == null || edit.contains("-1")) edit = "c";
+
+            switch (edit){
+                case "c":
+                    map.put("e",-1);
+                    map.put("mark",0);
+                    map.put("title", "Create");
+                    break;
+                case "e":
+                    map.put("e",1);
+                    String questionId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId")));
+                    Map<String, Object> question = DataMapper.getQuestion(Integer.parseInt(questionId), conn);
+                    Object questionText = question.get("questionText");
+                    sess.attribute("questionId",question);
+                    map.put("title","Modify "+questionText);
+                    map.put("questionText",questionText);
+                    map.put("question",question);
+                    map.put("questionId",questionId);
+                    break;
+                case "d":
+                    quiz.questionId = Integer.parseInt(String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId"))));
+                    DataMapper.deleteQuestion(quiz,conn);
+                    response.redirect("/course/quiz/"+courseId+"/"+quizId);
+                    break;
             }
-            if (edit.contains("1")){
-                map.put("e",1);
-                String questionId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId")));
-                Map<String, Object> question = DataMapper.getQuestion(Integer.parseInt(questionId), conn);
-                Object questionText = question.get("questionText");
-                sess.attribute("questionId",question);
-                map.put("title","Modify "+questionText);
-                map.put("questionText",questionText);
-                map.put("question",question);
-                map.put("questionId",questionId);
-            }
-            if (edit.contains("d")){
-                quiz.questionId = Integer.parseInt(String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId"))));
-                DataMapper.deleteQuestion(quiz,conn);
-                response.redirect("/course/quiz/"+courseId+"/"+quizId);
-            }
+//            if (edit == null || edit.contains("-1")){
+//                map.put("e",-1);
+//                map.put("mark",0);
+//                map.put("title", "Create");
+//            }
+//            if (edit.contains("1")){
+//                map.put("e",1);
+//                String questionId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId")));
+//                Map<String, Object> question = DataMapper.getQuestion(Integer.parseInt(questionId), conn);
+//                Object questionText = question.get("questionText");
+//                sess.attribute("questionId",question);
+//                map.put("title","Modify "+questionText);
+//                map.put("questionText",questionText);
+//                map.put("question",question);
+//                map.put("questionId",questionId);
+//            }
+//            if (edit.contains("d")){
+//                quiz.questionId = Integer.parseInt(String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId"))));
+//                DataMapper.deleteQuestion(quiz,conn);
+//                response.redirect("/course/quiz/"+courseId+"/"+quizId);
+//            }
 
             conn.close();
             return new ModelAndView(map,"question.ftl");

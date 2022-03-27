@@ -61,7 +61,7 @@
                                     <td>${c.marks}</td>
                                     <td>
                                         <#if role == "prof">
-                                            <a href="/course/${courseId}/create-quiz?courseId=${courseId}&quizId=${c.quizId!""}&e=1" class="btn btn-primary" style="float: right"><i class="fa fa-edit"></i></a>
+                                            <a href="/course/${courseId}/create-quiz?courseId=${courseId}&quizId=${c.quizId!""}&e=e" class="btn btn-primary" style="float: right"><i class="fa fa-edit"></i></a>
                                             <a href="/course/${courseId}/create-quiz?courseId=${courseId}&quizId=${c.quizId!""}&e=d" class="btn btn-primary" style="float: left"><i class="fa fa-trash"></i></a>
                                             <button type="button" class="btn-download" style="float: right">
                                                 <i class="fa fa-share"></i>
