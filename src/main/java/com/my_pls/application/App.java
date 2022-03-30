@@ -396,9 +396,9 @@ public class App {
             ArrayList<Lesson> lessons = DataMapper.getLessonsByCourseId(Integer.parseInt(courseId), conn);
             map.put("lessons",lessons);
             Quiz quizEdit = new Quiz();
-            if (edit == null) edit="-1";
+            if (edit == null || edit.contains("-1")) edit="e";
             switch (edit){
-                case "1":
+                case "e":
                     map.put("e",1);
                     int quizIdInt = Integer.parseInt(quizId);
                     map.put("quizId",quizId);
@@ -422,7 +422,6 @@ public class App {
                     map.put("title", "Create");
                     break;
             }
-
             map.put("lessons",DataMapper.getLessonsByCourseId(Integer.parseInt(courseId), conn));
             if (Courses.allowRating(course)) map.put("viewRate", true);
             conn.close();
