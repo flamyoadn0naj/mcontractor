@@ -396,7 +396,7 @@ public class App {
             ArrayList<Lesson> lessons = DataMapper.getLessonsByCourseId(Integer.parseInt(courseId), conn);
             map.put("lessons",lessons);
             Quiz quizEdit = new Quiz();
-            if (edit == null || edit.contains("-1")) edit="e";
+            if (edit == null || edit.contains("-1")) edit="c";
             switch (edit){
                 case "e":
                     map.put("e",1);
@@ -415,7 +415,7 @@ public class App {
                     DataMapper.deleteQuiz(quizEdit,conn);
                     response.redirect("/course/quiz/"+courseId+"/");
                     break;
-                case "-1":
+                case "c":
                     map.put("e",-1);
                     map.put("quizName","");
                     map.put("minMark",0);
