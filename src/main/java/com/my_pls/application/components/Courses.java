@@ -72,7 +72,7 @@ public class Courses {
         }
         Map<String,Object> course = DataMapper.findCourseByCourseId(courseId, conn);
         DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm");
-        DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:m a");
+        DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:mm a");
         LocalTime startTime = LocalTime.parse(String.valueOf(course.get("start_time")), df);
         String s = startTime.format(df2);
         LocalTime endTime = LocalTime.parse(String.valueOf(course.get("end_time")), df);
