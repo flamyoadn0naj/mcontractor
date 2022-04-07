@@ -79,7 +79,7 @@ public class Admin {
         if (formFields.containsKey("admin"))
             if (DataMapper.authorize(formFields.get("admin"), conn)) {
                 map.put("success", true);
-                Map<Integer, String> users = DataMapper.viewUsers(searchText, filterBy, conn);
+                Map<Integer, String> users = DataMapper.viewUsers("", "", conn);
                 if (!users.isEmpty()) {
                     map.put("users", users);
                 }

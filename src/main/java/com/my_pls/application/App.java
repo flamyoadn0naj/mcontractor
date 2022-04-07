@@ -219,6 +219,8 @@ public class App {
             else map.put("role","learner");
             map.put("course",course);
             map.put("courseId", courseId);
+            Map<String,Object> rating = DataMapper.getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"",conn);
+            if (!rating.isEmpty()) map.put("rating", rating);
             if (Courses.allowRating(course)) map.put("viewRate", true);
             conn.close();
             return new ModelAndView(map,"courseAbout.ftl");
@@ -249,6 +251,8 @@ public class App {
             else map.put("err", true);
             map.put("course",course);
             map.put("courseId", courseId);
+            Map<String,Object> rating = DataMapper.getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"",conn);
+            if (!rating.isEmpty()) map.put("rating", rating);
             if (Courses.allowRating(course)) map.put("viewRate", true);
             conn.close();
             return new ModelAndView(map,"courseAbout.ftl");
@@ -330,13 +334,6 @@ public class App {
                         "Check out this lesson!",
                         "/course/learnMat/"+courseId,
                         conn);
-                ;
-                //DataMapper.createDGPost(Integer.parseInt(
-                //                    URLDecoder.decode(request.params(":dgId"),"UTF-8")),
-                //                    sess.attribute("id"),
-                //                    URLDecoder.decode(formFields.get("name"), "UTF-8"),
-                //                    URLDecoder.decode(formFields.get("content"),"UTF-8"),
-                //                    conn);
             }
             conn.close();
             response.redirect("/course/learnMat/"+courseId);
@@ -394,7 +391,7 @@ public class App {
 
             String quizId = request.queryParams("quizId");
             ArrayList<Lesson> lessons = DataMapper.getLessonsByCourseId(Integer.parseInt(courseId), conn);
-            map.put("lessons",lessons);
+
             Quiz quizEdit = new Quiz();
             if (edit == null || edit.contains("-1")) edit="c";
             switch (edit){
@@ -406,6 +403,7 @@ public class App {
                     Lesson lesson = DataMapper.getLessonById(quizEdit.lessonId,conn);
                     map.put("currLesson",quizEdit.lessonId);
                     map.put("currLessonName", lesson.name);
+                    lessons.removeIf(l -> l.getId() == lesson.getId());
                     map.put("quizName",quizEdit.quizName);
                     map.put("minMark",quizEdit.MinMark);
                     map.put("title","Modify");
@@ -424,6 +422,7 @@ public class App {
             }
             map.put("lessons",DataMapper.getLessonsByCourseId(Integer.parseInt(courseId), conn));
             if (Courses.allowRating(course)) map.put("viewRate", true);
+            map.put("lessons",lessons);
             conn.close();
             return new ModelAndView(map,"createQuiz.ftl");
         }),engine);
@@ -538,27 +537,6 @@ public class App {
                     response.redirect("/course/quiz/"+courseId+"/"+quizId);
                     break;
             }
-//            if (edit == null || edit.contains("-1")){
-//                map.put("e",-1);
-//                map.put("mark",0);
-//                map.put("title", "Create");
-//            }
-//            if (edit.contains("1")){
-//                map.put("e",1);
-//                String questionId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId")));
-//                Map<String, Object> question = DataMapper.getQuestion(Integer.parseInt(questionId), conn);
-//                Object questionText = question.get("questionText");
-//                sess.attribute("questionId",question);
-//                map.put("title","Modify "+questionText);
-//                map.put("questionText",questionText);
-//                map.put("question",question);
-//                map.put("questionId",questionId);
-//            }
-//            if (edit.contains("d")){
-//                quiz.questionId = Integer.parseInt(String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId"))));
-//                DataMapper.deleteQuestion(quiz,conn);
-//                response.redirect("/course/quiz/"+courseId+"/"+quizId);
-//            }
 
             conn.close();
             return new ModelAndView(map,"question.ftl");

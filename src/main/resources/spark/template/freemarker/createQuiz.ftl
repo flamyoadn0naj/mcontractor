@@ -62,56 +62,6 @@
                         </select>
                     </div>
 
-<#--                    <div class="form-group" style="display: flex">-->
-<#--                        <label class="col-3">Meeting Days</label>-->
-<#--                        <#if days??>-->
-<#--                            <div class="col-9 space-between">-->
-<#--                                <#list days as k, v>-->
-<#--                                    <div class="form-check">-->
-<#--                                        <label class="form-check-label">-->
-<#--                                            <#if v == true>-->
-<#--                                                <input name="${k}" id="${k}" class="form-check-input" type="checkbox" checked value="${k}">-->
-<#--                                            <#else>-->
-<#--                                                <input name="${k}" id="${k}" class="form-check-input" type="checkbox" value="${k}">-->
-<#--                                            </#if>-->
-<#--                                            ${k}-->
-<#--                                        </label>-->
-<#--                                    </div>-->
-<#--                                </#list>-->
-<#--                            </div>-->
-<#--                        </#if>-->
-<#--                    </div>-->
-<#--                    <#if errTime??>-->
-<#--                        <div class="invalid-feedback" style="display:block;margin-left:1%">-->
-<#--                            The class ending time can not be before the starting time.-->
-<#--                        </div>-->
-<#--                    </#if>-->
-<#--                    <div class="form-group mb-3" style="display: flex">-->
-<#--                        <label class="col-3" for="exampleSelect2">Meeting Time</label>-->
-<#--                        <div class="col-9" style="display: flex">-->
-<#--                            <input min="09:00" max="18:00" required type="time" name="start_time"-->
-<#--                                   class="form-control col-4" id="start_time" value=${start_time!""}>-->
-<#--                            <div class="col-4 text-center"> to </div>-->
-<#--                            <input min="09:00" max="18:00" required type="time" name="end_time"-->
-<#--                                   class="form-control col-4" id="end_time" value=${end_time!""}>-->
-<#--                        </div>-->
-<#--                    </div>-->
-<#--                    <#if errDate??>-->
-<#--                        <div class="invalid-feedback" style="display:block;margin-left:1%">-->
-<#--                            The course ending date can not be before the starting date and-->
-<#--                            the course start date must be in the future.-->
-<#--                        </div>-->
-<#--                    </#if>-->
-<#--                    <div class="form-group mb-3" style="display: flex">-->
-<#--                        <label class="col-3" for="exampleSelect2">Starts</label>-->
-<#--                        <div class="col-9" style="display: flex">-->
-<#--                            <input required type="date" name="start_date" class="form-control col-4"-->
-<#--                                   id="start_date" value=${start_date!""}>-->
-<#--                            <div class="col-4 text-center"> Ends </div>-->
-<#--                            <input required type="date" name="end_date" class="form-control col-4"-->
-<#--                                   id="end_date" value=${end_date!""}>-->
-<#--                        </div>-->
-<#--                    </div>-->
                     <div class="form-group mb-3" style="display: flex">
                         <label class="col-3" for="1d">Minimum Mark to Pass</label>
 <#--                        <#if quizEdit??>-->
