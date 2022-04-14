@@ -12,12 +12,12 @@
 <#include "navbar.ftl">
 <div style="display: flex;justify-content: center">
     <div class="card text-black mb-3" style="width:100%; border: none">
-        <h2 class="card-header border-primary text-black-50 mb-3">
+        <h5 class="card-header border-primary text-black-50 mb-3">
             ${title}
-        </h2>
+        </h5>
         <div style="width: 90%; margin-left: 2%">
             <#if role == "prof">
-                <a href="/course/create-question?courseId=${courseId}&lessonId=${lessonId}&quizId=${quizId}&e=-1" class="btn btn-primary" style="float: right">Add</a>
+                <a href="/course/create-question?courseId=${courseId}&lessonId=${lessonId}&quizId=${quizId}&e=-1" class="btn btn-primary" style="float: right; margin-left: 2%">Add</a>
                 <a href="/course/quiz/${courseId}" class="btn btn-primary"
                    style="float:
                 right">Back</a>
