@@ -11,18 +11,18 @@ Software Engineering Course Project, SWEN-610
 6. We are using JDBC Connector v[8.0.2](https://dev.mysql.com/downloads/connector/j/)
 
 ### Some test users are given below:
-1. learner:
+1. learner role:
 email: jw@rit.edu
 password: 123456
 email: js@rit.edu
 password: 123456
 
-2. professor:
+2. professor role:
 email: tf@rit.edu
 password: 123456
 email: ps@rit.edu
 password: 123456
 
-3. admin:
+3. admin role:
 email: mc1927@rit.edu
 password: 123456
