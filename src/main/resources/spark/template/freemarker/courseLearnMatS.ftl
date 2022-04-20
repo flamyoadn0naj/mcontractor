@@ -2,6 +2,8 @@
 <html>
 
 <head>
+    <meta property="og:title"         content="My PLS" />
+    <meta property="og:description"   content="Course" />
     <link rel="stylesheet"  href="/css/_bootswatch.scss">
     <link rel="stylesheet"  href="/css/_variables.scss">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
@@ -9,6 +11,8 @@
     <title>Course Lessons - MyPLS</title>
 </head>
 <body>
+<div id="fb-root"></div>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v9.0" nonce="FveZBD1v"></script>
 <#include "navbar.ftl">
 <div style="display: flex;justify-content: center">
     <div class="card text-black mb-3" style="width:100%; border: none">
@@ -75,6 +79,11 @@
                                                 <button type="submit" class="btn btn-primary" style="float: right;" name="saveButton" value=${lesson.id}>Save</button>
                                                 <button class="btn-download" style="float: right; margin-top:5px;" name="deleteButton" value=${lesson.id}><i class="fa fa-trash"></i></button>
                                                 <button type="submit" class="btn-download" name="shareButton" value="true" style="margin-top:5px;"><i class="fa fa-share"></i></button>
+                                                <div class="fb-share-button" data-href="http://${ip}/course/learnMat/${courseNumber}" data-layout="button_count" data-size="small">
+                                                    <a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2F${ip}%3A8080%2Fcourse%2FlearnMat%2F${courseNumber}&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">
+                                                        Share
+                                                    </a>
+                                                </div>
                                             </div>
                                         </#if>
                                     </h5>

@@ -44,7 +44,7 @@ public class App {
     public static void main(String[] args) {
 
         port(8080);
-
+        String ip = "10.181.95.232:8080";
         final TemplateEngine engine = new FreeMarkerEngine();
         staticFileLocation("/public"); //So that it has access to the pubic resources(stylesheets, etc.)
 
@@ -280,6 +280,7 @@ public class App {
             map.put("courseNumber",courseId);
             map.put("name", course.get("name"));
             if (Courses.allowRating(course)) map.put("viewRate", true);
+            map.put("ip",ip);
             conn.close();
             return new ModelAndView(map,"courseLearnMatS.ftl");
         }),engine);
