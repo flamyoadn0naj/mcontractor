@@ -15,8 +15,15 @@
         <h2 class="card-header border-primary text-black-50 mb-3">
             ${name}
         </h2>
-        <h4 class="card-header border-primary text-black-50 mb-3" style="margin-top: -1.5%">
-            Maheen Riaz Contractor
+        <h4 class="card-header border-primary text-black-50 mb-3 space-between" style="margin-top: -1.5%">
+            ${learnerName}
+            <#if role == "prof">
+                <a class="text-white" href="/course/grades/${courseId}">
+                    <button class="btn btn-primary mb-3" style="float: left">
+                        Back
+                    </button>
+                </a>
+            </#if>
         </h4>
         <div style="width: 90%; margin-left: 2%">
             <ul class="nav nav-tabs">
@@ -30,7 +37,7 @@
                     <a class="nav-link" data-toggle="tab" href="/course/quiz/${courseId}">Quizzes</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" data-toggle="tab" href="/course/grade/${courseId}">Grades</a>
+                    <a class="nav-link active" data-toggle="tab" href="/course/grades/${courseId}">Grades</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="/course/classlist/${courseId}">Classlist</a>
@@ -43,85 +50,24 @@
             </ul>
             <div id="myTabContent" class="tab-content" style="margin:2%">
                 <div class="tab-pane fade active show" id="grade">
-                    <#if role == "prof">
-                        <form>
-                            <div class="mb-3" style="display: flex; justify-content: space-between">
-                            <span>
-                                Lesson #1
-                            </span>
-                                <span style="display: flex;justify-content:flex-end;">
-                                    <input type="number" class="form-control" name="1" style="width: 30%" value="30">
-                                    <div style="margin-right: 2%; margin-left: 2%">/</div>
-                                    <input type="number" class="form-control" name="1_tot" style="width: 30%" value="100">
-                                </span>
-                            </div>
-                            <div class="mb-3" style="display: flex; justify-content: space-between">
-                            <span>
-                                Lesson #2
-                            </span>
-                                <span style="display: flex;justify-content:flex-end;">
-                                    <input type="number" class="form-control" name="2" style="width: 30%" value="40">
-                                    <div style="margin-right: 2%; margin-left: 2%">/</div>
-                                    <input type="number" class="form-control" name="2_tot" style="width: 30%" value="100">
-                                </span>
-                            </div>
+                    <#if grades??>
+                        <#list grades as k,v>
                             <div class="mb-3" style="display: flex; justify-content: space-between">
                                 <span>
-                                    Lesson #3
+                                   ${k}
                                 </span>
-                                <span style="display: flex;justify-content:flex-end;">
-                                    <input type="number" class="form-control" name="3" style="width: 30%" value="60">
-                                    <div style="margin-right: 2%; margin-left: 2%">/</div>
-                                    <input type="number" class="form-control" name="3_tot" style="width: 30%" value="100">
-                                </span>
-                            </div>
-                            <div class="mb-3" style="display: flex; justify-content: space-between">
-                            <span>
-                                Midterm #1
-                            </span>
-                                <span style="display: flex;justify-content:flex-end;">
-                                    <input type="number" class="form-control" name="4" style="width: 30%" value="75">
-                                    <div style="margin-right: 2%; margin-left: 2%">/</div>
-                                    <input type="number" class="form-control" name="4_tot" style="width: 30%" value="100">
+                                <span>
+                                    <#if v.score != "Not Attempted">
+                                        ${v.score}/${v.marks}
+                                    <#else>
+                                        ${v.score}
+                                    </#if>
+
                                 </span>
                             </div>
-                            <button type="submit" class="btn btn-primary"  style="width:10rem; float:right;">
-                                Save
-                            </button>
-                        </form>
+                        </#list>
                     <#else>
-                        <div class="mb-3" style="display: flex; justify-content: space-between">
-                            <span>
-                                Lesson #1
-                            </span>
-                            <span>
-                                50/100
-                            </span>
-                        </div>
-                        <div class="mb-3" style="display: flex; justify-content: space-between">
-                            <span>
-                                Lesson #2
-                            </span>
-                            <span>
-                                30/100
-                            </span>
-                        </div>
-                        <div class="mb-3" style="display: flex; justify-content: space-between">
-                            <span>
-                                Lesson #3
-                            </span>
-                            <span>
-                                90/100
-                            </span>
-                        </div>
-                        <div class="mb-3" style="display: flex; justify-content: space-between">
-                            <span>
-                                Midterm #1
-                            </span>
-                            <span>
-                                75/100
-                            </span>
-                        </div>
+                    <div> No Grades Available </div>
                     </#if>
                 </div>
             </div>

@@ -8,7 +8,6 @@ import spark.template.freemarker.FreeMarkerEngine;
 
 //things for file upload
 import javax.servlet.MultipartConfigElement;
-import javax.xml.crypto.Data;
 import java.io.*;
 
 //end things for file upload
@@ -276,7 +275,8 @@ public class App {
             if((int)course.get("prof_id") == id) map.put("role", "prof");
             else map.put("role","learner");
             //add each lesson
-            map.put("lessons",DataMapper.getLessonsByCourseId(Integer.parseInt(courseId), conn));
+            ArrayList<Lesson> lessons = DataMapper.getLessonsByCourseId(Integer.parseInt(courseId), conn);
+            if (!lessons.isEmpty()) map.put("lessons",lessons);
             map.put("courseNumber",courseId);
             map.put("name", course.get("name"));
             if (Courses.allowRating(course)) map.put("viewRate", true);
@@ -614,11 +614,40 @@ public class App {
                 conn.close();
                 response.redirect("/course/grade/individual/" + courseId);
             }
+            Map<Integer, Map<String,String>> classList = DataMapper.getClassList(Integer.parseInt(courseId), conn);
+            classList.remove(id);
+            if (!classList.isEmpty()) map.put("classList", classList);
             map.put("courseId", courseId);
             map.put("name", course.get("name"));
             if (Courses.allowRating(course)) map.put("viewRate", true);
             conn.close();
             return new ModelAndView(map,"courseGrade.ftl");
+        }),engine);
+
+        get("/course/grade/individual/:courseId/:userId",((request, response) -> {
+            Map<String,Object> map = new HashMap<>();
+            Session sess = request.session();
+            int id = sess.attribute("id");
+            int userId = Integer.parseInt(request.params(":userId"));
+            String courseId = request.params(":courseId");
+            Connection conn = MySqlConnection.getConnection();
+            courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
+            Map<String,Object> course = Courses.getCourse(courseId, conn);
+            String name = DataMapper.getNameFromUserId(userId, conn);
+            if((int)course.get("prof_id") != id) {
+                conn.close();
+                response.redirect("/err");
+            }
+            map.put("role", "prof");
+            Grades grades = new Grades(Integer.valueOf(courseId), userId, conn);
+            Map<String,Object> g = grades.getGrades();
+            if (!g.isEmpty()) map.put("grades", g);
+            map.put("learnerName", name);
+            map.put("courseId", courseId);
+            map.put("name", course.get("name"));
+            if (Courses.allowRating(course)) map.put("viewRate", true);
+            conn.close();
+            return new ModelAndView(map,"courseGradeIndividual.ftl");
         }),engine);
 
         get("/course/grade/individual/:courseId",((request, response) -> {
@@ -629,8 +658,17 @@ public class App {
             Connection conn = MySqlConnection.getConnection();
             courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
             Map<String,Object> course = Courses.getCourse(courseId, conn);
-            if((int)course.get("prof_id") == id) map.put("role", "prof");
-            else map.put("role","learner");
+            String name = sess.attribute("firstName").toString() + " "
+                    + sess.attribute("lastName").toString();
+            if((int)course.get("prof_id") == id) {
+                conn.close();
+                response.redirect("/err");
+            }
+            map.put("role","learner");
+            Grades grades = new Grades(Integer.valueOf(courseId), id, conn);
+            Map<String,Object> g = grades.getGrades();
+            if (!g.isEmpty()) map.put("grades", g);
+            map.put("learnerName", name);
             map.put("courseId", courseId);
             map.put("name", course.get("name"));
             if (Courses.allowRating(course)) map.put("viewRate", true);

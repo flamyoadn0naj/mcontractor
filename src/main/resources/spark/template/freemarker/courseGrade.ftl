@@ -40,80 +40,54 @@
             </ul>
             <div id="myTabContent" class="tab-content" style="margin:2%">
                 <div class="tab-pane fade active show" id="grade">
-                    <#if role == "prof">
+                    <#if classList??>
+                        <table class="table">
+                            <tr class="table-primary justify-content-between">
+                            </tr>
+                            <#list classList as k,v>
+                                <tr>
+                                    <th scope="row">${v.name}</th>
+                                    <td>
+                                        <button type="button" class="btn-download" style="float: right">
+                                            <a href="/course/grade/individual/${courseId}/${k}"><i class="fa fa-eye"></i></a>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </#list>
+
+<#--                            <tr>-->
+<#--                                <th scope="row">Tharindu Cyril Weerasooriya</th>-->
+<#--                                <td>-->
+<#--                                    <button type="button" class="btn-download" style="float: right">-->
+<#--                                        <i class="fa fa-edit"></i>-->
+<#--                                    </button>-->
+<#--                                </td>-->
+<#--                            </tr>-->
+<#--                            <tr>-->
+<#--                                <th scope="row">Malcolm Lambrecht</th>-->
+<#--                                <td>-->
+<#--                                    <button type="button" class="btn-download" style="float: right">-->
+<#--                                        <i class="fa fa-edit"></i>-->
+<#--                                    </button>-->
+<#--                                </td>-->
+<#--                            </tr>-->
+<#--                            <tr>-->
+<#--                                <th scope="row">Saad Hassan</th>-->
+<#--                                <td>-->
+<#--                                    <button type="button" class="btn-download" style="float: right">-->
+<#--                                        <i class="fa fa-edit"></i>-->
+<#--                                    </button>-->
+<#--                                </td>-->
+<#--                            </tr>-->
+                        </table>
+                    <#else>
+                        No learners enrolled in this course.
+                    </#if>
 <#--                        <div class="space-between">-->
 <#--                            <a href="/course/grade/individual">Maheen Riaz Contractor</a>-->
 <#--                        </div>-->
-                    <table class="table">
-                        <tr class="table-primary justify-content-between">
-                        </tr>
-                        <tr>
-                            <th scope="row">Maheen Riaz Contractor</th>
-                            <td>
-                                <button type="button" class="btn-download" style="float: right">
-                                    <a href="/course/grade/individual/${courseId}"><i class="fa fa-edit"></i></a>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Tharindu Cyril Weerasooriya</th>
-                            <td>
-                                <button type="button" class="btn-download" style="float: right">
-                                    <i class="fa fa-edit"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Malcolm Lambrecht</th>
-                            <td>
-                                <button type="button" class="btn-download" style="float: right">
-                                    <i class="fa fa-edit"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Saad Hassan</th>
-                            <td>
-                                <button type="button" class="btn-download" style="float: right">
-                                    <i class="fa fa-edit"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </table>
-                    <#else>
-                        <div class="mb-3" style="display: flex; justify-content: space-between">
-                            <span>
-                                Lesson #1
-                            </span>
-                            <span>
-                                50/100
-                            </span>
-                        </div>
-                        <div class="mb-3" style="display: flex; justify-content: space-between">
-                            <span>
-                                Lesson #2
-                            </span>
-                            <span>
-                                30/100
-                            </span>
-                        </div>
-                        <div class="mb-3" style="display: flex; justify-content: space-between">
-                            <span>
-                                Lesson #3
-                            </span>
-                            <span>
-                                90/100
-                            </span>
-                        </div>
-                        <div class="mb-3" style="display: flex; justify-content: space-between">
-                            <span>
-                                Midterm #1
-                            </span>
-                            <span>
-                                75/100
-                            </span>
-                        </div>
-                    </#if>
+
+
                 </div>
             </div>
         </div>

@@ -1,4 +1,4 @@
-package com.my_pls;
+package com.my_pls.application.components;
 
 public class DiscussionPost {
     public int getDgId() {

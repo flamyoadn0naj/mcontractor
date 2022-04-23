@@ -1,7 +1,5 @@
 package com.my_pls.application.components;
 
-import com.my_pls.DiscussionPost;
-import com.my_pls.Lesson;
 import com.my_pls.securePassword;
 import com.my_pls.sendEmail;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -1614,5 +1612,23 @@ public class DataMapper {
             System.out.println("Exception at createDGPostLesson " + e);
         }
         return 0;
+    }
+
+    public static String getGradesOfUser(int userId, int courseId, int id, Integer quizId, Connection conn) {
+        String grade = "Not Attempted";
+        try{
+            PreparedStatement pst = conn.prepareStatement("select score from grades where userId=? and courseId=? " +
+                    "and lessonId=? and quizId=?");
+            pst.setInt(1, userId);
+            pst.setInt(2, courseId);
+            pst.setInt(3, id);
+            pst.setInt(4, quizId);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) grade = String.valueOf(rs.getInt("score"));
+
+        } catch( Exception e) {
+            System.out.println("Exception at createDGPostLesson " + e);
+        }
+        return grade;
     }
 }

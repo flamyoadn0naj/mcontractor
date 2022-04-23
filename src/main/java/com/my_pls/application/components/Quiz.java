@@ -1,7 +1,5 @@
 package com.my_pls.application.components;
 
-import com.my_pls.Lesson;
-
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
