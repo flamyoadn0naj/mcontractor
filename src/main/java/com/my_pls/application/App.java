@@ -49,11 +49,12 @@ public class App {
         staticFileLocation("/public"); //So that it has access to the pubic resources(stylesheets, etc.)
 
         //file upload location
-        File uploadDir = new File("uploadFolder");
+        String oldFileLoc = "uploadFolder";
+        File uploadDir = new File(oldFileLoc);
         uploadDir.mkdir(); // create the upload directory if it doesn't exist
         //folder is at the same hierarchy level as main
-        staticFiles.externalLocation("uploadFolder");
-
+        staticFiles.externalLocation(oldFileLoc);
+        System.out.println(uploadDir.toPath().toString());
         internalServerError((request, response) -> {
             response.redirect("/err");
             return "{\"message\":\"Server Error\"}";
@@ -1259,5 +1260,18 @@ public class App {
 
             return null;
         });
+
+        get("/view/:fileName",((request, response) -> {
+            //Session sess = request.session();
+           // String role = sess.attribute("role").toString();
+            Map<String,String> map = new HashMap<>();
+            String[] vals =request.params(":fileName").split("\\.");
+            map.put("fileName", vals[0]);
+            map.put("fileType", "."+vals[1]);
+            map.put("filePath", "/"+request.params(":fileName"));
+            return new ModelAndView(map,"viewFile.ftl");
+        }),engine);
+
+
     }
 }

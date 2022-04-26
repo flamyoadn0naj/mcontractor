@@ -95,7 +95,7 @@
 
                                                 <li class="list-group-item d-flex justify-content-between align-items-center">
 
-                                                    <input readonly style="border:none; text-decoration: underline" name="${material}" value="${material}">
+                                                    <a href="/view/${material}"><input readonly style="border:none; text-decoration: underline" name="${material}" value="${material}"></a>
                                                     <div>
                                                         <button type="submit" class="btn-download" name="dlButton" value="${material}"><i class="fa fa-download" ></i></button>
                                                          <#if role == "prof">
