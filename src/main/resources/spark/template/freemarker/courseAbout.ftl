@@ -64,7 +64,7 @@
                             <div style="display: flex">
                             <b>Rating: </b>
                             <#if rating??>
-                            <div class="mb-3" style="margin-bottom: 2%; margin-top: 2%; display: flex; justify-content: space-evenly">
+                            <div class="mb-3" style="margin-left: 5pt; width: 125pt; display: flex; justify-content: space-evenly">
                                 <#if rating.rating == 0>
                                     <div style="text-align: center; margin-top: 2%"> No Rating Found </div>
                                 <#else>

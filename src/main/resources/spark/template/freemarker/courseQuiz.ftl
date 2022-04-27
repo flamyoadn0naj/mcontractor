@@ -61,11 +61,9 @@
                                     <td>${c.marks}</td>
                                     <td>
                                         <#if role == "prof">
-                                            <a href="/course/${courseId}/create-quiz?courseId=${courseId}&quizId=${c.quizId!""}&e=e" class="btn-download" style="float: left"><i class="fa fa-edit"></i></a>
-                                            <a href="/course/${courseId}/create-quiz?courseId=${courseId}&quizId=${c.quizId!""}&e=d" class="btn-download" style="float: left"><i class="fa fa-trash"></i></a>
-                                            <button type="button" class="btn-download" style="float: left">
-                                                <i class="fa fa-share"></i>
-                                            </button>
+                                            <a class="btn-download padding2right" href="/course/${courseId}/create-quiz?courseId=${courseId}&quizId=${c.quizId!""}&e=e"><i class="fa fa-edit"></i></a>
+                                            <a class="btn-download" href="/course/${courseId}/create-quiz?courseId=${courseId}&quizId=${c.quizId!""}&e=d"><i class="fa fa-trash"></i></a>
+<#--                                            <a class="btn-download" href="#"><i class="fa fa-share"></i></a>-->
                                         <#else>
                                             <#if c.status == 1>
                                                 <button type="button" class="btn btn-primary">Take</button>
