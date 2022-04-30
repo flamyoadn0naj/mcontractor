@@ -14,7 +14,7 @@ import java.util.zip.ZipOutputStream;
 public class FileManager {
 
     public static Response downloadFile(Request request, Response response, String fileName){
-        File file = new File("uploadFolder/"+ fileName);
+        File file = new File(System.getProperty("user.dir") + "/src/main/resources/public/"+ fileName);
         response.raw().setContentType("application/octet-stream");
         response.raw().setHeader("Content-Disposition","attachment; filename="+file.getName()+".zip");
         try {

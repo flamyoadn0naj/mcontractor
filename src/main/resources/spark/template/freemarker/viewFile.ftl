@@ -13,10 +13,14 @@
 <div style="display: flex;justify-content: center">
     <div class="card text-black mb-3" style="width:100%; border: none">
         <h2 class="card-header border-primary text-black-50 mb-3">
-            View ${fileName}
+            <p style="float: left;">View ${fileName}</p>
+            <form method="get" action="/course/learnMat/${courseNumber}">
+                <button type="submit" class="btn btn-primary" style="float: right; margin-right: 2%">Back</button>
+            </form>
         </h2>
+        <div style="width:80%; margin:auto; text-align:center;">
         <#if fileType == ".mp4">
-            <video width="400" height="500" src="${filePath}" controls>
+            <video src="${filePath}" controls>
                 Error loading video player.
             </video>
         <#else>
@@ -24,6 +28,7 @@
                 MyPLS does not support the viewing of this file type.
             </p>
         </#if>
+        </div>
     </div>
 </div>
 </body>
