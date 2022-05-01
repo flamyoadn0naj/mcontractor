@@ -48,11 +48,13 @@ public class App {
         staticFileLocation("/public"); //So that it has access to the pubic resources(stylesheets, etc.)
 
         //file upload location
-        File uploadDir = new File("uploadFolder");
+        String oldFileLoc = "uploadFolder";
+        String newFileLoc = System.getProperty("user.dir") + "/src/main/resources/public";
+        File uploadDir = new File(newFileLoc);
         uploadDir.mkdir(); // create the upload directory if it doesn't exist
         //folder is at the same hierarchy level as main
-        staticFiles.externalLocation("uploadFolder");
-
+        staticFiles.externalLocation(newFileLoc);
+        System.out.println(uploadDir.toPath().toString());
         internalServerError((request, response) -> {
             response.redirect("/err");
             return "{\"message\":\"Server Error\"}";
@@ -1250,31 +1252,20 @@ public class App {
             return "Success!";
         });
 
-        post("/download", (request,response)-> {
-            File file = new File("uploadFolder/PDFTest.pdf");
-            response.raw().setContentType("application/octet-stream");
-            response.raw().setHeader("Content-Disposition","attachment; filename="+file.getName()+".zip");
-            try {
 
-                try(ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(response.raw().getOutputStream()));
-                    BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file)))
-                {
-                    ZipEntry zipEntry = new ZipEntry(file.getName());
 
-                    zipOutputStream.putNextEntry(zipEntry);
-                    byte[] buffer = new byte[1024];
-                    int len;
-                    while ((len = bufferedInputStream.read(buffer)) > 0) {
-                        zipOutputStream.write(buffer,0,len);
-                    }
-                    zipOutputStream.flush();
-                    zipOutputStream.close();
-                }
-            } catch (Exception e) {
+        get("/view/:courseNum/:fileName",((request, response) -> {
+            //Session sess = request.session();
+           // String role = sess.attribute("role").toString();
+            Map<String,String> map = new HashMap<>();
+            String[] vals =request.params(":fileName").split("\\.");
+            map.put("fileName", vals[0]);
+            map.put("fileType", "."+vals[1]);
+            map.put("filePath", "/"+request.params(":fileName"));
+            map.put("courseNumber", request.params(":courseNum"));
+            return new ModelAndView(map,"viewFile.ftl");
+        }),engine);
 
-            }
 
-            return null;
-        });
     }
 }
