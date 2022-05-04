@@ -372,7 +372,7 @@ public class App {
              map.put("name", course.get("name"));
             if (Courses.allowRating(course)) map.put("viewRate", true);
             Map<Integer, Object>  quizzes = Quiz.getQuizzes(Integer.parseInt(courseId), conn);
-                if (!quizzes.isEmpty()) map.put("quizzes",quizzes);
+            if (!quizzes.isEmpty()) map.put("quizzes",quizzes);
             conn.close();
             return new ModelAndView(map,"courseQuiz.ftl");
         }),engine);

@@ -17,7 +17,7 @@
         </h5>
         <div style="width: 90%; margin-left: 2%">
             <#if role == "prof">
-                <a href="/course/create-question?courseId=${courseId}&lessonId=${lessonId}&quizId=${quizId}&e=-1" class="btn btn-primary" style="float: right; margin-left: 2%">Add</a>
+<#--                <a href="/course/create-question?courseId=${courseId}&lessonId=${lessonId}&quizId=${quizId}&e=-1" class="btn btn-primary" style="float: right; margin-left: 2%">Add</a>-->
                 <a href="/course/quiz/${courseId}" class="btn btn-primary"
                    style="float:
                 right">Back</a>
