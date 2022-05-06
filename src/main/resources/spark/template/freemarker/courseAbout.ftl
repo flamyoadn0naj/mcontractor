@@ -6,6 +6,7 @@
     <link rel="stylesheet"  href="/css/_variables.scss">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Course About - MyPLS</title>
 </head>
 <body>
     <#include "navbar.ftl">
@@ -53,7 +54,7 @@
                             <#if role == "prof">
                                 <div class="mb-3">
                                     <b>Requirements:</b>
-                                    <input required style="width: 80%" name="req" type="text" id="req" value="${course.requirements}">
+                                    <input required style="width: 80%" name="req" pattern="\S.*\S" id="req" value="${course.requirements}">
                                 </div>
                             <#else>
                                 <p class="mb-3"><b>Requirements:</b>${course.requirements}</p>
@@ -63,7 +64,7 @@
                             <div style="display: flex">
                             <b>Rating: </b>
                             <#if rating??>
-                            <div class="mb-3" style="margin-bottom: 2%; margin-top: 2%; display: flex; justify-content: space-evenly">
+                            <div class="mb-3" style="margin-left: 5pt; width: 125pt; display: flex; justify-content: space-evenly">
                                 <#if rating.rating == 0>
                                     <div style="text-align: center; margin-top: 2%"> No Rating Found </div>
                                 <#else>

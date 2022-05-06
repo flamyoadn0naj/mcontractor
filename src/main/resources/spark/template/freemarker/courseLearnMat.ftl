@@ -6,6 +6,7 @@
     <link rel="stylesheet"  href="/css/_variables.scss">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Course Lessons - MyPLS</title>
 </head>
 <body>
 <#include "navbar.ftl">
@@ -65,7 +66,7 @@
                                     <#if role == "prof">
                                         <div class="mb-3">
                                             <b>Requirements:</b>
-                                            <input style="width: 80%" name="req1" type="text" id="req1" value="The student must get at least 80 marks in Quiz 1.">
+                                            <input style="width: 80%" name="req1" pattern="\S.*\S" id="req1" value="The student must get at least 80 marks in Quiz 1.">
                                         </div>
                                     <#else>
                                         <div class="mb-3"> <b>Requirements:</b> The student must get at least 80 marks in Quiz 1.</div>

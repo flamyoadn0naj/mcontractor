@@ -6,6 +6,7 @@
     <link rel="stylesheet"  href="/css/_variables.scss">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Approvals - MyPLS</title>
 </head>
 <body>
 <#include "navbar.ftl">
@@ -47,7 +48,7 @@
                 </div>
                 <div class="form-group mb-3" style="display: flex">
                     <label class="col-4" for="1d">Please write your name as a signature</label>
-                    <input required type="text" name="name" class="form-control col-8" id="name"  value="">
+                    <input required pattern="\S.*\S" name="name" class="form-control col-8" id="name"  value="">
                 </div>
                 <#if disable??>
                     <button disabled type="submit" name="action" value="Save" class="btn btn-primary" style="width:10rem; float:right;">

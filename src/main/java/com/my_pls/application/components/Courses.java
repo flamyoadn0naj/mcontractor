@@ -72,11 +72,12 @@ public class Courses {
         }
         Map<String,Object> course = Proxy.findCourseByCourseId(courseId, conn);
         DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm");
-        DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:m a");
+        DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:mm a");
         LocalTime startTime = LocalTime.parse(String.valueOf(course.get("start_time")), df);
         String s = startTime.format(df2);
         LocalTime endTime = LocalTime.parse(String.valueOf(course.get("end_time")), df);
         String e = endTime.format(df2);
+
         course.put("start_time", s);
         course.put("end_time", e);
         course.put("prof_name", Proxy.findProfName((Integer) course.get("prof_id"), conn));

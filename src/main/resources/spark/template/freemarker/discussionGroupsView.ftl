@@ -5,6 +5,7 @@
     <link rel="stylesheet"  href="/css/_bootswatch.scss">
     <link rel="stylesheet"  href="/css/_variables.scss">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <title>Discussion Groups - MyPLS</title>
 </head>
 <body>
 <a class="btn btn-primary col-2 mb-3" href="/discussion/create"
@@ -35,23 +36,25 @@
                                 </th>
                                 <#if g.course??>
                                 <#else>
-                                    <td>
-                                        <button name="leave" value="${g.id}" style="float: right" class="btn btn-primary" type="submit">Leave</button>
-                                    </td>
+                                    <#if g.id != 311>
+                                        <td>
+                                            <button name="leave" value="${g.id}" style="float: right" class="btn btn-primary" type="submit">Leave</button>
+                                        </td>
+                                    </#if>
                                 </#if>
                             </tr>
                         </#list>
                     </form>
                 </#if>
 
-                <tr>
-                    <th scope="row">
-                        <a class="text-muted" href="">Added Value</a>
-                    </th>
-                    <td>
-                        <button style="float: right" class="btn btn-primary" type="submit">Leave</button>
-                    </td>
-                </tr>
+<#--                <tr>-->
+<#--                    <th scope="row">-->
+<#--                        <a class="text-muted" href="">Added Value</a>-->
+<#--                    </th>-->
+<#--                    <td>-->
+<#--                        <button style="float: right" class="btn btn-primary" type="submit">Leave</button>-->
+<#--                    </td>-->
+<#--                </tr>-->
             </table>
         </div>
     </div>

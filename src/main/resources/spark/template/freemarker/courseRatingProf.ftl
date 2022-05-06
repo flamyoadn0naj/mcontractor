@@ -6,6 +6,7 @@
     <link rel="stylesheet"  href="/css/_variables.scss">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Course Rate - MyPLS</title>
 </head>
 <body>
 <div id="myTabContent" class="tab-content">
@@ -56,12 +57,12 @@
                     </div>
                     <div class="mb-3" style="display: flex;margin-bottom: 2%">
                         <label style="margin-right: 2%" for="marks">Feedback</label>
-                        <input required type="text" name="feedback" class="form-control col-8" id="feedback">
+                        <input required pattern="\S.*\S" name="feedback" class="form-control col-8" id="feedback">
                     </div>
                     <button
                             type="submit"
                             name="doneRating"
-                            class="btn btn-primary mb-3 col-2"
+                            class="btn btn-primary mb-3"
                             value="${learnerId}"
                             style="float: right"
                     >
@@ -78,7 +79,7 @@
                         <tr>
                             <th scope="row">${v.name}</th>
                             <td>
-                                <button type="submit" name="rateLearner" class="btn btn-primary mb-3 col-2" value="${k}">
+                                <button type="submit" name="rateLearner" class="btn btn-primary mb-3" value="${k}">
                                     Rate
                                 </button>
                             </td>

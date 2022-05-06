@@ -1,6 +1,5 @@
 package com.my_pls.application.components;
 
-import com.my_pls.Lesson;
 import com.my_pls.securePassword;
 import com.my_pls.sendEmail;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -537,7 +536,7 @@ public class Proxy {
                 details.put("enrolled", String.valueOf(rs.getInt("enrolled")));
                 details.put("credits", String.valueOf(rs.getInt("credits")));
                 DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm");
-                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:m a");
+                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("hh:mm a");
                 LocalTime startTime = LocalTime.parse(String.valueOf(rs.getString("start_time")), df);
                 String st = startTime.format(df2);
                 LocalTime endTime = LocalTime.parse(String.valueOf(rs.getString("end_time")), df);
@@ -731,6 +730,7 @@ public class Proxy {
     }
 
     public static boolean createQuestion(Quiz question1, Connection conn) {
+        question1.answer = question1.answer.toUpperCase();
         boolean flag = false;
         try {
             PreparedStatement pst = conn.prepareStatement("insert into quiz_questions (quizId,question,answer,mark,responseA,responseB,responseC,responseD) VALUES (?,?,?,?,?,?,?,?)");
@@ -751,6 +751,7 @@ public class Proxy {
 
     public static boolean updateQuestion(Quiz question1, Connection conn) {
         boolean flag = false;
+        question1.answer = question1.answer.toUpperCase();
         try {
             PreparedStatement pst = conn.prepareStatement("update quiz_questions set question=?,answer=?,mark=?,responseA=?,responseB=?,responseC=?,responseD=? WHERE quizId=? and questionId=?");
 
@@ -771,9 +772,79 @@ public class Proxy {
         return flag;
     }
 
+    public static boolean deleteQuestion(Quiz question1, Connection conn) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("delete from quiz_questions where questionId=?");
+            pst.setInt(1, question1.questionId);
+            int i = pst.executeUpdate();
+            if (i != 0) flag = true;
+        } catch(Exception e) {
+            System.out.println("Exception at deleteQuestion " + e);
+        }
+        return flag;
+    }
+    public static boolean deleteQuiz(Quiz question1, Connection conn) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("delete from quizzes where Id=?");
+            pst.setInt(1, question1.quizId);
+            int i = pst.executeUpdate();
+            if (i != 0) flag = true;
+        } catch(Exception e) {
+            System.out.println("Exception at deleteQuiz " + e);
+        }
+        return flag;
+    }
+    public static boolean updateQuiz(Quiz question1, Connection conn) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("update quizzes set lessonId=?,name=?,minimumMarks=? WHERE Id=?");
+
+            pst.setInt(1, question1.lessonId);
+            pst.setString(2,question1.quizName);
+            pst.setInt(3,question1.MinMark);
+            pst.setInt(4,question1.quizId);
+            int i = pst.executeUpdate();
+            if (i != 0) {
+                flag = true;
+                pst.close();
+            }
+        } catch(Exception e) {
+            System.out.println("Exception at createQuestion " + e);
+        }
+        return flag;
+    }
+
+    public static int updateTotalMark(Quiz quiz, Connection conn){
+
+        Map<Integer,Object> questions = new HashMap<>();
+        int mark=0;
+        try{
+            PreparedStatement pst1 = conn.prepareStatement("select * from quiz_questions where quizId=?");
+            pst1.setInt(1,quiz.quizId);
+            ResultSet dbrs = pst1.executeQuery();
+            while (dbrs.next()){
+                Map<String, Object> question = new HashMap<>();
+                mark = mark + dbrs.getInt("mark");
+            }
+            dbrs.close();
+            pst1.close();
+            PreparedStatement pst2 = conn.prepareStatement("update quizzes set totalMarks=? WHERE Id=?");
+            pst2.setInt(1,mark);
+            pst2.setInt(2,quiz.quizId);
+            int i = pst2.executeUpdate();
+            if (i != 0) {
+                pst2.close();
+            }
+
+        } catch(Exception e) {
+            System.out.println("Exception at update mark " + e);
+        }
+        return mark;
+    }
     public static Map<Integer,Object> getQuestions(Quiz quiz, Connection conn){
-//        Quiz[] questions = new Quiz[MAXQUIZ]; //= new Quiz[0];
-//        ArrayList<Map<Quiz,Quiz>> questions = new ArrayList<Map<Quiz, Quiz>>();
+
         Map<Integer,Object> questions = new HashMap<>();
         int i=0;
         try{
@@ -792,13 +863,39 @@ public class Proxy {
                 question.put("responseC",dbrs.getString("responseC"));
                 question.put("responseD",dbrs.getString("responseD"));
                 questions.put((Integer) question.get("questionId"),question);
-
             }
 
         } catch(Exception e) {
             System.out.println("Exception at getQuestions " + e);
         }
         return questions;
+    }
+
+
+    public static Map<String, Object> getQuestion(int QuestionId, Connection conn) {
+
+        Map<String, Object> question = new HashMap<>();
+
+        try {
+            PreparedStatement pst1 = conn.prepareStatement("select * from quiz_questions where questionId=?");
+            pst1.setInt(1, QuestionId);
+            ResultSet dbrs = pst1.executeQuery();
+            while (dbrs.next()) {
+                question.put("quizId", dbrs.getInt("quizId"));
+                question.put("questionId", dbrs.getInt("questionId"));
+                question.put("questionText", dbrs.getString("question"));
+                question.put("answer", dbrs.getString("answer"));
+                question.put("mark", dbrs.getInt("mark"));
+                question.put("responseA", dbrs.getString("responseA"));
+                question.put("responseB", dbrs.getString("responseB"));
+                question.put("responseC", dbrs.getString("responseC"));
+                question.put("responseD", dbrs.getString("responseD"));
+            }
+
+        } catch (Exception e) {
+            System.out.println("Exception at getQuestions " + e);
+        }
+        return question;
     }
 
     public static Map<Integer, Object>  viewQuizzes(int lessonID, Connection conn) {
@@ -864,6 +961,7 @@ public class Proxy {
                 singleQuiz.quizId = rs.getInt("Id");
                 singleQuiz.quizName = rs.getString("name");
                 singleQuiz.MinMark = rs.getInt("minimumMarks");
+                singleQuiz.totalMark = rs.getInt("totalMarks");
             }
         } catch (Exception e) {
             System.out.println("Exception at view Quizes "+e);
@@ -1294,7 +1392,7 @@ public class Proxy {
                 LocalDate endDate = LocalDate.parse(details.get("end_date").toString());
                 String e = endDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
                 DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm");
-                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:m a");
+                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:mm a");
                 LocalTime startTime = LocalTime.parse(String.valueOf(details.get("start_time").toString()), df);
                 String st = startTime.format(df2);
                 LocalTime endTime = LocalTime.parse(String.valueOf(details.get("end_time").toString()), df);
@@ -1334,7 +1432,7 @@ public class Proxy {
                 details.put("enrolled", rs.getInt("enrolled"));
                 details.put("credits", rs.getInt("credits"));
                 DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm");
-                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:m a");
+                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("hh:mm a");
                 LocalTime startTime = LocalTime.parse(String.valueOf(rs.getString("start_time")), df);
                 String st = startTime.format(df2);
                 LocalTime endTime = LocalTime.parse(String.valueOf(rs.getString("end_time")), df);
@@ -1446,5 +1544,91 @@ public class Proxy {
             System.out.println("Exception at getNameFromUserId " + e);
         }
         return name;
+    }
+
+    public static ArrayList<DiscussionPost> getDGPostsById(int dgId, Connection conn){
+        ArrayList<DiscussionPost> allPosts = new ArrayList<>();
+        try {
+            PreparedStatement pst = conn.prepareStatement("select * from discussion_group_content where group_id="+ dgId +" ORDER BY post_time DESC");
+            ResultSet rs = pst.executeQuery();
+            while (rs.next()) {
+                DiscussionPost temp = new DiscussionPost(
+                        rs.getInt("group_id"),
+                        DataMapper.getNameFromUserId(rs.getInt("user_id"),conn),
+                        rs.getString("post_name"),
+                        rs.getString("post_content"),
+                        rs.getString("post_time"),
+                        rs.getString("post_attachment"));
+                allPosts.add(temp);
+                System.out.println(temp.getPostAttachment());
+            }
+        } catch (Exception e) {
+            System.out.println("Exception at getPendingGroupRequests " + e);
+        }
+        //System.out.println(allLessons);
+        return allPosts;
+    }
+
+    public static void createDGPost(int groupId, int userId, String postName, String postContent, Connection conn){
+        try{
+            PreparedStatement pst = conn.prepareStatement("insert into discussion_group_content (group_id, user_id, post_time, post_name, post_content) VALUES (?,?,?,?,?)");
+            pst.setInt(1, groupId);
+            pst.setInt(2, userId);
+            pst.setString(3, String.valueOf(java.time.LocalDateTime.now()));//GET TIME HERE
+            pst.setString(4, postName);
+            pst.setString(5, postContent);
+            pst.execute();
+        } catch( Exception e) {
+            System.out.println("Exception at createDGPostLesson " + e);
+        }
+    }
+
+    public static void createDGPostLesson(int groupId, int userId, String postName, String postContent, String postAttachment, Connection conn){
+        try{
+            PreparedStatement pst = conn.prepareStatement("insert into discussion_group_content (group_id, user_id, post_time, post_name, post_content, post_attachment) VALUES (?,?,?,?,?,?)");
+            pst.setInt(1, groupId);
+            pst.setInt(2, userId);
+            pst.setString(3, String.valueOf(java.time.LocalDateTime.now()));//GET TIME HERE
+            pst.setString(4, postName);
+            pst.setString(5, postContent);
+            pst.setString(6, postAttachment);
+            pst.execute();
+        } catch( Exception e) {
+            System.out.println("Exception at createDGPostLesson " + e);
+        }
+
+    }
+
+    public static int getDGIdByCourseId(int courseId,Connection conn){
+        try{
+            PreparedStatement pst = conn.prepareStatement("select id from discussion_groups where course_id=?");
+            pst.setInt(1, courseId);
+            ResultSet rs = pst.executeQuery();
+            while(rs.next()){
+                return rs.getInt("id");
+            }
+
+        } catch( Exception e) {
+            System.out.println("Exception at createDGPostLesson " + e);
+        }
+        return 0;
+    }
+
+    public static String getGradesOfUser(int userId, int courseId, int id, Integer quizId, Connection conn) {
+        String grade = "Not Attempted";
+        try{
+            PreparedStatement pst = conn.prepareStatement("select score from grades where userId=? and courseId=? " +
+                    "and lessonId=? and quizId=?");
+            pst.setInt(1, userId);
+            pst.setInt(2, courseId);
+            pst.setInt(3, id);
+            pst.setInt(4, quizId);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) grade = String.valueOf(rs.getInt("score"));
+
+        } catch( Exception e) {
+            System.out.println("Exception at createDGPostLesson " + e);
+        }
+        return grade;
     }
 }

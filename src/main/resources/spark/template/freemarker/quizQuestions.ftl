@@ -17,10 +17,8 @@
         </h2>
         <div style="width: 90%; margin-left: 2%">
             <#if role == "prof">
-                <a href="/course/${courseId}/create-quiz?courseId=${courseId}" class="btn btn-primary" style="float: right">Add</a>
-                <a href="/course/quiz/${courseId}" class="btn btn-primary"
-                   style="float:
-                right">Back</a>
+                <a href="/course/create-question?courseId=${courseId}&lessonId=${courseId}&quizId=${quizId}&e=-1" class="btn btn-primary col-1" style="float: right; margin-left: 2%">Add</a>
+                <a href="/course/quiz/${courseId}" class="btn btn-primary col-1" style="float:right">Back</a>
             </#if>
             <ul class="nav nav-tabs">
                 <li class="nav-item">
@@ -55,11 +53,12 @@
                         <#if questions??>
                             <#list questions as k,c>
                                 <tr>
-                                    <th scope="row"><a class="text-muted" href="${courseId}/${c.quizId}/${k}">${c.questionText}</a></th>
+                                    <th scope="row"><a class="text-muted" href="/course/create-question?quizId=${c.quizId}&questionId=${k}&courseId=${courseId}&e=e">${c.questionText}</a></th>
                                     <td>${c.mark}</td>
                                     <td>
                                         <#if role == "prof">
-                                            <a href="/course/${courseId}/create-quiz?courseId=${courseId}&quizId=${c.quizId!""}&e=1" class="btn btn-primary" style="float: right"><i class="fa fa-edit"></i></a>
+                                            <a class="btn-download padding2right" href="/course/create-question?quizId=${c.quizId}&questionId=${k}&courseId=${courseId}&e=e"><i class="fa fa-edit"></i></a>
+                                            <a class="btn-download" href="/course/create-question?quizId=${c.quizId}&questionId=${k}&courseId=${courseId}&e=d"><i class="fa fa-trash"></i></a>
                                         <#else>
                                             <#if c.status == 1>
                                                 <button type="button" class="btn btn-primary">Take</button>
@@ -68,14 +67,12 @@
                                     </td>
                                 </tr>
                             </#list>
-
-                            <#else>
-                                <tr>
-                                <div style="margin-left: 2%"> No Questions Found. Please add questions using the "Add"
-                                    button.</div>
-                                </tr>
                         </#if>
                     </table>
+                    <#if !questions??>
+                        <div style="margin-left: 2%"> No Questions Found. Please add questions using the "Add"
+                            button.</div>
+                    </#if>
 
                     <#--                        <tr>-->
                     <#--                            <th scope="row">Quiz 1</th>-->

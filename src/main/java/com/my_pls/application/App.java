@@ -43,16 +43,18 @@ public class App {
     public static void main(String[] args) {
 
         port(8080);
-
+        String ip = "10.181.95.232:8080";
         final TemplateEngine engine = new FreeMarkerEngine();
         staticFileLocation("/public"); //So that it has access to the pubic resources(stylesheets, etc.)
 
         //file upload location
-        File uploadDir = new File("uploadFolder");
+        String oldFileLoc = "uploadFolder";
+        String newFileLoc = System.getProperty("user.dir") + "/src/main/resources/public";
+        File uploadDir = new File(newFileLoc);
         uploadDir.mkdir(); // create the upload directory if it doesn't exist
         //folder is at the same hierarchy level as main
-        staticFiles.externalLocation("uploadFolder");
-
+        staticFiles.externalLocation(newFileLoc);
+        System.out.println(uploadDir.toPath().toString());
         internalServerError((request, response) -> {
             response.redirect("/err");
             return "{\"message\":\"Server Error\"}";
@@ -137,6 +139,10 @@ public class App {
                 email = URLDecoder.decode(email,"UTF-8");
                 String hash = request.queryParams("key2");
                 boolean flag = Proxy.verifyEmailofUser(email, hash, conn);
+                if (flag) {
+                    int id = Proxy.getUserIdFromEmail(email, conn);
+                    Proxy.addDGmember(id,311,conn);
+                }
             }
             conn.close();
             return new ModelAndView(map,"verifyRegister.ftl");
@@ -214,6 +220,8 @@ public class App {
             else map.put("role","learner");
             map.put("course",course);
             map.put("courseId", courseId);
+            Map<String,Object> rating = Proxy.getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"",conn);
+            if (!rating.isEmpty()) map.put("rating", rating);
             if (Courses.allowRating(course)) map.put("viewRate", true);
             conn.close();
             return new ModelAndView(map,"courseAbout.ftl");
@@ -244,6 +252,8 @@ public class App {
             else map.put("err", true);
             map.put("course",course);
             map.put("courseId", courseId);
+            Map<String,Object> rating = Proxy.getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"",conn);
+            if (!rating.isEmpty()) map.put("rating", rating);
             if (Courses.allowRating(course)) map.put("viewRate", true);
             conn.close();
             return new ModelAndView(map,"courseAbout.ftl");
@@ -267,10 +277,12 @@ public class App {
             if((int)course.get("prof_id") == id) map.put("role", "prof");
             else map.put("role","learner");
             //add each lesson
-            map.put("lessons", Proxy.getLessonsByCourseId(Integer.parseInt(courseId), conn));
+            ArrayList<Lesson> lessons = Proxy.getLessonsByCourseId(Integer.parseInt(courseId), conn));
+            if (!lessons.isEmpty()) map.put("lessons",lessons);
             map.put("courseNumber",courseId);
             map.put("name", course.get("name"));
             if (Courses.allowRating(course)) map.put("viewRate", true);
+            map.put("ip",ip);
             conn.close();
             return new ModelAndView(map,"courseLearnMatS.ftl");
         }),engine);
@@ -287,19 +299,18 @@ public class App {
             }
             Map<String,String> formFields = extractFields(request.body());
 
-            System.out.println(formFields);
-            System.out.println(URLDecoder.decode(formFields.get("req"),"UTF-8"));
+            //System.out.println(formFields);
+            //System.out.println(URLDecoder.decode(formFields.get("req"),"UTF-8"));
             Lesson temp = new Lesson(Integer.parseInt(URLDecoder.decode(formFields.get("lessonId"),"UTF-8")),
 
             URLDecoder.decode(formFields.get("name"),"UTF-8"),
             URLDecoder.decode(formFields.get("req"),"UTF-8"));
 
-            System.out.println(temp.getId());
+            //System.out.println(temp.getId());
             for(Map.Entry<String, String> element : formFields.entrySet()){
                 String k = URLDecoder.decode(element.getKey(),"UTF-8");
                 String v = URLDecoder.decode(element.getValue(),"UTF-8");
                 if(k.equals(v)){
-                    //
                     temp.materials.add(v);
                 }
             }
@@ -317,6 +328,15 @@ public class App {
 
             }else if(formFields.containsKey("deleteLMButton")){
                 Proxy.deleteLearningMaterial(temp.getId(),URLDecoder.decode(formFields.get("deleteLMButton"),"UTF-8"), conn);
+            }else if(formFields.containsKey("shareButton")){
+                System.out.println("Share lesson!");
+                Proxy.createDGPostLesson(
+                        Proxy.getDGIdByCourseId(Integer.parseInt(courseId),conn)
+                        ,sess.attribute("id"),
+                        URLDecoder.decode(formFields.get("name"),"UTF-8"),
+                        "Check out this lesson!",
+                        "/course/learnMat/"+courseId,
+                        conn);
             }
             conn.close();
             response.redirect("/course/learnMat/"+courseId);
@@ -352,7 +372,7 @@ public class App {
              map.put("name", course.get("name"));
             if (Courses.allowRating(course)) map.put("viewRate", true);
             Map<Integer, Object>  quizzes = Quiz.getQuizzes(Integer.parseInt(courseId), conn);
-                if (!quizzes.isEmpty()) map.put("quizzes",quizzes);
+            if (!quizzes.isEmpty()) map.put("quizzes",quizzes);
             conn.close();
             return new ModelAndView(map,"courseQuiz.ftl");
         }),engine);
@@ -371,30 +391,41 @@ public class App {
             map.put("courseId", courseId);
             map.put("name", course.get("name"));
             String edit = request.queryParams("e");
+
             String quizId = request.queryParams("quizId");
             ArrayList<Lesson> lessons = Proxy.getLessonsByCourseId(Integer.parseInt(courseId), conn);
-            map.put("lessons",lessons);
+            
             Quiz quizEdit = new Quiz();
-            if (edit == null){
-                map.put("e",-1);
-                map.put("quizName","");
-                map.put("minMark",0);
-                map.put("title", "Create");
-            }else{
-                map.put("e",1);
-                int quizIdInt = Integer.parseInt(quizId);
-                map.put("quizId",quizId);
-                quizEdit =  Proxy.viewSingleQuiz(quizIdInt,conn);
-                Lesson lesson = Proxy.getLessonById(quizEdit.lessonId,conn);
-                map.put("currLesson",quizEdit.lessonId);
-                map.put("currLessonName", lesson.name);
-                map.put("quizName",quizEdit.quizName);
-                map.put("minMark",quizEdit.MinMark);
-                map.put("title","Modify");
+            if (edit == null || edit.contains("-1")) edit="c";
+            switch (edit){
+                case "e":
+                    map.put("e",1);
+                    int quizIdInt = Integer.parseInt(quizId);
+                    map.put("quizId",quizId);
+                    quizEdit =  Proxy.viewSingleQuiz(quizIdInt,conn);
+                    Lesson lesson = Proxy.getLessonById(quizEdit.lessonId,conn);
+                    map.put("currLesson",quizEdit.lessonId);
+                    map.put("currLessonName", lesson.name);
+                    lessons.removeIf(l -> l.getId() == lesson.getId());
+                    map.put("quizName",quizEdit.quizName);
+                    map.put("minMark",quizEdit.MinMark);
+                    map.put("title","Modify");
+                    break;
+                case "d":
+                    quizEdit.quizId = Integer.parseInt(quizId);
+                    Proxy.deleteQuiz(quizEdit,conn);
+                    response.redirect("/course/quiz/"+courseId+"/");
+                    break;
+                case "c":
+                    map.put("e",-1);
+                    map.put("quizName","");
+                    map.put("minMark",0);
+                    map.put("title", "Create");
+                    break;
             }
-
-            map.put("lessons", Proxy.getLessonsByCourseId(Integer.parseInt(courseId), conn));
+            map.put("lessons",Proxy.getLessonsByCourseId(Integer.parseInt(courseId), conn));
             if (Courses.allowRating(course)) map.put("viewRate", true);
+            map.put("lessons",lessons);
             conn.close();
             return new ModelAndView(map,"createQuiz.ftl");
         }),engine);
@@ -411,18 +442,18 @@ public class App {
             newQuiz.MinMark = Integer.parseInt(formFields.get("minMark"));
             Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
-            if (Proxy.createQuiz(newQuiz, conn)){
-                conn.close();
-                response.redirect("/course/quiz/"+courseId);
+            String edit = request.queryParams("e");
+            if (edit == null || edit.contains("-1")) {
+                Proxy.createQuiz(newQuiz, conn);
+            } else{
+                newQuiz.quizId = Integer.parseInt(formFields.get("action"));
+                Proxy.updateQuiz(newQuiz, conn);
+                Proxy.updateTotalMark(newQuiz,conn);
             }
-            else{
-                conn.close();
-                response.redirect("/err");
-            }
-            map.put("courseId", courseId);
-            map.put("name", course.get("name"));
-            if (Courses.allowRating(course)) map.put("viewRate", true);
-            return new ModelAndView(map,"createQuiz.ftl");
+            conn.close();
+            response.redirect("/course/quiz/"+courseId);
+
+            return null;
 
         }),engine);
 
@@ -446,6 +477,7 @@ public class App {
             Map<Integer,Object> questions = Proxy.getQuestions(quiz,conn);
             map.put("quizName", quiz.quizName);
             map.put("quiz",quiz);
+            map.put("quizId",quizId);
             if (!questions.isEmpty()) {
                 map.put("questions",questions);
                 map.put("quizName", quiz.quizName);
@@ -454,6 +486,109 @@ public class App {
             return new ModelAndView(map,"quizQuestions.ftl");
 
         }),engine);
+
+        get("/course/create-question",((request, response) -> {
+
+            Map<String,Object> map = new HashMap<>();
+            Session sess = request.session();
+            int id = sess.attribute("id");
+            Connection conn = MySqlConnection.getConnection();
+            String courseId = request.queryParams("courseId");
+            courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
+
+            Map<String,Object> course = Courses.getCourse(courseId, conn);
+
+            if((int)course.get("prof_id") == id) map.put("role", "prof");
+            else
+            {
+                conn.close();
+                response.redirect("/err");
+            }
+            map.put("courseId", courseId);
+            map.put("name", course.get("name"));
+            String edit = request.queryParams("e");
+            String quizId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("quizId")));
+            map.put("quizId",quizId);
+
+            Quiz quiz = Proxy.viewSingleQuiz(Integer.parseInt(quizId),conn);
+            map.put("tot",quiz.totalMark);
+            map.put("min",quiz.MinMark);
+            map.put("lessonId", quiz.lessonId);
+
+            if (edit == null || edit.contains("-1")) edit = "c";
+
+            switch (edit){
+                case "c":
+                    map.put("e",-1);
+                    map.put("mark",0);
+                    map.put("title", "Create");
+                    break;
+                case "e":
+                    map.put("e",1);
+                    String questionId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId")));
+                    Map<String, Object> question = Proxy.getQuestion(Integer.parseInt(questionId), conn);
+                    Object questionText = question.get("questionText");
+                    sess.attribute("questionId",question);
+                    map.put("title","Modify "+questionText);
+                    map.put("questionText",questionText);
+                    map.put("question",question);
+                    map.put("questionId",questionId);
+                    break;
+                case "d":
+                    quiz.questionId = Integer.parseInt(String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId"))));
+                    Proxy.deleteQuestion(quiz,conn);
+                    response.redirect("/course/quiz/"+courseId+"/"+quizId);
+                    break;
+            }
+
+            conn.close();
+            return new ModelAndView(map,"question.ftl");
+        }),engine);
+
+        post("/course/create-question",((request, response) -> {
+            Map<String,Object> map = new HashMap<>();
+            Map<String,String> formFields = extractFields(request.body());
+            Session sess = request.session();
+            int id = sess.attribute("id");
+
+            Quiz newQuiz = new Quiz();
+            String courseId = request.queryParams("courseId");
+            courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
+            Connection conn = MySqlConnection.getConnection();
+            System.out.println(formFields);
+            String edit = request.queryParams("e");
+
+            String quizId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("quizId")));
+
+            newQuiz.questionText = URLDecoder.decode(formFields.get("QText"), "UTF-8");
+
+            newQuiz.mark = Integer.parseInt(formFields.get("marks"));
+            newQuiz.quizId = Integer.parseInt(quizId);
+            newQuiz.responseA = URLDecoder.decode(formFields.get("QA"), "UTF-8");
+            newQuiz.responseB = URLDecoder.decode(formFields.get("QB"), "UTF-8");
+            newQuiz.responseC = URLDecoder.decode(formFields.get("QC"), "UTF-8");
+            newQuiz.responseD = URLDecoder.decode(formFields.get("QD"), "UTF-8");
+            newQuiz.answer = URLDecoder.decode(formFields.get("ans"), "UTF-8");
+            if (edit == null || edit.contains("-1"))
+            {
+                Proxy.createQuestion(newQuiz,conn);
+                Proxy.updateTotalMark(newQuiz,conn);
+            }
+            else
+            {
+                int questionId = Integer.parseInt(formFields.get("action"));
+                newQuiz.questionId = questionId;
+                sess.removeAttribute("questionId");
+                Proxy.updateQuestion(newQuiz,conn);
+                Proxy.updateTotalMark(newQuiz,conn);
+            }
+            conn.close();
+            response.redirect("/course/quiz/"+courseId+"/"+quizId);
+            return null;
+
+        }),engine);
+
+
         post("/course/add/:courseId", (request,response)-> {
             Session sess = request.session();
             int id = sess.attribute("id");
@@ -481,11 +616,40 @@ public class App {
                 conn.close();
                 response.redirect("/course/grade/individual/" + courseId);
             }
+            Map<Integer, Map<String,String>> classList = Proxy.getClassList(Integer.parseInt(courseId), conn);
+            classList.remove(id);
+            if (!classList.isEmpty()) map.put("classList", classList);
             map.put("courseId", courseId);
             map.put("name", course.get("name"));
             if (Courses.allowRating(course)) map.put("viewRate", true);
             conn.close();
             return new ModelAndView(map,"courseGrade.ftl");
+        }),engine);
+
+        get("/course/grade/individual/:courseId/:userId",((request, response) -> {
+            Map<String,Object> map = new HashMap<>();
+            Session sess = request.session();
+            int id = sess.attribute("id");
+            int userId = Integer.parseInt(request.params(":userId"));
+            String courseId = request.params(":courseId");
+            Connection conn = MySqlConnection.getConnection();
+            courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
+            Map<String,Object> course = Courses.getCourse(courseId, conn);
+            String name = Proxy.getNameFromUserId(userId, conn);
+            if((int)course.get("prof_id") != id) {
+                conn.close();
+                response.redirect("/err");
+            }
+            map.put("role", "prof");
+            Grades grades = new Grades(Integer.valueOf(courseId), userId, conn);
+            Map<String,Object> g = grades.getGrades();
+            if (!g.isEmpty()) map.put("grades", g);
+            map.put("learnerName", name);
+            map.put("courseId", courseId);
+            map.put("name", course.get("name"));
+            if (Courses.allowRating(course)) map.put("viewRate", true);
+            conn.close();
+            return new ModelAndView(map,"courseGradeIndividual.ftl");
         }),engine);
 
         get("/course/grade/individual/:courseId",((request, response) -> {
@@ -496,8 +660,17 @@ public class App {
             Connection conn = MySqlConnection.getConnection();
             courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
             Map<String,Object> course = Courses.getCourse(courseId, conn);
-            if((int)course.get("prof_id") == id) map.put("role", "prof");
-            else map.put("role","learner");
+            String name = sess.attribute("firstName").toString() + " "
+                    + sess.attribute("lastName").toString();
+            if((int)course.get("prof_id") == id) {
+                conn.close();
+                response.redirect("/err");
+            }
+            map.put("role","learner");
+            Grades grades = new Grades(Integer.valueOf(courseId), id, conn);
+            Map<String,Object> g = grades.getGrades();
+            if (!g.isEmpty()) map.put("grades", g);
+            map.put("learnerName", name);
             map.put("courseId", courseId);
             map.put("name", course.get("name"));
             if (Courses.allowRating(course)) map.put("viewRate", true);
@@ -891,8 +1064,9 @@ public class App {
             map.put("group", group);
             map.put("role", role);
             map.put("members", members);
-            map.put("reqs", requests);
+            if (!requests.isEmpty()) map.put("reqs", requests);
             map.put("id", id);
+            map.put("posts",Proxy.getDGPostsById(Integer.parseInt(URLDecoder.decode(request.params(":id"),"UTF-8")),conn));
             conn.close();
             return new ModelAndView(map,"groupDesc.ftl");
         }),engine);
@@ -923,11 +1097,38 @@ public class App {
             return new ModelAndView(map,"groupDesc.ftl");
         },engine);
 
-        get("/discussion/create-post",((request, response) -> {
+        get("/discussion/create-post/:dgId",((request, response) -> {
+            //need course and user Id
+            Connection conn = MySqlConnection.getConnection();
             Session sess = request.session();
             String role = sess.attribute("role").toString();
             Map<String,String> map = new HashMap<>();
             map.put("role", role);
+            map.put("dgName", "Test Name"); //CHANGE
+            map.put("dgId",URLDecoder.decode(request.params(":dgId"),"UTF-8"));
+            conn.close();
+
+            return new ModelAndView(map,"discussionPost.ftl");
+        }),engine);
+
+        post("/discussion/create-post/:dgId",((request, response) -> {
+            Session sess = request.session();
+            Connection conn = MySqlConnection.getConnection();
+            String role = sess.attribute("role").toString();
+            Map<String,String> map = new HashMap<>();
+            map.put("role", role);
+            map.put("dgName", "Test Name"); //CHANGE
+            map.put("dgId",URLDecoder.decode(request.params(":dgId"),"UTF-8"));
+            Map<String,String> formFields = extractFields(request.body());
+            System.out.println(formFields);
+            Proxy.createDGPost(Integer.parseInt(
+                    URLDecoder.decode(request.params(":dgId"),"UTF-8")),
+                    sess.attribute("id"),
+                    URLDecoder.decode(formFields.get("name"), "UTF-8"),
+                    URLDecoder.decode(formFields.get("content"),"UTF-8"),
+                    conn);
+            conn.close();
+            response.redirect("/discussion/group-desc/"+request.params(":dgId"));
             return new ModelAndView(map,"discussionPost.ftl");
         }),engine);
 
@@ -954,7 +1155,7 @@ public class App {
             Map<String,String> formFields = extractFields(request.body());
             Connection conn = MySqlConnection.getConnection();
             Map<String, Object> map = Admin.postMethodFunctionality(formFields, conn);
-            if (map.containsKey("redirect") && (boolean) map.get(redirect)) {
+            if (map.containsKey("redirect") && (boolean) map.get("redirect")) {
                 conn.close();
                 response.redirect("/approval");
             }
@@ -1051,31 +1252,20 @@ public class App {
             return "Success!";
         });
 
-        post("/download", (request,response)-> {
-            File file = new File("uploadFolder/PDFTest.pdf");
-            response.raw().setContentType("application/octet-stream");
-            response.raw().setHeader("Content-Disposition","attachment; filename="+file.getName()+".zip");
-            try {
 
-                try(ZipOutputStream zipOutputStream = new ZipOutputStream(new BufferedOutputStream(response.raw().getOutputStream()));
-                    BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file)))
-                {
-                    ZipEntry zipEntry = new ZipEntry(file.getName());
 
-                    zipOutputStream.putNextEntry(zipEntry);
-                    byte[] buffer = new byte[1024];
-                    int len;
-                    while ((len = bufferedInputStream.read(buffer)) > 0) {
-                        zipOutputStream.write(buffer,0,len);
-                    }
-                    zipOutputStream.flush();
-                    zipOutputStream.close();
-                }
-            } catch (Exception e) {
+        get("/view/:courseNum/:fileName",((request, response) -> {
+            //Session sess = request.session();
+           // String role = sess.attribute("role").toString();
+            Map<String,String> map = new HashMap<>();
+            String[] vals =request.params(":fileName").split("\\.");
+            map.put("fileName", vals[0]);
+            map.put("fileType", "."+vals[1]);
+            map.put("filePath", "/"+request.params(":fileName"));
+            map.put("courseNumber", request.params(":courseNum"));
+            return new ModelAndView(map,"viewFile.ftl");
+        }),engine);
 
-            }
 
-            return null;
-        });
     }
 }

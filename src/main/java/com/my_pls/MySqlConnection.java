@@ -13,7 +13,10 @@ public class MySqlConnection {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
             // Database link, username and password
-            conn = DriverManager.getConnection("jdbc:mysql://b8bfeaec94d3d2:b7e7427e@us-cdbr-east-02.cleardb.com/heroku_d47d83ae3d838cf");
+
+            conn = DriverManager.getConnection("jdbc:mysql://b8bfeaec94d3d2:b7e7427e@18.217.126.50:3306/mypls"); //AWS
+//            Heroku
+//            conn = DriverManager.getConnection("jdbc:mysql://b8bfeaec94d3d2:b7e7427e@us-cdbr-east-02.cleardb.com/heroku_d47d83ae3d838cf");
             System.out.println("Connection Succeeded");
 
         } catch (Exception e) {

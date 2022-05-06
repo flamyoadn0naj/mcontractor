@@ -1,7 +1,5 @@
 package com.my_pls.application.components;
 
-import com.my_pls.Lesson;
-
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +12,7 @@ public class Quiz {
     public int questionId;
     public int mark;
     public int MinMark;
+    public int totalMark;
     public String questionText;
     public String responseA;
     public String responseB;

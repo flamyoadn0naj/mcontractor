@@ -112,32 +112,16 @@ public class Rating {
         Map<String,Object> map = new HashMap<>();
         Map<Integer, Map<String, Object>> users = getAllUserRatings("", conn);
         Map<Integer, Map<String, Object>> courses = getAllCourseRatings("", conn);
+        if (role.contentEquals("learner")) users = getAllUserRatings("", "prof", conn);
+        if (role.contentEquals("prof")) users = getAllUserRatings("", "learner", conn);
+        map.put("users", users);
         if (formFields == null) {
             map.put("ratings", true);
             map.put("users", users);
             map.put("courses", courses);
             map.put("searchOptions", getSearchOptions(""));
         } else {
-            if (formFields.containsKey("rate")) {
-                map.put("user_details", users.get(Integer.parseInt(formFields.get("rate"))));
-                map.put("rateUser", true);
-                map.put("curr_user", formFields.get("rate"));
-            } else if (formFields.containsKey("doneRating")) {
-                boolean addedRating = addRating(formFields, conn);
-                if (addedRating) {
-                    map.put("success", "true");
-                    map.put("ratings", true);
-                } else {
-                    map.put("err", "true");
-                    map.put("user_details", users.get(Integer.parseInt(formFields.get("doneRating"))));
-                    map.put("rateUser", true);
-                    map.put("curr_user", formFields.get("rate"));
-                }
-                if (role.contentEquals("learner")) users = getAllUserRatingsLearner("", conn);
-                if (role.contentEquals("prof")) users = getAllRatingsProf("", conn);
-                map.put("users", users);
-            }
-            else if (formFields.containsKey("userId"))
+            if (formFields.containsKey("userId"))
                 map.put("feedback",users.get(Integer.parseInt(formFields.get("userId"))));
             else if (formFields.containsKey("courseId"))
                 map.put("feedback", courses.get(Integer.parseInt(formFields.get("courseId"))));
