@@ -1554,7 +1554,7 @@ public class Proxy {
             while (rs.next()) {
                 DiscussionPost temp = new DiscussionPost(
                         rs.getInt("group_id"),
-                        DataMapper.getNameFromUserId(rs.getInt("user_id"),conn),
+                        getNameFromUserId(rs.getInt("user_id"),conn),
                         rs.getString("post_name"),
                         rs.getString("post_content"),
                         rs.getString("post_time"),
