@@ -15,14 +15,14 @@ public class Grades {
     public Grades(int courseId, int userId, Connection conn) {
         courseId = courseId;
         userId = userId;
-        lessons = DataMapper.getLessonsByCourseId(courseId,conn);
+        lessons = Proxy.getLessonsByCourseId(courseId,conn);
         for (Lesson l: lessons) {
             int id = l.getId();
-            quizzes = DataMapper.viewQuizzes(id,conn);
+            quizzes = Proxy.viewQuizzes(id,conn);
             for (Integer quizId : quizzes.keySet()) {
                 String quizName = ((Map<String, Object>) quizzes.get(quizId)).get("name").toString();
                 String quizMarks = ((Map<String, Object>) quizzes.get(quizId)).get("marks").toString();
-                String grade = DataMapper.getGradesOfUser(userId, courseId, id, quizId, conn);
+                String grade = Proxy.getGradesOfUser(userId, courseId, id, quizId, conn);
                 Map<String, String> g = new HashMap<>();
                 g.put("marks", quizMarks);
                 g.put("score", grade);

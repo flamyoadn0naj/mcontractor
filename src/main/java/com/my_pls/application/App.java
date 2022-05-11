@@ -259,13 +259,6 @@ public class App {
             return new ModelAndView(map,"courseAbout.ftl");
         }),engine);
 
-//        get("/course/learnMat",((request, response) -> {
-//            Map<String,String> map = new HashMap<>();
-//            Session sess = request.session();
-//            map.put("role", sess.attribute("role"));
-//            return new ModelAndView(map,"courseLearnMat.ftl");
-//        }),engine);
-
         get("/course/learnMat/:number",((request, response) -> {
             Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
@@ -277,7 +270,7 @@ public class App {
             if((int)course.get("prof_id") == id) map.put("role", "prof");
             else map.put("role","learner");
             //add each lesson
-            ArrayList<Lesson> lessons = Proxy.getLessonsByCourseId(Integer.parseInt(courseId), conn));
+            ArrayList<Lesson> lessons = Proxy.getLessonsByCourseId(Integer.parseInt(courseId), conn);
             if (!lessons.isEmpty()) map.put("lessons",lessons);
             map.put("courseNumber",courseId);
             map.put("name", course.get("name"));

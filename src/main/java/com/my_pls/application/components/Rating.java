@@ -112,13 +112,11 @@ public class Rating {
         Map<String,Object> map = new HashMap<>();
         Map<Integer, Map<String, Object>> users = getAllUserRatings("", conn);
         Map<Integer, Map<String, Object>> courses = getAllCourseRatings("", conn);
-        if (role.contentEquals("learner")) users = getAllUserRatings("", "prof", conn);
-        if (role.contentEquals("prof")) users = getAllUserRatings("", "learner", conn);
-        map.put("users", users);
+        if (role.contentEquals("learner")) users = getAllRatingsProf("", conn);
+        if (role.contentEquals("prof")) users = getAllUserRatingsLearner("", conn);
+
         if (formFields == null) {
             map.put("ratings", true);
-            map.put("users", users);
-            map.put("courses", courses);
             map.put("searchOptions", getSearchOptions(""));
         } else {
             if (formFields.containsKey("userId"))
@@ -147,41 +145,43 @@ public class Rating {
                     }
                     String filter = "";
                     if (role.contentEquals("learner"))
-                        users = getAllRatingsProf("", conn);
-                    if (role.contentEquals("prof"))
-                        users = getAllUserRatingsLearner("", conn);
-
-                    if (role.contentEquals("admin")) filter = formFields.get("filterBy");
-//Facade Pattern
-                    switch(formFields.get("filterBy")) {
-                    case "all":
-                        users = getAllUserRatings(searchText, conn);
-                        break;
-                    case "admin":
-                        users = getAllUserRatingsAdmin(searchText, conn);
-                        break;
-                    case "prof":
                         users = getAllRatingsProf(searchText, conn);
-                        break;
-                    case "learner":
+                    if (role.contentEquals("prof"))
                         users = getAllUserRatingsLearner(searchText, conn);
-                        break;
-                    default:
-                        users = getAllUserRatings(searchText, conn);
+
+                    if (role.contentEquals("admin")) {
+                        filter = formFields.get("filterBy");
+//Facade Pattern
+                        switch (filter) {
+                            case "all":
+                                users = getAllUserRatings(searchText, conn);
+                                break;
+                            case "admin":
+                                users = getAllUserRatingsAdmin(searchText, conn);
+                                break;
+                            case "prof":
+                                users = getAllRatingsProf(searchText, conn);
+                                break;
+                            case "learner":
+                                users = getAllUserRatingsLearner(searchText, conn);
+                                break;
+                            default:
+                                users = getAllUserRatings(searchText, conn);
+                        }
+                        map.put("filterKey", filter);
+                        map.put("filterVal", Admin.mapFilterKey(filter));
                     }
 
                     map.put("searchText", searchText);
-                    map.put("filterKey", filter);
-                    map.put("filterVal", Admin.mapFilterKey(filter));
                     map.put("searchOptions", getSearchOptions(filter));
                 }
                 map.put("ratings", true);
-                map.put("users", users);
-                map.put("courses", courses);
             }
         }
         if (users.isEmpty()) map.put("userEmpty", true);
+        else map.put("users", users);
         if (courses.isEmpty()) map.put("courseEmpty", true);
+        else map.put("courses", courses);
         return map;
     }
 }
