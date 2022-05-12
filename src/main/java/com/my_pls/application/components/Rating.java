@@ -112,8 +112,8 @@ public class Rating {
         Map<String,Object> map = new HashMap<>();
         Map<Integer, Map<String, Object>> users = getAllUserRatings("", conn);
         Map<Integer, Map<String, Object>> courses = getAllCourseRatings("", conn);
-        if (role.contentEquals("learner")) users = getAllUserRatings("", "prof", conn);
-        if (role.contentEquals("prof")) users = getAllUserRatings("", "learner", conn);
+        if (role.contentEquals("learner")) users = getAllUserRatings("", conn);
+        if (role.contentEquals("prof")) users = getAllUserRatings("", conn);
         map.put("users", users);
         if (formFields == null) {
             map.put("ratings", true);

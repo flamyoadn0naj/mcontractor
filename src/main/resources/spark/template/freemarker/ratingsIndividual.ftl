@@ -36,9 +36,11 @@
                                     <#list 1..user_details.rating as i>
                                         <span class="fa fa-star checked large"></span>
                                     </#list>
+                                    <#if user_details.unchecked != 0>
                                     <#list 1..user_details.unchecked as j>
                                         <span class="fa fa-star large"></span>
                                     </#list>
+                                    </#if>
                                 </#if>
                             </p>
                             <div class="mb-3" style="display: flex" style="margin-bottom: 2%">

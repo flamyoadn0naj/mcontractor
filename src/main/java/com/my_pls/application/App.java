@@ -277,7 +277,7 @@ public class App {
             if((int)course.get("prof_id") == id) map.put("role", "prof");
             else map.put("role","learner");
             //add each lesson
-            ArrayList<Lesson> lessons = Proxy.getLessonsByCourseId(Integer.parseInt(courseId), conn));
+            ArrayList<Lesson> lessons = Proxy.getLessonsByCourseId(Integer.parseInt(courseId), conn);
             if (!lessons.isEmpty()) map.put("lessons",lessons);
             map.put("courseNumber",courseId);
             map.put("name", course.get("name"));

@@ -22,12 +22,14 @@
                         <#if course_rate.rating == 0>
                             No Rating Found
                         <#else>
+                            <#if course_rate.unchecked != 0>
                             <#list 1..course_rate.rating as i>
                                 <span class="fa fa-star checked large"></span>
                             </#list>
                             <#list 1..course_rate.unchecked as j>
                                 <span class="fa fa-star large"></span>
                             </#list>
+                            </#if>
                         </#if>
                     <#else>
                         No Rating Found
@@ -79,9 +81,11 @@
                             <#list 1..prof.rating as i>
                                 <span class="fa fa-star checked large"></span>
                             </#list>
+                            <#if prof.unchecked != 0>
                             <#list 1..prof.unchecked as j>
                                 <span class="fa fa-star large"></span>
                             </#list>
+                            </#if>
                         </#if>
                     <#else>
                         No Rating Found
