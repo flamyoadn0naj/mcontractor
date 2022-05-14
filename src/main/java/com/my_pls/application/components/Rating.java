@@ -114,7 +114,6 @@ public class Rating {
         Map<Integer, Map<String, Object>> courses = getAllCourseRatings("", conn);
         if (role.contentEquals("learner")) users = getAllRatingsProf("", conn);
         if (role.contentEquals("prof")) users = getAllUserRatingsLearner("", conn);
-
         if (formFields == null) {
             map.put("ratings", true);
             map.put("searchOptions", getSearchOptions(""));

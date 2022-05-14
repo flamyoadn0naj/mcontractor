@@ -82,9 +82,11 @@
                             <#list 1..rating.rating as i>
                                 <span class="fa fa-star checked large"></span>
                             </#list>
+                            <#if rating.unchecked != 0>
                             <#list 1..rating.unchecked as j>
                                 <span class="fa fa-star large"></span>
                             </#list>
+                            </#if>
                         </#if>
                         </div>
                         <div class="mb-2" style="margin-left: 10%; overflow-y: scroll; height: 230px">
