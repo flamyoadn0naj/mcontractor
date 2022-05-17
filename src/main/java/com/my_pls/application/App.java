@@ -138,10 +138,10 @@ public class App {
                 String email = request.queryParams("key1");
                 email = URLDecoder.decode(email,"UTF-8");
                 String hash = request.queryParams("key2");
-                boolean flag = DataMapper.verifyEmailofUser(email, hash, conn);
+                boolean flag = Proxy.verifyEmailofUser(email, hash, conn);
                 if (flag) {
-                    int id = DataMapper.getUserIdFromEmail(email, conn);
-                    DataMapper.addDGmember(id,311,conn);
+                    int id = Proxy.getUserIdFromEmail(email, conn);
+                    Proxy.addDGmember(id,311,conn);
                 }
             }
             conn.close();
@@ -153,7 +153,7 @@ public class App {
             Map<String, Object> map = new HashMap<>();
             if (formFields.containsKey("resend")) {
                 Connection conn = MySqlConnection.getConnection();
-                boolean flag = DataMapper.resendEmailConfirmation(user_current.email, conn);
+                boolean flag = Proxy.resendEmailConfirmation(user_current.email, conn);
                 if (flag) map.put("resend", true);
                 else map.put("resend", false);
                 conn.close();
@@ -220,7 +220,7 @@ public class App {
             else map.put("role","learner");
             map.put("course",course);
             map.put("courseId", courseId);
-            Map<String,Object> rating = DataMapper.getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"",conn);
+            Map<String,Object> rating = Proxy.getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"",conn);
             if (!rating.isEmpty()) map.put("rating", rating);
             if (Courses.allowRating(course)) map.put("viewRate", true);
             conn.close();
@@ -242,7 +242,7 @@ public class App {
             if (formFields.containsKey("req")) {
 
                String req = URLDecoder.decode(formFields.get("req"), "UTF-8");
-               flag = DataMapper.updateCourseRequirements(Integer.parseInt(courseId), req, conn);
+               flag = Proxy.updateCourseRequirements(Integer.parseInt(courseId), req, conn);
 
             }
             if (flag) {
@@ -252,19 +252,12 @@ public class App {
             else map.put("err", true);
             map.put("course",course);
             map.put("courseId", courseId);
-            Map<String,Object> rating = DataMapper.getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"",conn);
+            Map<String,Object> rating = Proxy.getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"",conn);
             if (!rating.isEmpty()) map.put("rating", rating);
             if (Courses.allowRating(course)) map.put("viewRate", true);
             conn.close();
             return new ModelAndView(map,"courseAbout.ftl");
         }),engine);
-
-//        get("/course/learnMat",((request, response) -> {
-//            Map<String,String> map = new HashMap<>();
-//            Session sess = request.session();
-//            map.put("role", sess.attribute("role"));
-//            return new ModelAndView(map,"courseLearnMat.ftl");
-//        }),engine);
 
         get("/course/learnMat/:number",((request, response) -> {
             Map<String,Object> map = new HashMap<>();
@@ -273,11 +266,11 @@ public class App {
             String courseId = request.params(":number");;
             Connection conn = MySqlConnection.getConnection();
             courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
-            Map<String,Object> course = DataMapper.findCourseByCourseId(courseId, conn);
+            Map<String,Object> course = Proxy.findCourseByCourseId(courseId, conn);
             if((int)course.get("prof_id") == id) map.put("role", "prof");
             else map.put("role","learner");
             //add each lesson
-            ArrayList<Lesson> lessons = DataMapper.getLessonsByCourseId(Integer.parseInt(courseId), conn);
+            ArrayList<Lesson> lessons = Proxy.getLessonsByCourseId(Integer.parseInt(courseId), conn);
             if (!lessons.isEmpty()) map.put("lessons",lessons);
             map.put("courseNumber",courseId);
             map.put("name", course.get("name"));
@@ -316,10 +309,10 @@ public class App {
             }
             //branch based on which button was pressed
             if( formFields.containsKey("saveButton")){
-                DataMapper.createOrUpdateLesson(temp,Integer.parseInt(courseId), conn);
+                Proxy.createOrUpdateLesson(temp,Integer.parseInt(courseId), conn);
 
             }else if(formFields.containsKey("deleteButton")){
-                DataMapper.deleteLesson(temp.getId(), conn);
+                Proxy.deleteLesson(temp.getId(), conn);
 
             }else if(formFields.containsKey("dlButton")){
 
@@ -327,11 +320,11 @@ public class App {
                     return null;
 
             }else if(formFields.containsKey("deleteLMButton")){
-                DataMapper.deleteLearningMaterial(temp.getId(),URLDecoder.decode(formFields.get("deleteLMButton"),"UTF-8"), conn);
+                Proxy.deleteLearningMaterial(temp.getId(),URLDecoder.decode(formFields.get("deleteLMButton"),"UTF-8"), conn);
             }else if(formFields.containsKey("shareButton")){
                 System.out.println("Share lesson!");
-                DataMapper.createDGPostLesson(
-                        DataMapper.getDGIdByCourseId(Integer.parseInt(courseId),conn)
+                Proxy.createDGPostLesson(
+                        Proxy.getDGIdByCourseId(Integer.parseInt(courseId),conn)
                         ,sess.attribute("id"),
                         URLDecoder.decode(formFields.get("name"),"UTF-8"),
                         "Check out this lesson!",
@@ -350,7 +343,7 @@ public class App {
             Connection conn = MySqlConnection.getConnection();
             Map<String,Object> course = Courses.getCourse(courseId, conn);
             if((int)course.get("prof_id") != id) response.redirect("/err");
-            DataMapper.createLesson("New Lesson","Lesson Requirements", Integer.parseInt(request.params(":courseId")), conn);
+            Proxy.createLesson("New Lesson","Lesson Requirements", Integer.parseInt(request.params(":courseId")), conn);
             conn.close();
             response.redirect("/course/learnMat/"+courseId);
             return null;
@@ -393,8 +386,8 @@ public class App {
             String edit = request.queryParams("e");
 
             String quizId = request.queryParams("quizId");
-            ArrayList<Lesson> lessons = DataMapper.getLessonsByCourseId(Integer.parseInt(courseId), conn);
-
+            ArrayList<Lesson> lessons = Proxy.getLessonsByCourseId(Integer.parseInt(courseId), conn);
+            
             Quiz quizEdit = new Quiz();
             if (edit == null || edit.contains("-1")) edit="c";
             switch (edit){
@@ -402,8 +395,8 @@ public class App {
                     map.put("e",1);
                     int quizIdInt = Integer.parseInt(quizId);
                     map.put("quizId",quizId);
-                    quizEdit =  DataMapper.viewSingleQuiz(quizIdInt,conn);
-                    Lesson lesson = DataMapper.getLessonById(quizEdit.lessonId,conn);
+                    quizEdit =  Proxy.viewSingleQuiz(quizIdInt,conn);
+                    Lesson lesson = Proxy.getLessonById(quizEdit.lessonId,conn);
                     map.put("currLesson",quizEdit.lessonId);
                     map.put("currLessonName", lesson.name);
                     lessons.removeIf(l -> l.getId() == lesson.getId());
@@ -413,7 +406,7 @@ public class App {
                     break;
                 case "d":
                     quizEdit.quizId = Integer.parseInt(quizId);
-                    DataMapper.deleteQuiz(quizEdit,conn);
+                    Proxy.deleteQuiz(quizEdit,conn);
                     response.redirect("/course/quiz/"+courseId+"/");
                     break;
                 case "c":
@@ -423,7 +416,7 @@ public class App {
                     map.put("title", "Create");
                     break;
             }
-            map.put("lessons",DataMapper.getLessonsByCourseId(Integer.parseInt(courseId), conn));
+            map.put("lessons",Proxy.getLessonsByCourseId(Integer.parseInt(courseId), conn));
             if (Courses.allowRating(course)) map.put("viewRate", true);
             map.put("lessons",lessons);
             conn.close();
@@ -444,11 +437,11 @@ public class App {
             Session sess = request.session();
             String edit = request.queryParams("e");
             if (edit == null || edit.contains("-1")) {
-                DataMapper.createQuiz(newQuiz, conn);
+                Proxy.createQuiz(newQuiz, conn);
             } else{
                 newQuiz.quizId = Integer.parseInt(formFields.get("action"));
-                DataMapper.updateQuiz(newQuiz, conn);
-                DataMapper.updateTotalMark(newQuiz,conn);
+                Proxy.updateQuiz(newQuiz, conn);
+                Proxy.updateTotalMark(newQuiz,conn);
             }
             conn.close();
             response.redirect("/course/quiz/"+courseId);
@@ -473,8 +466,8 @@ public class App {
             if((int)course.get("prof_id") == id) map.put("role", "prof");
             else map.put("role","learner");
             map.put("courseId", courseId);
-            Quiz quiz = DataMapper.viewSingleQuiz(Integer.parseInt(quizId),conn);
-            Map<Integer,Object> questions = DataMapper.getQuestions(quiz,conn);
+            Quiz quiz = Proxy.viewSingleQuiz(Integer.parseInt(quizId),conn);
+            Map<Integer,Object> questions = Proxy.getQuestions(quiz,conn);
             map.put("quizName", quiz.quizName);
             map.put("quiz",quiz);
             map.put("quizId",quizId);
@@ -510,7 +503,7 @@ public class App {
             String quizId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("quizId")));
             map.put("quizId",quizId);
 
-            Quiz quiz = DataMapper.viewSingleQuiz(Integer.parseInt(quizId),conn);
+            Quiz quiz = Proxy.viewSingleQuiz(Integer.parseInt(quizId),conn);
             map.put("tot",quiz.totalMark);
             map.put("min",quiz.MinMark);
             map.put("lessonId", quiz.lessonId);
@@ -526,7 +519,7 @@ public class App {
                 case "e":
                     map.put("e",1);
                     String questionId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId")));
-                    Map<String, Object> question = DataMapper.getQuestion(Integer.parseInt(questionId), conn);
+                    Map<String, Object> question = Proxy.getQuestion(Integer.parseInt(questionId), conn);
                     Object questionText = question.get("questionText");
                     sess.attribute("questionId",question);
                     map.put("title","Modify "+questionText);
@@ -536,7 +529,7 @@ public class App {
                     break;
                 case "d":
                     quiz.questionId = Integer.parseInt(String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId"))));
-                    DataMapper.deleteQuestion(quiz,conn);
+                    Proxy.deleteQuestion(quiz,conn);
                     response.redirect("/course/quiz/"+courseId+"/"+quizId);
                     break;
             }
@@ -571,16 +564,16 @@ public class App {
             newQuiz.answer = URLDecoder.decode(formFields.get("ans"), "UTF-8");
             if (edit == null || edit.contains("-1"))
             {
-                DataMapper.createQuestion(newQuiz,conn);
-                DataMapper.updateTotalMark(newQuiz,conn);
+                Proxy.createQuestion(newQuiz,conn);
+                Proxy.updateTotalMark(newQuiz,conn);
             }
             else
             {
                 int questionId = Integer.parseInt(formFields.get("action"));
                 newQuiz.questionId = questionId;
                 sess.removeAttribute("questionId");
-                DataMapper.updateQuestion(newQuiz,conn);
-                DataMapper.updateTotalMark(newQuiz,conn);
+                Proxy.updateQuestion(newQuiz,conn);
+                Proxy.updateTotalMark(newQuiz,conn);
             }
             conn.close();
             response.redirect("/course/quiz/"+courseId+"/"+quizId);
@@ -597,7 +590,7 @@ public class App {
             Map<String,Object> course = Courses.getCourse(courseId, conn);
             courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
             if((int)course.get("prof_id") != id) response.redirect("/err");
-            DataMapper.createLesson("New Lesson","Lesson Requirements", Integer.parseInt(request.params(":courseId")), conn);
+            Proxy.createLesson("New Lesson","Lesson Requirements", Integer.parseInt(request.params(":courseId")), conn);
             response.redirect("/course/learnMat/"+courseId);
             conn.close();
             return null;
@@ -616,7 +609,7 @@ public class App {
                 conn.close();
                 response.redirect("/course/grade/individual/" + courseId);
             }
-            Map<Integer, Map<String,String>> classList = DataMapper.getClassList(Integer.parseInt(courseId), conn);
+            Map<Integer, Map<String,String>> classList = Proxy.getClassList(Integer.parseInt(courseId), conn);
             classList.remove(id);
             if (!classList.isEmpty()) map.put("classList", classList);
             map.put("courseId", courseId);
@@ -635,7 +628,7 @@ public class App {
             Connection conn = MySqlConnection.getConnection();
             courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
             Map<String,Object> course = Courses.getCourse(courseId, conn);
-            String name = DataMapper.getNameFromUserId(userId, conn);
+            String name = Proxy.getNameFromUserId(userId, conn);
             if((int)course.get("prof_id") != id) {
                 conn.close();
                 response.redirect("/err");
@@ -691,7 +684,7 @@ public class App {
             else map.put("role","learner");
             map.put("courseId", courseId);
             map.put("name", course.get("name"));
-            Map<Integer, Map<String,String>> classList = DataMapper.getClassList(Integer.parseInt(courseId), conn);
+            Map<Integer, Map<String,String>> classList = Proxy.getClassList(Integer.parseInt(courseId), conn);
             map.put("classList", classList);
             map.put("profId", course.get("prof_id"));
             if (Courses.allowRating(course)) map.put("viewRate", true);
@@ -709,15 +702,15 @@ public class App {
             Map<String,Object> course = Courses.getCourse(courseId, conn);
             if((int)course.get("prof_id") == id) {
                 map.put("role", "prof");
-                Map<Integer, Map<String,String>> classList = DataMapper.getClassList(Integer.parseInt(courseId), conn);
+                Map<Integer, Map<String,String>> classList = Proxy.getClassList(Integer.parseInt(courseId), conn);
                 classList.remove((int)course.get("prof_id"));
                 map.put("classList", classList);
             }
             else {
                 map.put("role","learner");
-                Map<String,Object> rating = DataMapper.getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"", conn);
+                Map<String,Object> rating = Proxy.getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"", conn);
                 if (!rating.isEmpty()) map.put("course_rate", rating);
-                rating = DataMapper.getRatingAndFeedbackOfUserGivenUserId((int)course.get("prof_id"), "", "", conn);
+                rating = Proxy.getRatingAndFeedbackOfUserGivenUserId((int)course.get("prof_id"), "", "", conn);
                 if (!rating.isEmpty()) map.put("prof", rating);
                 map.put("profId", course.get("prof_id"));
             }
@@ -747,10 +740,10 @@ public class App {
                     }
                 }
                 int learner_id = Integer.parseInt(formFields.get("rateLearner"));
-                Map<String, Object> rating = DataMapper.getRatingAndFeedbackOfUserGivenUserId(id,"","",conn);
+                Map<String, Object> rating = Proxy.getRatingAndFeedbackOfUserGivenUserId(id,"","",conn);
                 if (!rating.isEmpty()) map.put("learner", rating);
                 map.put("learnerId", learner_id);
-                String name = DataMapper.getNameFromUserId(learner_id, conn);
+                String name = Proxy.getNameFromUserId(learner_id, conn);
                 map.put("learner_name", name);
                 map.put("rateLearner", true);
             }
@@ -759,9 +752,9 @@ public class App {
                 boolean flag = Courses.addRating(formFields, courseId, conn);
                 if (flag) map.put("success", true);
                 else map.put("err", true);
-                Map<String,Object> rating = DataMapper.getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"", conn);
+                Map<String,Object> rating = Proxy.getRatingAndFeedbackOfCourseGivenCourseId(Integer.parseInt(courseId),"", conn);
                 if (!rating.isEmpty()) map.put("course_rate", rating);
-                rating = DataMapper.getRatingAndFeedbackOfUserGivenUserId((int)course.get("prof_id"), "", "", conn);
+                rating = Proxy.getRatingAndFeedbackOfUserGivenUserId((int)course.get("prof_id"), "", "", conn);
                 if (!rating.isEmpty()) map.put("prof", rating);
                 map.put("profId", course.get("prof_id"));
             }
@@ -869,7 +862,7 @@ public class App {
             map.put("obj","");
             map.put("role", "admin");
             Connection conn = MySqlConnection.getConnection();
-            map.put("profList", DataMapper.findAllProfs(conn));
+            map.put("profList", Proxy.findAllProfs(conn));
             map.put("e",-1);
             Map<Integer, String> allCourses = CreateCourse.allCourses(conn);
             map.put("title","Create Course");
@@ -955,11 +948,11 @@ public class App {
             //display course specific info
             map.put("courseNumber", request.params(":number"));
             Connection conn = MySqlConnection.getConnection();
-            Map<String, Object> tempCourse = DataMapper.findCourseByCourseId(request.params(":number"), conn);
+            Map<String, Object> tempCourse = Proxy.findCourseByCourseId(request.params(":number"), conn);
             for(Map.Entry<String, Object> entry: tempCourse.entrySet()){
                 map.put(entry.getKey(), entry.getValue().toString());
             }
-            map.put("profName",DataMapper.findProfName(Integer.parseInt(map.get("prof_id")), conn));
+            map.put("profName", Proxy.findProfName(Integer.parseInt(map.get("prof_id")), conn));
             conn.close();
             return new ModelAndView(map,"enrollAbout.ftl");
         }),engine);
@@ -993,9 +986,9 @@ public class App {
             String role = sess.attribute("role").toString();
             Map<String,Object> map = new HashMap<>();
             Connection conn = MySqlConnection.getConnection();
-            ArrayList<Map<String,Object>> groups = DataMapper.getMyDiscussionGroups(id, conn);
+            ArrayList<Map<String,Object>> groups = Proxy.getMyDiscussionGroups(id, conn);
             Map<Integer,Map<String, Object>> allGroups = DiscussionGroups.getGroups("", -1, id, conn);
-            Map<Integer, Object> requestedGroups = DataMapper.getPendingGroupRequests(id, conn);
+            Map<Integer, Object> requestedGroups = Proxy.getPendingGroupRequests(id, conn);
             map.put("groups", groups);
             map.put("allGroups", allGroups);
             map.put("role", role);
@@ -1053,10 +1046,10 @@ public class App {
             int user_id = sess.attribute("id");
             int id = Integer.parseInt(request.params(":id"));
             Connection conn = MySqlConnection.getConnection();
-            Map<String, Object> group = DataMapper.getGroupDetailsByGroupId(id, conn);
+            Map<String, Object> group = Proxy.getGroupDetailsByGroupId(id, conn);
             String member = DiscussionGroups.isMemberOfGroup(user_id, id, conn);
-            Map<Integer, String> members = DataMapper.viewAllGroupMembers(id, conn);
-            Map<Integer, String> requests = DataMapper.getAllPendingGroupRequestsOfGroup(id, conn);
+            Map<Integer, String> members = Proxy.viewAllGroupMembers(id, conn);
+            Map<Integer, String> requests = Proxy.getAllPendingGroupRequestsOfGroup(id, conn);
             int prof = DiscussionGroups.findProfofCourse(group, conn);
             Map<String,Object> map = new HashMap<>();
             if (prof != 0) map.put("prof", prof);
@@ -1066,7 +1059,7 @@ public class App {
             map.put("members", members);
             if (!requests.isEmpty()) map.put("reqs", requests);
             map.put("id", id);
-            map.put("posts",DataMapper.getDGPostsById(Integer.parseInt(URLDecoder.decode(request.params(":id"),"UTF-8")),conn));
+            map.put("posts",Proxy.getDGPostsById(Integer.parseInt(URLDecoder.decode(request.params(":id"),"UTF-8")),conn));
             conn.close();
             return new ModelAndView(map,"groupDesc.ftl");
         }),engine);
@@ -1080,16 +1073,16 @@ public class App {
             Map<String,String> formFields = extractFields(request.body());
             if (formFields.containsKey("add")) {
                 int u_id = Integer.parseInt(formFields.get("add"));
-                boolean flag = DataMapper.addDGmember(u_id, id, conn);
+                boolean flag = Proxy.addDGmember(u_id, id, conn);
                 boolean flag2 = false;
-                if (flag) flag2 = DataMapper.deleteRequestForGroup(u_id, id, conn);
+                if (flag) flag2 = Proxy.deleteRequestForGroup(u_id, id, conn);
                 if (flag2) response.redirect("/discussion/group-desc/"+id);
             } else if (formFields.containsKey("del")) {
                 int u_id = Integer.parseInt(formFields.get("del"));
-                boolean flag = DataMapper.deleteRequestForGroup(u_id, id, conn);
+                boolean flag = Proxy.deleteRequestForGroup(u_id, id, conn);
                 if (flag) response.redirect("/discussion/group-desc/"+id);
             } else if (formFields.containsKey("leave")) {
-                boolean flag = DataMapper.deleteDGMember(user_id, id, conn);
+                boolean flag = Proxy.deleteDGMember(user_id, id, conn);
                 if (flag) response.redirect("/discussion-groups");
             }
             Map<String,Object> map = new HashMap<>();
@@ -1121,7 +1114,7 @@ public class App {
             map.put("dgId",URLDecoder.decode(request.params(":dgId"),"UTF-8"));
             Map<String,String> formFields = extractFields(request.body());
             System.out.println(formFields);
-            DataMapper.createDGPost(Integer.parseInt(
+            Proxy.createDGPost(Integer.parseInt(
                     URLDecoder.decode(request.params(":dgId"),"UTF-8")),
                     sess.attribute("id"),
                     URLDecoder.decode(formFields.get("name"), "UTF-8"),
@@ -1138,7 +1131,7 @@ public class App {
             if (!role.contentEquals("admin")) response.redirect("/err");
             Map<String,Object> map = new HashMap<>();
             Connection conn = MySqlConnection.getConnection();
-            Map<Integer,String> profs = DataMapper.viewAllRequests(conn);
+            Map<Integer,String> profs = Proxy.viewAllRequests(conn);
             map.put("profs",profs);
             map.put("role", role);
             Map<String,String> searchOptions = Admin.getSearchOptions("");
@@ -1241,7 +1234,7 @@ public class App {
                 Connection conn = MySqlConnection.getConnection();
                 File newFile = new File(uploadDir.toPath().toString(),request.raw().getPart("uploadFile").getSubmittedFileName());
                 Files.copy(input, newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                DataMapper.createLearningMaterial(Integer.parseInt(request.params(":lessonId")),
+                Proxy.createLearningMaterial(Integer.parseInt(request.params(":lessonId")),
                         request.raw().getPart("uploadFile").getSubmittedFileName(),
                         conn
                 );

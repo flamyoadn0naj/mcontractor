@@ -31,7 +31,7 @@ public class ForgetPassword {
                 map.put("success", "false");
                 map.put("succMsg", "");
             } else {
-                boolean flag = DataMapper.forgetPasswordSendEmail(email, conn);
+                boolean flag = Proxy.forgetPasswordSendEmail(email, conn);
                 if(!flag) {
                     map.put("errorEmail", "display:block;margin-left:5%; width:90%");
                     map.put("emailVal", "");
@@ -61,7 +61,7 @@ public class ForgetPassword {
             if (formFields.get("pass").equals(formFields.get("retPass")) && formFields.get("pass").length() >= 6 && confirmCode.length() == 4) {
                 String newPassword = formFields.get("pass");
                 newPassword = pwd_manager.hashPassword(newPassword);
-                boolean flag = DataMapper.changePassword(confirmCode, email, newPassword, conn);
+                boolean flag = Proxy.changePassword(confirmCode, email, newPassword, conn);
                 if (flag) {
                     map.put("errorPassMatch", "");
                     map.put("success", "true");

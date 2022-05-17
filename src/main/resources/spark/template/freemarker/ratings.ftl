@@ -53,16 +53,10 @@
                                         <tr>
                                             <th scope="row">${u.name}</th>
                                             <td>
-                                                <#if u.rating == 0>
-                                                    <span class="fa fa-star large"></span>
-                                                    <span class="fa fa-star large"></span>
-                                                    <span class="fa fa-star large"></span>
-                                                    <span class="fa fa-star large"></span>
-                                                    <span class="fa fa-star large"></span>
-                                                <#else>
-                                                    <#list 1..u.rating as i>
-                                                        <span class="fa fa-star checked large"></span>
-                                                    </#list>
+                                                <#list 1..u.rating as i>
+                                                    <span class="fa fa-star checked large"></span>
+                                                </#list>
+                                                <#if u.unchecked != 0>
                                                     <#list 1..u.unchecked as j>
                                                         <span class="fa fa-star large"></span>
                                                     </#list>
@@ -105,19 +99,13 @@
                                             <tr>
                                                 <th scope="row">${u.name}</th>
                                                 <td>
-                                                    <#if u.rating == 0>
+                                                    <#list 1..u.rating as i>
+                                                        <span class="fa fa-star checked large"></span>
+                                                    </#list>
+                                                    <#if u.unchecked != 0>
+                                                    <#list 1..u.unchecked as j>
                                                         <span class="fa fa-star large"></span>
-                                                        <span class="fa fa-star large"></span>
-                                                        <span class="fa fa-star large"></span>
-                                                        <span class="fa fa-star large"></span>
-                                                        <span class="fa fa-star large"></span>
-                                                    <#else>
-                                                        <#list 1..u.rating as i>
-                                                            <span class="fa fa-star checked large"></span>
-                                                        </#list>
-                                                        <#list 1..u.unchecked as j>
-                                                            <span class="fa fa-star large"></span>
-                                                        </#list>
+                                                    </#list>
                                                     </#if>
                                                 </td>
                                                 <td>
@@ -168,19 +156,13 @@
                                             <th scope="row">${u.name}</th>
                                             <td>${u.role}</td>
                                             <td>
-                                                <#if u.rating == 0>
+                                                <#if u.unchecked != 0>
+                                                <#list 1..u.rating as i>
+                                                    <span class="fa fa-star checked large"></span>
+                                                </#list>
+                                                <#list 1..u.unchecked as j>
                                                     <span class="fa fa-star large"></span>
-                                                    <span class="fa fa-star large"></span>
-                                                    <span class="fa fa-star large"></span>
-                                                    <span class="fa fa-star large"></span>
-                                                    <span class="fa fa-star large"></span>
-                                                <#else>
-                                                    <#list 1..u.rating as i>
-                                                        <span class="fa fa-star checked large"></span>
-                                                    </#list>
-                                                    <#list 1..u.unchecked as j>
-                                                        <span class="fa fa-star large"></span>
-                                                    </#list>
+                                                </#list>
                                                 </#if>
                                             </td>
                                             <td>
@@ -221,19 +203,13 @@
                                     <th scope="row">${c.name}</th>
                                     <td>${c.prof}</td>
                                     <td>
-                                        <#if c.rating == 0>
+                                        <#list 1..c.rating as i>
+                                            <span class="fa fa-star checked large"></span>
+                                        </#list>
+                                        <#if c.unchecked != 0>
+                                        <#list 1..c.unchecked as j>
                                             <span class="fa fa-star large"></span>
-                                            <span class="fa fa-star large"></span>
-                                            <span class="fa fa-star large"></span>
-                                            <span class="fa fa-star large"></span>
-                                            <span class="fa fa-star large"></span>
-                                        <#else>
-                                            <#list 1..c.rating as i>
-                                                <span class="fa fa-star checked large"></span>
-                                            </#list>
-                                            <#list 1..c.unchecked as j>
-                                                <span class="fa fa-star large"></span>
-                                            </#list>
+                                        </#list>
                                         </#if>
                                     </td>
                                     <td>

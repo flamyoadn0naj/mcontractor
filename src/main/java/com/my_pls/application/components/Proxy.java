@@ -15,8 +15,8 @@ import java.time.format.FormatStyle;
 import java.util.*;
 import java.util.Date;
 import java.util.function.Function;
-
-public class DataMapper {
+//Proxy Pattern - changing the query to a prepared statement
+public class Proxy {
     private static int MAXQUIZ = 200;
     private static Function<String,String> addQuotes = s -> "\"" + s + "\"";
 
@@ -229,7 +229,7 @@ public class DataMapper {
             PreparedStatement pst = conn.prepareStatement("select dg_id from dg_members where user_id=" + id);
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
-                Map<String, Object> group = DataMapper.getGroupDetailsByGroupId(rs.getInt("dg_id"), conn);
+                Map<String, Object> group = Proxy.getGroupDetailsByGroupId(rs.getInt("dg_id"), conn);
                 allGroups.add(group);
             }
         } catch (SQLException throwables) {
@@ -522,7 +522,7 @@ public class DataMapper {
             while(rs.next()) {
                 Map<String,String> details = new HashMap<>();
                 details.put("name",rs.getString("course_name"));
-                String prof = DataMapper.findProfName(rs.getInt("profId"), conn);
+                String prof = Proxy.findProfName(rs.getInt("profId"), conn);
                 details.put("prof",prof);
                 LocalDate startDate = LocalDate.parse(rs.getString("start_date"));
                 String s = startDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
@@ -1381,7 +1381,7 @@ public class DataMapper {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Map<String, Object> details = findCourseByCourseId(String.valueOf(rs.getInt("courseId")), conn);
-                String prof = DataMapper.findProfName((Integer) details.get("prof_id"), conn);
+                String prof = Proxy.findProfName((Integer) details.get("prof_id"), conn);
                 details.put("prof",prof);
                 String prereq = "None";
                 Integer p = (Integer) details.get("prereq_course");
@@ -1418,7 +1418,7 @@ public class DataMapper {
             while (rs.next()) {
                 Map<String, Object> details = new HashMap<>();
                 details.put("name",rs.getString("course_name"));
-                String prof = DataMapper.findProfName(rs.getInt("profId"), conn);
+                String prof = Proxy.findProfName(rs.getInt("profId"), conn);
                 details.put("prof",prof);
                 LocalDate startDate = LocalDate.parse(rs.getString("start_date"));
                 String s = startDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
@@ -1554,7 +1554,7 @@ public class DataMapper {
             while (rs.next()) {
                 DiscussionPost temp = new DiscussionPost(
                         rs.getInt("group_id"),
-                        DataMapper.getNameFromUserId(rs.getInt("user_id"),conn),
+                        getNameFromUserId(rs.getInt("user_id"),conn),
                         rs.getString("post_name"),
                         rs.getString("post_content"),
                         rs.getString("post_time"),

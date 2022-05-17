@@ -32,9 +32,11 @@
                                 <#list 1..learner.rating as i>
                                     <span class="fa fa-star checked large"></span>
                                 </#list>
+                                <#if learner.unchecked != 0>
                                 <#list 1..learner.unchecked as j>
                                     <span class="fa fa-star large"></span>
                                 </#list>
+                                </#if>
                             </#if>
                         <#else>
                             No Rating Found

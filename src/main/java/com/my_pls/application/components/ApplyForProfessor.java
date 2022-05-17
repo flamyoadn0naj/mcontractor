@@ -1,13 +1,7 @@
 package com.my_pls.application.components;
 
-import com.my_pls.MySqlConnection;
-import com.my_pls.application.App;
-
 import java.net.URLDecoder;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +34,7 @@ public class ApplyForProfessor {
         Map<String,Object> map = checkForErrors(fname, lname, formFields);
         boolean err = (boolean) map.get("applyProfErr");
         if (!err) {
-            String applied = DataMapper.applyProf(email, conn);
+            String applied = Proxy.applyProf(email, conn);
             if (applied.equals("true")) {
                 map.put("success", true);
                 map.put("disable",true);

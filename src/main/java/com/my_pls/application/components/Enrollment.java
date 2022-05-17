@@ -2,7 +2,6 @@ package com.my_pls.application.components;
 
 import java.sql.Connection;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
@@ -38,7 +37,7 @@ public class Enrollment {
             c = checkCapacity(c);
             c = checkStartDate(c);
             int id = Integer.parseInt(c.get("id").toString());
-            Map<String, Object> ratingObj = DataMapper.getRatingAndFeedbackOfCourseGivenCourseId(id, "", conn);
+            Map<String, Object> ratingObj = Proxy.getRatingAndFeedbackOfCourseGivenCourseId(id, "", conn);
             if (ratingObj.isEmpty()) c.put("noRating", true);
             else {
                 c.put("rating", ratingObj.get("rating"));
@@ -57,8 +56,8 @@ public class Enrollment {
     }
 
     public static ArrayList<Map<String, Object>> findAllAvailableCourses(Connection conn) {
-        ArrayList<Map<String,String>> current = DataMapper.viewCourses("Current", conn);
-        ArrayList<Map<String,String>> upcoming = DataMapper.viewCourses("Upcoming", conn);
+        ArrayList<Map<String,String>> current = Proxy.viewCourses("Current", conn);
+        ArrayList<Map<String,String>> upcoming = Proxy.viewCourses("Upcoming", conn);
         ArrayList<Map<String, Object>> all = new ArrayList<>();
 
         for(Map<String, String> m: upcoming) {

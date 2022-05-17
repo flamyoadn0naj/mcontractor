@@ -26,10 +26,10 @@ public class Home {
             }
         } else courses.putAll(allCourses);
 
-        groups = DataMapper.getMyDiscussionGroups(id, conn);
+        groups = Proxy.getMyDiscussionGroups(id, conn);
 
         if (groups.size() > 5) groups = new ArrayList<>(groups.subList(0, 5));
-        rating = DataMapper.getRatingAndFeedbackOfUserGivenUserId(id, "", "", conn);
+        rating = Proxy.getRatingAndFeedbackOfUserGivenUserId(id, "", "", conn);
     }
 
     public Map<Integer,Object> getCourses() {
