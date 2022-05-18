@@ -46,15 +46,6 @@
                         </#list>
                     </form>
                 </#if>
-
-<#--                <tr>-->
-<#--                    <th scope="row">-->
-<#--                        <a class="text-muted" href="">Added Value</a>-->
-<#--                    </th>-->
-<#--                    <td>-->
-<#--                        <button style="float: right" class="btn btn-primary" type="submit">Leave</button>-->
-<#--                    </td>-->
-<#--                </tr>-->
             </table>
         </div>
     </div>

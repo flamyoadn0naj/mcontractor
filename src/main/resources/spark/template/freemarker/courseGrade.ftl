@@ -54,40 +54,10 @@
                                     </td>
                                 </tr>
                             </#list>
-
-<#--                            <tr>-->
-<#--                                <th scope="row">Tharindu Cyril Weerasooriya</th>-->
-<#--                                <td>-->
-<#--                                    <button type="button" class="btn-download" style="float: right">-->
-<#--                                        <i class="fa fa-edit"></i>-->
-<#--                                    </button>-->
-<#--                                </td>-->
-<#--                            </tr>-->
-<#--                            <tr>-->
-<#--                                <th scope="row">Malcolm Lambrecht</th>-->
-<#--                                <td>-->
-<#--                                    <button type="button" class="btn-download" style="float: right">-->
-<#--                                        <i class="fa fa-edit"></i>-->
-<#--                                    </button>-->
-<#--                                </td>-->
-<#--                            </tr>-->
-<#--                            <tr>-->
-<#--                                <th scope="row">Saad Hassan</th>-->
-<#--                                <td>-->
-<#--                                    <button type="button" class="btn-download" style="float: right">-->
-<#--                                        <i class="fa fa-edit"></i>-->
-<#--                                    </button>-->
-<#--                                </td>-->
-<#--                            </tr>-->
                         </table>
                     <#else>
                         No learners enrolled in this course.
                     </#if>
-<#--                        <div class="space-between">-->
-<#--                            <a href="/course/grade/individual">Maheen Riaz Contractor</a>-->
-<#--                        </div>-->
-
-
                 </div>
             </div>
         </div>

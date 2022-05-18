@@ -66,21 +66,6 @@
                                 </tr>
                             </#list>
                         </#if>
-                        <tr>
-                            <th scope="row">Software Process and Management</th>
-                            <td>Samuel Malachowsky</td>
-                            <td>Closed</td>
-                            <td>3</td>
-                            <td>Monday, Wednesday</td>
-                            <td>1:25 am - 2:15 am</td>
-                            <td>
-                                <span class="fa fa-star checked large"></span>
-                                <span class="fa fa-star checked large"></span>
-                                <span class="fa fa-star checked large"></span>
-                                <span class="fa fa-star large"></span>
-                                <span class="fa fa-star large"></span>
-                            </td>
-                        </tr>
                     </table>
                 </div>
             </div>

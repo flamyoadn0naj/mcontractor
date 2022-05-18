@@ -1,7 +1,5 @@
 package com.my_pls.application.components;
 
-import com.my_pls.MySqlConnection;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.Connection;
@@ -9,8 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Admin {
-
-    private static Connection conn = MySqlConnection.getConnection();
 
     public static Map<String,String> getSearchOptions(String filterBy) {
         Map<String,String> options = new HashMap<String, String>();

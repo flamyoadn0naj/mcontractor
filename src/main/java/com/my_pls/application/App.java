@@ -5,22 +5,14 @@ import com.my_pls.application.components.*;
 import spark.*;
 import spark.template.freemarker.FreeMarkerEngine;
 
-
-//things for file upload
 import javax.servlet.MultipartConfigElement;
 import java.io.*;
-
-//end things for file upload
-
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.text.NumberFormat;
 import java.util.*;
 import java.net.URLDecoder;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
 
 import static spark.Spark.*;
 
@@ -291,15 +283,10 @@ public class App {
                 response.redirect("/err");
             }
             Map<String,String> formFields = extractFields(request.body());
-
-            //System.out.println(formFields);
-            //System.out.println(URLDecoder.decode(formFields.get("req"),"UTF-8"));
             Lesson temp = new Lesson(Integer.parseInt(URLDecoder.decode(formFields.get("lessonId"),"UTF-8")),
 
             URLDecoder.decode(formFields.get("name"),"UTF-8"),
             URLDecoder.decode(formFields.get("req"),"UTF-8"));
-
-            //System.out.println(temp.getId());
             for(Map.Entry<String, String> element : formFields.entrySet()){
                 String k = URLDecoder.decode(element.getKey(),"UTF-8");
                 String v = URLDecoder.decode(element.getValue(),"UTF-8");
@@ -915,8 +902,6 @@ public class App {
             return new ModelAndView(map,"createCourse.ftl");
         },engine);
 
-
-
         get("/enroll",((request, response) -> {
             Session sess = request.session();
             String role = sess.attribute("role").toString();
@@ -945,7 +930,6 @@ public class App {
             Map<String,String> map = new HashMap<>();
             map.put("role", role);
 
-            //display course specific info
             map.put("courseNumber", request.params(":number"));
             Connection conn = MySqlConnection.getConnection();
             Map<String, Object> tempCourse = Proxy.findCourseByCourseId(request.params(":number"), conn);
@@ -1217,17 +1201,11 @@ public class App {
         }),engine);
 
         get("/upload",((request, response) -> {
-            //Session sess = request.session();
-            //String role = sess.attribute("role").toString();
             Map<String,String> map = new HashMap<>();
-            //map.put("role", role);
             return new ModelAndView(map,"upload.ftl");
         }),engine);
 
         post("/upload/:courseId/:lessonId", (request, response) -> {
-
-            // tempFile = Files.createFile(uploadDir.toPath(), "test", ".pdf");
-
             request.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
 
             try (InputStream input = request.raw().getPart("uploadFile").getInputStream()) { // getPart needs to use same "name" as input field in form
@@ -1245,11 +1223,7 @@ public class App {
             return "Success!";
         });
 
-
-
         get("/view/:courseNum/:fileName",((request, response) -> {
-            //Session sess = request.session();
-           // String role = sess.attribute("role").toString();
             Map<String,String> map = new HashMap<>();
             String[] vals =request.params(":fileName").split("\\.");
             map.put("fileName", vals[0]);
@@ -1258,7 +1232,5 @@ public class App {
             map.put("courseNumber", request.params(":courseNum"));
             return new ModelAndView(map,"viewFile.ftl");
         }),engine);
-
-
     }
 }

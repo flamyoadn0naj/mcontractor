@@ -57,9 +57,5 @@
             </h2>
         </div>
     </#if>
-
-<#--    <#if resend == true>-->
-<#--      ${toast}-->
-<#--    </#if>-->
 </body>
 </html>

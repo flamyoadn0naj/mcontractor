@@ -16,11 +16,6 @@
                 <div class="tab-content">
                     <h4 style="margin: 2% 0 2% 0; font-weight: 500">
                         ${learner_name}
-<#--                        <a class="text-white" href="/course/rate/${courseId}">-->
-<#--                            <button class="btn btn-primary mb-3" style="float: right">-->
-<#--                                Back-->
-<#--                            </button>-->
-<#--                        </a>-->
                     </h4>
                     <hr />
                     <p class="mb-3" style="margin-bottom: 2%">

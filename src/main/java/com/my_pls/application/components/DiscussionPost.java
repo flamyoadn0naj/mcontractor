@@ -1,6 +1,13 @@
 package com.my_pls.application.components;
 
 public class DiscussionPost {
+    private String username;
+    private int dgId;
+    private String postName;
+    private String postContent;
+    private String postAttachment;
+    private String postDate;
+
     public int getDgId() {
         return dgId;
     }
@@ -41,12 +48,6 @@ public class DiscussionPost {
         this.postDate = postDate;
     }
 
-    String username;
-    int dgId;
-
-    String postName;
-    String postContent;
-
     public String getPostAttachment() {
         return postAttachment;
     }
@@ -54,9 +55,6 @@ public class DiscussionPost {
     public void setPostAttachment(String postAttachment) {
         this.postAttachment = postAttachment;
     }
-
-    String postAttachment;
-    String postDate;
 
     public DiscussionPost(int dgId, String username, String postName, String postContent, String postDate, String postAttachment){
         this.dgId =dgId;

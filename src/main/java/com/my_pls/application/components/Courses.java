@@ -1,7 +1,5 @@
 package com.my_pls.application.components;
 
-import com.my_pls.MySqlConnection;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.*;
@@ -14,8 +12,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class Courses {
-    private static Connection conn = MySqlConnection.getConnection();
-
     public static Map<String,Object> getMethodDefaults(String filterstatus, Connection conn) {
         Map<String,Object> map = new HashMap<>();
         map.put("role","admin");

@@ -22,10 +22,11 @@
                         <#if course_rate.rating == 0>
                             No Rating Found
                         <#else>
-                            <#if course_rate.unchecked != 0>
+
                             <#list 1..course_rate.rating as i>
                                 <span class="fa fa-star checked large"></span>
                             </#list>
+                            <#if course_rate.unchecked != 0>
                             <#list 1..course_rate.unchecked as j>
                                 <span class="fa fa-star large"></span>
                             </#list>
