@@ -693,7 +693,7 @@ public class Proxy {
                 String db_password = rs.getString("Password");
 
                 if (pwd_manager.comparePassword(db_password, input_password))
-                    user.setAll(rs.getString("First_Name"),rs.getString("Last_Name"),
+                    user = new User(rs.getString("First_Name"),rs.getString("Last_Name"),
                             db_password, emVal, rs.getInt("Id"), rs.getString("role"));
             }
         } catch (Exception e) {

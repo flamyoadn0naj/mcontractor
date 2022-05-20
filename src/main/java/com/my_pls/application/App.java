@@ -13,6 +13,7 @@ import java.sql.Connection;
 import java.text.NumberFormat;
 import java.util.*;
 import java.net.URLDecoder;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static spark.Spark.*;
 
@@ -60,15 +61,27 @@ public class App {
         User user_current = new User();
 
         get("/login/errAuth",(request, response) -> {
-            Map<String,Object> map = Login.getMethodDefaults();
-            map.forEach((k,v)->map.put(k,v));
+            Map<String,Object> map = new HashMap<>();
+            map.put("actionLink", "/login");
+            map.put("errorEmail", "");
+            map.put("errorPassMatch", "");
+            map.put("loginErr", "");
+            map.put("emailVal","");
+            map.put("pageType","Login");
+            map.put("styleVal", "margin-top:5%; width:45%");
             map.put("errAuth","true");
             return new ModelAndView(map,"login.ftl");
         },engine);
 
         get("/login",(request, response) -> {
-            Map<String,Object> map = Login.getMethodDefaults();
-            map.forEach((k,v)->map.put(k,v));
+            Map<String,Object> map = new HashMap<>();
+            map.put("actionLink", "/login");
+            map.put("errorEmail", "");
+            map.put("errorPassMatch", "");
+            map.put("loginErr", "");
+            map.put("emailVal","");
+            map.put("pageType","Login");
+            map.put("styleVal", "margin-top:5%; width:45%");
             return new ModelAndView(map,"login.ftl");
         },engine);
 
@@ -76,20 +89,39 @@ public class App {
             Map<String,Object> map = new HashMap<>();
             Connection conn = MySqlConnection.getConnection();
             Map<String,String> formFields = extractFields(request.body());
-            Pair p = Login.postMethodDefaults(map, formFields, user_current, pwd_manager, conn);
-            map = p.fst();
-            User logUser = p.snd();
-            user_current.setAll(logUser.firstName, logUser.lastName, logUser.password, logUser.email, logUser.id, logUser.role);
-            Map<String, Object> finalMap = map;
-            map.forEach((k, v)-> finalMap.put(k,v));
-            if (logUser.firstName.length() > 0) {
-                System.out.println(logUser);
+            if (formFields.size() > 0) {
+                user_current.setEmail(URLDecoder.decode(formFields.get("email"), "UTF-8"));
+                user_current.setPassword(formFields.get("pass"));
+                if (user_current.checkErrorEmail()) {
+                    map.put("errorEmail", "display:list-item;margin-left:5%");
+                    map.put("emailVal","");
+                    map.put("loginErr", "");
+                } else {
+                    if (user_current.login(pwd_manager, conn)) {
+                        map.put("loginErr", "");
+
+                    } else {
+                        map.put("loginErr", "display:list-item;margin-left:5%");
+                    }
+                }
+                map.put("errorEmail", "");
+                map.put("emailVal", user_current.getEmail());
+
+            } else {
+                map.put("loginErr", "");
+                map.put("emailVal", "");
+            }
+            map.put("actionLink", "/login");
+            map.put("errorPassMatch", "");
+            map.put("pageType","Login");
+            map.put("styleVal", "margin-top:5%; width:45%");
+            if (user_current.getFirstName().length() > 0) {
                 Session session = request.session(true);
-                session.attribute("firstName", logUser.firstName);
-                session.attribute("lastName", logUser.lastName);
-                session.attribute("email", logUser.email);
-                session.attribute("id", logUser.id);
-                session.attribute("role", logUser.role);
+                session.attribute("firstName", user_current.getFirstName());
+                session.attribute("lastName", user_current.getLastName());
+                session.attribute("email", user_current.getEmail());
+                session.attribute("id", user_current.getId());
+                session.attribute("role", user_current.getRole());
                 response.redirect("/");
             }
             conn.close();
@@ -105,15 +137,17 @@ public class App {
         post("/register",(request, response) -> {
             Map<String,String> formFields = extractFields(request.body());
             Connection conn = MySqlConnection.getConnection();
-            Pair p = Register.postMethodDefaults(formFields, user_current, pwd_manager,conn);
+            Pair p = Register.postMethodDefaults(formFields, pwd_manager,conn);
             Map<String,Object> map = p.fst();
             map.forEach((k,v)->map.put(k,v));
             User logUser = p.snd();
 
-            user_current.setAll(logUser.firstName, logUser.lastName, logUser.password,
-                    logUser.email, -1, "learner");
-            if (logUser.firstName.length() > 0){
-                request.session().attribute("email",logUser.email); //saved to session
+            user_current.setEmail(logUser.getEmail());
+            user_current.setFirstName(logUser.getFirstName());
+            user_current.setLastName(logUser.getLastName());
+            user_current.setPassword(logUser.getPassword());
+            if (logUser.getFirstName().length() > 0){
+                request.session().attribute("email",logUser.getEmail()); //saved to session
                 response.redirect("/verify-register/send");
             }
             conn.close();
@@ -145,7 +179,7 @@ public class App {
             Map<String, Object> map = new HashMap<>();
             if (formFields.containsKey("resend")) {
                 Connection conn = MySqlConnection.getConnection();
-                boolean flag = Proxy.resendEmailConfirmation(user_current.email, conn);
+                boolean flag = Proxy.resendEmailConfirmation(user_current.getEmail(), conn);
                 if (flag) map.put("resend", true);
                 else map.put("resend", false);
                 conn.close();
@@ -1195,6 +1229,7 @@ public class App {
 
         get("/logout",((request, response) -> {
             Map<String,Object> map = new HashMap<>();
+            user_current.erase();
             request.session().invalidate();
             response.redirect("/login");
             return new ModelAndView(map,"homePage.ftl");

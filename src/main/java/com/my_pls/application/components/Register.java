@@ -24,7 +24,7 @@ public class Register {
         return map;
     }
 
-    public static Pair postMethodDefaults(Map<String, String> formFields, User user, securePassword pwd_manager, Connection conn) throws UnsupportedEncodingException {
+    public static Pair postMethodDefaults(Map<String, String> formFields, securePassword pwd_manager, Connection conn) throws UnsupportedEncodingException {
         Map<String,Object> map = new HashMap<>();
         map.put("actionLink", "/register");
         map.put("loginErr", "");
@@ -33,7 +33,7 @@ public class Register {
         password = pwd_manager.hashPassword(password);
         String fName = URLDecoder.decode(formFields.get("firstName"),"UTF-8").trim();
         String lName = URLDecoder.decode(formFields.get("lastName"), "UTF-8").trim();
-
+        User user = new User();
 
         if (formFields.size() > 0) {
             Boolean flag = true;
@@ -63,7 +63,7 @@ public class Register {
                     map.put("lname",formFields.get("lastName"));
                     map.put("emailVal",email);
                 } else {
-                    user.setAll(fName, lName, email, password, -1, "learner");
+                    user = new User(fName, lName, email, password, -1, "learner");
                 }
 
             } else {
