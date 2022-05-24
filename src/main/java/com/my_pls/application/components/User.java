@@ -100,4 +100,12 @@ public class User {
         this.password = "";
         this.email = "";
     }
+
+    public boolean checkPassword(String pass) {
+        return (password.equals(pass) && password.length() >= 6);
+    }
+
+    public boolean register(securePassword pwd_manager, Connection conn) {
+        return Proxy.register(firstName, lastName, email, pwd_manager.hashPassword(password), conn);
+    }
 }

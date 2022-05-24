@@ -13,7 +13,6 @@ import java.sql.Connection;
 import java.text.NumberFormat;
 import java.util.*;
 import java.net.URLDecoder;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static spark.Spark.*;
 
@@ -129,25 +128,59 @@ public class App {
         },engine);
 
         get("/register",(request, response) -> {
-            Map<String,Object> map = Register.getMethodDefaults();
-            map.forEach((k,v)->map.put(k,v));
+            Map<String, Object> map = new HashMap<>();
+            map.put("actionLink", "/register");
+            map.put("loginErr", "");
+            map.put("errorEmail", "");
+            map.put("errorPassMatch", "");
+            map.put("fname","");
+            map.put("lname","");
+            map.put("emailVal","");
+            map.put("pageType","Register");
+            map.put("loading","false");
+            map.put("styleVal", "margin-top:5%; width:45%");
             return new ModelAndView(map,"login.ftl");
         },engine);
 
         post("/register",(request, response) -> {
             Map<String,String> formFields = extractFields(request.body());
             Connection conn = MySqlConnection.getConnection();
-            Pair p = Register.postMethodDefaults(formFields, pwd_manager,conn);
-            Map<String,Object> map = p.fst();
-            map.forEach((k,v)->map.put(k,v));
-            User logUser = p.snd();
+            Map<String,Object> map = new HashMap<>();
+            map.put("actionLink", "/register");
+            map.put("loginErr", "");
+            user_current.setEmail(URLDecoder.decode(formFields.get("email"),"UTF-8"));
+            user_current.setPassword(formFields.get("pass"));
+            user_current.setFirstName(URLDecoder.decode(formFields.get("firstName"),"UTF-8").trim());
+            user_current.setLastName(URLDecoder.decode(formFields.get("lastName"), "UTF-8").trim());
+            boolean flag = true;
+            map.put("fname",user_current.getFirstName());
+            map.put("lname",user_current.getLastName());
+            if (user_current.checkErrorEmail()) {
+                map.put("errorEmail", "display:list-item;margin-left:5%");
+                map.put("emailVal","");
+                flag = false;
+            } else {
+                map.put("errorEmail", "");
+                map.put("emailVal",user_current.getEmail());
+            }
+            if (user_current.checkPassword(formFields.get("retPass"))) {
+                map.put("errorPassMatch", "");
+            } else {
+                flag = false;
+                map.put("errorPassMatch", "display:list-item;margin-left:5%");
+            }
+            if (flag) {
+                if (!user_current.register(pwd_manager, conn)) {
+                    map.put("dbErr", "true");
+                    map.put("emailVal",user_current.getEmail());
+                    user_current.erase();
+                }
+            } else user_current.erase();
+            map.put("pageType","Register");
+            map.put("styleVal", "margin-top:5%; width:45%");
 
-            user_current.setEmail(logUser.getEmail());
-            user_current.setFirstName(logUser.getFirstName());
-            user_current.setLastName(logUser.getLastName());
-            user_current.setPassword(logUser.getPassword());
-            if (logUser.getFirstName().length() > 0){
-                request.session().attribute("email",logUser.getEmail()); //saved to session
+            if (user_current.getFirstName().length() > 0){
+                request.session().attribute("email",user_current.getEmail()); //saved to session
                 response.redirect("/verify-register/send");
             }
             conn.close();
@@ -177,6 +210,8 @@ public class App {
         post("/verify-register/:type",((request, response) -> {
             Map<String,String> formFields = extractFields(request.body());
             Map<String, Object> map = new HashMap<>();
+            String type = request.params(":type");
+            map.put("type", type);
             if (formFields.containsKey("resend")) {
                 Connection conn = MySqlConnection.getConnection();
                 boolean flag = Proxy.resendEmailConfirmation(user_current.getEmail(), conn);
