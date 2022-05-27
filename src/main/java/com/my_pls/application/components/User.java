@@ -108,4 +108,12 @@ public class User {
     public boolean register(securePassword pwd_manager, Connection conn) {
         return Proxy.register(firstName, lastName, email, pwd_manager.hashPassword(password), conn);
     }
+
+    public boolean forgetPassword(Connection conn) {
+        return Proxy.forgetPasswordSendEmail(email, conn);
+    }
+
+    public boolean changePassword(securePassword pwd_manager, String confirmCode, Connection conn) {
+        return Proxy.changePassword(confirmCode, email, pwd_manager.hashPassword(password), conn);
+    }
 }

@@ -224,18 +224,66 @@ public class App {
 
         get("/forgot-password/:type",((request, response) -> {
             String pageType = request.params(":type");
-            Map<String, Object> map = ForgetPassword.getMethodDefaults(pageType);
-            map.forEach((k,v)->map.put(k,v));
+            Map<String,Object> map = new HashMap<>();
+            map.put("actionLink", ("/forgot-password/" + pageType));
+            map.put("success", "false");
+            map.put("succMsg", "");
+            map.put("errorEmail", "");
+            map.put("errorPassMatch", "");
+            map.put("pageType", pageType);
             return new ModelAndView(map,"forgotPassword.ftl");
         }),engine);
 
         post("/forgot-password/:type",((request, response) -> {
             String pageType = request.params(":type");
             Connection conn = MySqlConnection.getConnection();
+            Map<String,Object> map = new HashMap<>();
             Map<String,String> formFields = extractFields(request.body());
-            Map<String,Object> map = ForgetPassword.postMethodDefaults(pageType,
-                    formFields,pwd_manager, conn);
-            map.forEach((k,v)->map.put(k,v));
+            map.put("emailVal","");
+            map.put("success", "false");
+            map.put("succMsg", "");
+            map.put("pageType", pageType);
+            map.put("actionLink", ("/forgot-password/" + pageType));
+            user_current.setEmail(URLDecoder.decode(formFields.get("email"),"UTF-8"));
+            if (pageType.equals("email")) {
+                map.put("errorPassMatch", "");
+                if (user_current.checkErrorEmail()) {
+                    map.put("errorEmail", "display:block;margin-left:5%; width:90%");
+                } else {
+                    boolean flag = user_current.forgetPassword(conn);
+                    if(!flag) {
+                        map.put("errorEmail", "display:block;margin-left:5%; width:90%");
+                    }
+                    map.put("errorEmail", "");
+                    map.put("success", "true");
+                    map.put("succMsg", "A verification link has been emailed to you!");
+                }
+            } else if (pageType.equals("password")) {
+                map.put("errorEmail", "");
+                user_current.setPassword(formFields.get("pass"));
+                String confirmCode = formFields.get("confirmCode");
+                map.put("errorPassMatch", "");
+                if (user_current.checkErrorEmail()) {
+                    map.put("errorEmail", "display:block;margin-left:5%; width:90%");
+                }
+                if (user_current.checkPassword(formFields.get("retPass"))) {
+                    if (confirmCode.length() == 4) {
+                        boolean flag = user_current.changePassword(pwd_manager, confirmCode, conn);
+                        if (flag) {
+                            map.put("errorPassMatch", "");
+                            map.put("success", "true");
+                            map.put("succMsg", "Your password has been changed. Please log in again.");
+                        } else {
+                            map.put("errorLink","true");
+                        }
+                    } else map.put("errCode","display:block;margin-left:5%; width:90%" );
+                } else {
+                    map.put("errorPassMatch", "display:block;margin-left:5%; width:90%");
+                }
+            }
+//            Map<String,Object> map = ForgetPassword.postMethodDefaults(pageType,
+//                    formFields,pwd_manager, conn);
+//            map.forEach((k,v)->map.put(k,v));
             conn.close();
             return new ModelAndView(map,"forgotPassword.ftl");
         }),engine);

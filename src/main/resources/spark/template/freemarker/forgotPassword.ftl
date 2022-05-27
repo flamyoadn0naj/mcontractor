@@ -42,9 +42,13 @@
             <div class="invalid-feedback" style="${errorPassMatch}">
                 The passwords do not match or must be at least 6 characters. Try again.
             </div>
-        <#else>
-            <div class="invalid-feedback" style="${errorEmail}">Email must be in the form _@rit.edu</div>
+            <#if errCode??>
+                <div class="invalid-feedback" style="${errCode}">
+                    The confirmation code must be 4 digits long.
+                </div>
+            </#if>
         </#if>
+            <div class="invalid-feedback" style="${errorEmail}">Email must be in the form _@rit.edu</div>
 
         <div class="card-body">
             <#if pageType == "email">
