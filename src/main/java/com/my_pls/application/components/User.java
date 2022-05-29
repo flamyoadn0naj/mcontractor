@@ -116,4 +116,16 @@ public class User {
     public boolean changePassword(securePassword pwd_manager, String confirmCode, Connection conn) {
         return Proxy.changePassword(confirmCode, email, pwd_manager.hashPassword(password), conn);
     }
+
+    public void verifyEmailofUser(String hash, Connection conn) {
+        boolean flag =  Proxy.verifyEmailofUser(email, hash, conn);
+        if (flag) {
+            int id = Proxy.getUserIdFromEmail(email, conn);
+            Proxy.addDGmember(id,311,conn);
+        }
+    }
+
+    public boolean resendVerificationEmail(Connection conn) {
+        return Proxy.resendEmailConfirmation(email, conn);
+    }
 }

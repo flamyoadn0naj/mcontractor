@@ -196,12 +196,9 @@ public class App {
             if(type.equals("confirm")) {
                 String email = request.queryParams("key1");
                 email = URLDecoder.decode(email,"UTF-8");
+                user_current.setEmail(email);
                 String hash = request.queryParams("key2");
-                boolean flag = Proxy.verifyEmailofUser(email, hash, conn);
-                if (flag) {
-                    int id = Proxy.getUserIdFromEmail(email, conn);
-                    Proxy.addDGmember(id,311,conn);
-                }
+                user_current.verifyEmailofUser(hash, conn);
             }
             conn.close();
             return new ModelAndView(map,"verifyRegister.ftl");
@@ -214,7 +211,7 @@ public class App {
             map.put("type", type);
             if (formFields.containsKey("resend")) {
                 Connection conn = MySqlConnection.getConnection();
-                boolean flag = Proxy.resendEmailConfirmation(user_current.getEmail(), conn);
+                boolean flag = user_current.resendVerificationEmail(conn);
                 if (flag) map.put("resend", true);
                 else map.put("resend", false);
                 conn.close();
