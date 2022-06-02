@@ -48,7 +48,9 @@
                             <th scope="col">Quiz name</th>
                             <th scope="col">Total marks</th>
                             <th scope="col">Minimum Score to Pass</th>
-                            <th scope="col">Score</th>
+                            <#if role == "learner">
+                                <th scope="col">Score</th>
+                            </#if>
                             <th scope="col">Action</th>
                         </tr>
                         <#if quizzes??>
@@ -58,7 +60,9 @@
                                     <th scope="row"><a class="text-muted" href="${courseId}/${k}">${c.name}</a></th>
                                     <td>${c.marks}</td>
                                     <td>${c.minMark}</td>
-                                    <td>${c.marks}</td>
+                                    <#if role == "learner">
+                                        <td>${c.marks}</td>
+                                    </#if>
                                     <td>
                                         <#if role == "prof">
                                             <a class="btn-download padding2right" href="/course/${courseId}/create-quiz?courseId=${courseId}&quizId=${c.quizId!""}&e=e"><i class="fa fa-edit"></i></a>
