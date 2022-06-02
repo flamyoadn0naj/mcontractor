@@ -17,7 +17,7 @@
         </h5>
         <div style="width: 90%; margin-left: 2%">
             <#if role == "prof">
-<#--                <a href="/course/create-question?courseId=${courseId}&lessonId=${lessonId}&quizId=${quizId}&e=-1" class="btn btn-primary" style="float: right; margin-left: 2%">Add</a>-->
+            <#--                <a href="/course/create-question?courseId=${courseId}&lessonId=${lessonId}&quizId=${quizId}&e=-1" class="btn btn-primary" style="float: right; margin-left: 2%">Add</a>-->
                 <a href="/course/quiz/${courseId}" class="btn btn-primary"
                    style="float:
                 right">Back</a>
@@ -48,6 +48,7 @@
             <form style="display:flex; justify-content:center;" method="post" action="/course/create-question?courseId=${courseId}&lessonId=${lessonId}&quizId=${quizId}&e=${e}">
 
                 <div class="card" style="width: 90%">
+                    <#if role == "prof">
                     <div class="card-header" id="headingOne">
                         <h5>
                             <div class="space-between">
@@ -63,21 +64,12 @@
                         </h5>
                         <hr>
                         <h6 class="space-between">
-                            <#--                                        <div class="form-group space-between mb-3">-->
-                            <#--                                            <label class="padding2right col-3" for="1a">Question:</label>-->
-
-                            <#--                                            <input required type="text" name="questionText" class="form-control col-9" id="questionText" <#if question ??>value=${question.questionText!""}</#if>>-->
-
-                            <#--                                        </div>-->
                             <div style="display: flex">
                                 <label style="margin-right: 2%" for="marks">Marks</label>
                                 <input required type="number" name="marks" class="form-control col-3" id="marks"  <#if question ??>value=${question.mark!""}</#if> >
                             </div>
                         </h6>
-                        <#--                                    <div class="form-group mb3">-->
-                        <#--                                        <input required type="text" name="QText" class="form-control" id="1"  <#if question ??>value=${question.questionText!""}</#if> >-->
-                        <#--                                    </div>-->
-
+                        </#if>
                         <div class="form-group space-between">
                             <label class="padding2right" for="1a">Question</label>
                             <input required type="text" name="QText" class="form-control" id="1"  <#if question ??>value="${question.questionText!""}"</#if> >
@@ -105,7 +97,7 @@
                         </div>
                         <#if question ??>
                             <button type="submit" name="action" value=${questionId} class="btn btn-primary" style="width:10rem; float:right;">
-                                Save
+                                                                                                          Save Submission
                             </button>
                         <#else>
                             <button type="submit" name="action" value="AddQ" class="btn btn-primary" style="width:10rem; float:right; margin-right: 2%">
@@ -115,6 +107,7 @@
                     </div>
                 </div>
             </form>
+            
         </div>
     </div>
 </div>
