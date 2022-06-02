@@ -13,6 +13,8 @@ public class Quiz {
     public int mark;
     public int MinMark;
     public int totalMark;
+    public int courseId;
+    public int learnerId;
     public String questionText;
     public String responseA;
     public String responseB;

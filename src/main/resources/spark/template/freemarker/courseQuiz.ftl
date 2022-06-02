@@ -57,7 +57,11 @@
                             <#list quizzes as k,c>
                                 <tr>
 <#--                                    <td>${c.name}</td>-->
-                                    <th scope="row"><a class="text-muted" href="${courseId}/${k}">${c.name}</a></th>
+                                    <#if role == "prof">
+                                        <th scope="row"><a class="text-muted" href="${courseId}/${c.quizId}">${c.name}</a></th>
+                                    <#else>
+                                        <th scope="row"><a class="text-muted">${c.name}</a></th>
+                                    </#if>
                                     <td>${c.marks}</td>
                                     <td>${c.minMark}</td>
                                     <#if role == "learner">
@@ -70,7 +74,9 @@
 <#--                                            <a class="btn-download" href="#"><i class="fa fa-share"></i></a>-->
                                         <#else>
                                             <#if c.status == 1>
-                                                <button type="button" class="btn btn-primary">Take</button>
+                                                <button type="button" class="btn btn-primary" href="${courseId}/${c.quizId}?&e=t">Take</button>
+                                            <#elseif c.status == 2>
+                                                <button type="button" class="btn btn-primary" href="${courseId}/${c.quizId}?&e=rt">Retake</button>
                                             </#if>
                                         </#if>
                                     </td>
