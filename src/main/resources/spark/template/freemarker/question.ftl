@@ -48,8 +48,8 @@
             <form style="display:flex; justify-content:center;" method="post" action="/course/create-question?courseId=${courseId}&lessonId=${lessonId}&quizId=${quizId}&e=${e}">
 
                 <div class="card" style="width: 90%">
-                    <#if role == "prof">
                     <div class="card-header" id="headingOne">
+                    <#if role == "prof">
                         <h5>
                             <div class="space-between">
                                 <div style="display: flex">
@@ -70,39 +70,70 @@
                             </div>
                         </h6>
                         </#if>
-                        <div class="form-group space-between">
-                            <label class="padding2right" for="1a">Question</label>
-                            <input required type="text" name="QText" class="form-control" id="1"  <#if question ??>value="${question.questionText!""}"</#if> >
-                        </div>
+                        <#if role == "prof">
+                            <div class="form-group space-between">
+                                <label class="padding2right" for="1a">Question</label>
+                                <input required type="text" name="QText" class="form-control" id="1"  <#if question ??>value="${question.questionText!""}"</#if> >
+                            </div>
 
-                        <div class="form-group space-between">
-                            <label class="padding2right" for="1a">A</label>
-                            <input required type="text" name="QA" class="form-control" id="QA"  <#if question ??>value="${question.responseA!""}"</#if> >
-                        </div>
-                        <div class="form-group space-between">
-                            <label class="padding2right" for="1b">B</label>
-                            <input required type="text" name="QB" class="form-control" id="QB"  <#if question ??>value="${question.responseB!""}"</#if> >
-                        </div>
-                        <div class="form-group space-between">
-                            <label class="padding2right" for="1c">C</label>
-                            <input required type="text" name="QC" class="form-control" id="QC"  <#if question ??>value="${question.responseC!""}"</#if> >
-                        </div>
-                        <div class="form-group space-between mb3">
-                            <label class="padding2right" for="1d">D</label>
-                            <input required type="text" name="QD" class="form-control" id="QD"  <#if question ??>value="${question.responseD!""}"</#if> >
-                        </div>
-                        <div class="form-group space-between">
-                            <label class="padding2right" for="ans1">Answer</label>
-                            <input required type="text" name="ans" class="form-control" id="ans"  <#if question ??>value="${question.answer!""}"</#if> >
-                        </div>
-                        <#if question ??>
-                            <button type="submit" name="action" value=${questionId} class="btn btn-primary" style="width:10rem; float:right;">
-                                                                                                          Save Submission
-                            </button>
-                        <#else>
-                            <button type="submit" name="action" value="AddQ" class="btn btn-primary" style="width:10rem; float:right; margin-right: 2%">
-                                Add Question
-                            </button>
+                            <div class="form-group space-between">
+                                <label class="padding2right" for="1a">A</label>
+                                <input required type="text" name="QA" class="form-control" id="QA"  <#if question ??>value="${question.responseA!""}"</#if> >
+                            </div>
+                            <div class="form-group space-between">
+                                <label class="padding2right" for="1b">B</label>
+                                <input required type="text" name="QB" class="form-control" id="QB"  <#if question ??>value="${question.responseB!""}"</#if> >
+                            </div>
+                            <div class="form-group space-between">
+                                <label class="padding2right" for="1c">C</label>
+                                <input required type="text" name="QC" class="form-control" id="QC"  <#if question ??>value="${question.responseC!""}"</#if> >
+                            </div>
+                            <div class="form-group space-between mb3">
+                                <label class="padding2right" for="1d">D</label>
+                                <input required type="text" name="QD" class="form-control" id="QD"  <#if question ??>value="${question.responseD!""}"</#if> >
+                            </div>
+                            <div class="form-group space-between">
+                                <label class="padding2right" for="ans1">Answer</label>
+                                <input required type="text" name="ans" class="form-control" id="ans"  <#if question ??>value="${question.answer!""}"</#if> >
+                            </div>
+                            <#if question ??>
+                                <button type="submit" name="action" value=${questionId} class="btn btn-primary" style="width:10rem; float:right;">Save Submission</button>
+                            <#else>
+                                <button type="submit" name="action" value="AddQ" class="btn btn-primary" style="width:10rem; float:right; margin-right: 2%">
+                                    Add Question
+                                </button>
+                            </#if>
+                        <#elseif role=="learner">
+                            <div class="form-group space-between">
+                                <label class="padding2right" for="1a">${question.questionText!""}</label>
+                            </div>
+
+                            <div class="form-group space-between">
+                                <label class="padding2right" for="1a">A: ${question.responseA!""}</label>
+                            </div>
+                            <div class="form-group space-between">
+                                <label class="padding2right" for="1b">B: ${question.responseB!""}</label>
+
+                            </div>
+                            <div class="form-group space-between">
+                                <label class="padding2right" for="1c">C: ${question.responseC!""}</label>
+
+                            </div>
+                            <div class="form-group space-between mb3">
+                                <label class="padding2right" for="1d">D: ${question.responseD!""}</label>
+
+                            </div>
+                            <div class="form-group space-between">
+                                <label class="padding2right" for="ans1">Answer</label>
+                                <input required type="text" name="ans" class="form-control" id="ans" <#if question ??>value="${question.answer!""}"</#if> >
+                            </div>
+                            <#if question ??>
+                                <button type="submit" name="action" value=${questionId} class="btn btn-primary" style="width:10rem; float:right;">Save Submission</button>
+                            <#else>
+                                <button type="submit" name="action" value="AddQ" class="btn btn-primary" style="width:10rem; float:right; margin-right: 2%">
+                                    Add Question
+                                </button>
+                            </#if>
                         </#if>
                     </div>
                 </div>

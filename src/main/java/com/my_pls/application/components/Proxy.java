@@ -800,11 +800,10 @@ public class Proxy {
     public static boolean deleteQuizAttempt(Quiz question, Connection conn) {
         boolean flag = false;
         try {
-            PreparedStatement pst = conn.prepareStatement("delete from grades where userId=? AND courseId=? AND lessonId=? AND quizId=?");
+            PreparedStatement pst = conn.prepareStatement("delete from grades where userId=? AND courseId=? AND quizId=?");
             pst.setInt(1,question.learnerId);
             pst.setInt(2, question.courseId);
-            pst.setInt(3,question.lessonId);
-            pst.setInt(4, question.quizId);
+            pst.setInt(3, question.quizId);
             int i = pst.executeUpdate();
             if (i != 0) flag = true;
         } catch(Exception e) {
@@ -878,6 +877,7 @@ public class Proxy {
                 question.put("responseB",dbrs.getString("responseB"));
                 question.put("responseC",dbrs.getString("responseC"));
                 question.put("responseD",dbrs.getString("responseD"));
+                question.put("status",1);
                 questions.put((Integer) question.get("questionId"),question);
             }
 
@@ -887,6 +887,28 @@ public class Proxy {
         return questions;
     }
 
+    public static Map<Integer,Object> getQuestionAttempts(Quiz quiz,Map<Integer,Object> questions, Connection conn){
+
+        int i=0;
+        try{
+            PreparedStatement pst1 = conn.prepareStatement("select * from question_grades where quizId=? AND learnerId=?");
+            pst1.setInt(1,quiz.quizId);
+            pst1.setInt(2,quiz.learnerId);
+            ResultSet dbrs = pst1.executeQuery();
+            while (dbrs.next()){
+                int questionId = dbrs.getInt("learnerId");
+                String response = dbrs.getString("response");
+                Map<String, Object> question = new HashMap<>();
+                question.put("status",2);
+                question.put("answer",response);
+                questions.put(questionId,question);
+            }
+
+        } catch(Exception e) {
+            System.out.println("Exception at getQuestions " + e);
+        }
+        return questions;
+    }
 
     public static Map<String, Object> getQuestion(int QuestionId, Connection conn) {
 
@@ -914,7 +936,7 @@ public class Proxy {
         return question;
     }
 
-    public static Map<Integer, Object>  viewQuizzes(int lessonID, Connection conn) {
+    public static Map<Integer, Object>  viewQuizzes(int lessonID, Connection conn) throws Exception{
 //        ArrayList<Map<String,String>> quizzes = new ArrayList<Map<String, String>>();
         Map<Integer,Object> quizzes = new HashMap<>();
         try {
@@ -933,12 +955,14 @@ public class Proxy {
                 quizzes.put(rs.getInt("Id"),quiz);
             }
         } catch (Exception e) {
-            System.out.println("Exception at view Quizes "+e);
+            System.out.println("Exception at View Quizes");
+            throw new Exception(e);
+            /* System.out.println("Exception at view Quizes "+e); */
         }
         return quizzes;
     }
 
-    public static Map<Integer, Object>  viewQuiz(int quizId, Connection conn) {
+    public static Map<Integer, Object>  viewQuiz(int quizId, Connection conn) throws Exception {
 //        ArrayList<Map<String,String>> quizzes = new ArrayList<Map<String, String>>();
         Map<Integer,Object> quizzes = new HashMap<>();
         try {
@@ -957,12 +981,13 @@ public class Proxy {
                 quizzes.put(rs.getInt("Id"),quiz);
             }
         } catch (Exception e) {
-            System.out.println("Exception at view Quizes "+e);
+            System.out.println("Exception at view Quiz");
+            throw new Exception(e);
         }
         return quizzes;
     }
 
-    public static Quiz viewSingleQuiz(int quizId, Connection conn) {
+    public static Quiz viewSingleQuiz(int quizId, Connection conn) throws Exception {
 //        ArrayList<Map<String,String>> quizzes = new ArrayList<Map<String, String>>();
         Map<Integer,Object> quizzes = new HashMap<>();
         Quiz singleQuiz = new Quiz();
@@ -980,36 +1005,12 @@ public class Proxy {
                 singleQuiz.totalMark = rs.getInt("totalMarks");
             }
         } catch (Exception e) {
-            System.out.println("Exception at view Quizes "+e);
+            System.out.println("Exception at view Single Quiz");
+            throw new Exception(e);
         }
         return singleQuiz;
     }
-//    public static Quiz[] getQuizzes(int lessonID){
-//        Quiz[] quizzes = new Quiz[MAXQUIZ]; //= new Quiz[0];
-//        Quiz test = new Quiz();
-//        int i=0;
-//            try{
-//                PreparedStatement pst1 = conn.prepareStatement("select * from quizzes where lessonId=?");
-//                pst1.setInt(1,lessonID);
-//                ResultSet dbrs = pst1.executeQuery();
-//
-//                while (dbrs.next()){
-//                    test.quizId = 1;
-//                    System.out.println(test.quizId);
-//                    System.out.println(quizzes[i].quizId);
-//                    quizzes[i].quizId = dbrs.getInt("Id");
-//                    quizzes[i].quizName = dbrs.getString("name");
-//                    quizzes[i].MinMark = dbrs.getInt("minimumMarks");
-//                    quizzes[i].mark = dbrs.getInt("totalMarks");
-//                    System.out.println("Q Name "+quizzes[i].quizName);
-//                    i++;
-//                }
-//
-//        } catch(Exception e) {
-//            System.out.println("Exception at createQuiz " + e);
-//        }
-//        return quizzes;
-//    }
+
 
     public static boolean createQuiz(Quiz newQuiz, Connection conn) {
         boolean flag = false;

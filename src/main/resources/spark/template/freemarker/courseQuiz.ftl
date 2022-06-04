@@ -74,9 +74,11 @@
 <#--                                            <a class="btn-download" href="#"><i class="fa fa-share"></i></a>-->
                                         <#else>
                                             <#if c.status == 1>
-                                                <button type="button" class="btn btn-primary" href="${courseId}/${c.quizId}?&e=t">Take</button>
+                                                <a href="${courseId}/${c.quizId}?&e=t" class="btn btn-primary">Take</a>
+<#--                                                <button type="button" class="btn btn-primary" href="${courseId}/${c.quizId}?&e=t">Take</button>-->
                                             <#elseif c.status == 2>
-                                                <button type="button" class="btn btn-primary" href="${courseId}/${c.quizId}?&e=rt">Retake</button>
+                                                <a href="${courseId}/${c.quizId}?&e=rt" class="btn btn-primary">Retake</a>
+<#--                                                <button type="button" class="btn btn-primary" href="${courseId}/${c.quizId}?&e=rt">Retake</button>-->
                                             </#if>
                                         </#if>
                                     </td>

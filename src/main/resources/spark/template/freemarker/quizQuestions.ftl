@@ -6,7 +6,7 @@
     <link rel="stylesheet"  href="/css/_variables.scss">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <title>Edit Quiz - MyPLS</title>
+    <title>${quizName} Quiz - MyPLS</title>
 </head>
 <body>
 <#include "navbar.ftl">
@@ -53,14 +53,24 @@
                         <#if questions??>
                             <#list questions as k,c>
                                 <tr>
-                                    <th scope="row"><a class="text-muted" href="/course/create-question?quizId=${c.quizId}&questionId=${k}&courseId=${courseId}&e=e">${c.questionText}</a></th>
+                                    <#if role == "prof">
+                                        <th scope="row"><a class="text-muted" href="/course/create-question?quizId=${c.quizId}&questionId=${k}&courseId=${courseId}&e=e">${c.questionText}</a></th>
+                                    <#else>
+                                        <th scope="row"><a class="text-muted">${c.questionText}</a></th>
+                                    </#if>
                                     <td>${c.mark}</td>
                                     <td>
                                         <#if role == "prof">
                                             <a class="btn-download padding2right" href="/course/create-question?quizId=${c.quizId}&questionId=${k}&courseId=${courseId}&e=e"><i class="fa fa-edit"></i></a>
                                             <a class="btn-download" href="/course/create-question?quizId=${c.quizId}&questionId=${k}&courseId=${courseId}&e=d"><i class="fa fa-trash"></i></a>
                                         <#else>
-                                                <button type="button" class="btn btn-primary">Take</button>
+                                            <#if c.status == 1>
+                                                <a href="/course/create-question?quizId=${c.quizId}&questionId=${k}&courseId=${courseId}&e=t" class="btn btn-primary">Take</a>
+<#--                                                <button type="button" class="btn btn-primary" href="${courseId}/${c.quizId}?&e=t">Take</button>-->
+                                            <#elseif c.status == 2>
+                                                <a href="/course/create-question?quizId=${c.quizId}&questionId=${k}&courseId=${courseId}?&e=rt" class="btn btn-primary">Retake</a>
+<#--                                                <button type="button" class="btn btn-primary" href="${courseId}/${c.quizId}?&e=rt">Retake</button>-->
+                                         </#if>
                                         </#if>
                                     </td>
                                 </tr>

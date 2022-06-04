@@ -21,8 +21,9 @@ public class Quiz {
     public String responseC;
     public String responseD;
     public String answer;
+    public int status = 1;
 
-    public static Map<Integer, Object> getQuizzes(int courseId, Connection conn) {
+    public static Map<Integer, Object> getQuizzes(int courseId, Connection conn) throws Exception {
         Map<Integer,Object> quizzes = new HashMap<>();
 
         ArrayList<Lesson> lessons = Proxy.getLessonsByCourseId(courseId, conn);
@@ -34,11 +35,12 @@ public class Quiz {
     }
 
 
-    public static Map<Integer, Object> getQuizzesbyId(int quizId, Connection conn) {
+    public static Map<Integer, Object> getQuizzesbyId(int quizId, Connection conn) throws Exception {
         Map<Integer,Object> quizzes = new HashMap<>();
         Map<Integer,Object> MyQuizzes = Proxy.viewQuiz(quizId, conn);
         Object currentQuiz = MyQuizzes.get(quizId);
         return quizzes;
     }
+
 
 }

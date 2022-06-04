@@ -555,7 +555,7 @@ public class App {
             Map<String,Object> map = new HashMap<>();
             Session sess = request.session();
             int id = sess.attribute("id");
-
+            String edit = request.queryParams("e");
             Connection conn = MySqlConnection.getConnection();
             String courseId = request.params(":courseId");
             courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
@@ -567,11 +567,26 @@ public class App {
             if((int)course.get("prof_id") == id) map.put("role", "prof");
             else map.put("role","learner");
             map.put("courseId", courseId);
+
             Quiz quiz = Proxy.viewSingleQuiz(Integer.parseInt(quizId),conn);
             Map<Integer,Object> questions = Proxy.getQuestions(quiz,conn);
             map.put("quizName", quiz.quizName);
             map.put("quiz",quiz);
             map.put("quizId",quizId);
+
+            quiz.learnerId = id;
+            quiz.quizId = Integer.parseInt(quizId);
+            quiz.courseId = Integer.parseInt(courseId);
+            map.put("status",1);
+            if (edit != null){
+                if (edit.contains("rt"))
+                {
+                Proxy.deleteQuizAttempt(quiz,conn);
+                }
+                else if (edit.compareTo("t")==0){
+                    questions = Proxy.getQuestionAttempts(quiz,questions,conn);
+                }
+            }
             if (!questions.isEmpty()) {
                 map.put("questions",questions);
                 map.put("quizName", quiz.quizName);
@@ -591,8 +606,12 @@ public class App {
             courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
 
             Map<String,Object> course = Courses.getCourse(courseId, conn);
-
+            String edit = request.queryParams("e");
             if((int)course.get("prof_id") == id) map.put("role", "prof");
+            else if (edit.length()>0)
+            {
+                map.put("role","learner");
+            }
             else
             {
                 conn.close();
@@ -600,7 +619,7 @@ public class App {
             }
             map.put("courseId", courseId);
             map.put("name", course.get("name"));
-            String edit = request.queryParams("e");
+
             String quizId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("quizId")));
             map.put("quizId",quizId);
 
@@ -610,7 +629,9 @@ public class App {
             map.put("lessonId", quiz.lessonId);
 
             if (edit == null || edit.contains("-1")) edit = "c";
-
+            String questionId;
+            Map<String, Object> question;
+            Object questionText;
             switch (edit){
                 case "c":
                     map.put("e",-1);
@@ -619,9 +640,20 @@ public class App {
                     break;
                 case "e":
                     map.put("e",1);
-                    String questionId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId")));
-                    Map<String, Object> question = Proxy.getQuestion(Integer.parseInt(questionId), conn);
-                    Object questionText = question.get("questionText");
+                    questionId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId")));
+                    question = Proxy.getQuestion(Integer.parseInt(questionId), conn);
+                    questionText = question.get("questionText");
+                    sess.attribute("questionId",question);
+                    map.put("title","Modify "+questionText);
+                    map.put("questionText",questionText);
+                    map.put("question",question);
+                    map.put("questionId",questionId);
+                    break;
+                case "t":
+                    map.put("e","t");
+                    questionId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId")));
+                    question = Proxy.getQuestion(Integer.parseInt(questionId), conn);
+                    questionText = question.get("questionText");
                     sess.attribute("questionId",question);
                     map.put("title","Modify "+questionText);
                     map.put("questionText",questionText);

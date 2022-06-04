@@ -12,7 +12,7 @@ public class Grades {
     private Map<Integer, Object> quizzes = new HashMap<>();
     private Map<String, Object> grades = new HashMap<String, Object>();
 
-    public Grades(int courseId, int userId, Connection conn) {
+    public Grades(int courseId, int userId, Connection conn) throws Exception {
         courseId = courseId;
         userId = userId;
         lessons = Proxy.getLessonsByCourseId(courseId,conn);
