@@ -64,16 +64,16 @@
                 <th scope="col">Status</th>
             </tr>
                 <#if courses??>
-                    <#list courses as k,c>
+                    <#list courses as c>
                         <tr>
-                            <th scope="row"><a class="text-muted" href="course/about/${k}">${c.name}</a></th>
-                            <td>${c.prof}</td>
-                            <td style="text-align: center">${c.prereq}</td>
-                            <td>${c.startDate}</td>
-                            <td>${c.endDate}</td>
-                            <td>${c.meeting_days}</td>
-                            <td>${c.startTime} - ${c.endTime}</td>
-                            <td>${c.status}</td>
+                            <th scope="row"><a class="text-muted" href="course/about/${c.getId()}">${c.getName()}</a></th>
+                            <td>${c.getProfessorName()}</td>
+                            <td style="text-align: center">${c.getPreReqName()}</td>
+                            <td>${c.getStartDate()}</td>
+                            <td>${c.getEndDate()}</td>
+                            <td>${c.getMeeting_days()}</td>
+                            <td>${c.getStartTime()} - ${c.getEndTime()}</td>
+                            <td>${c.getStatus()}</td>
                         </tr>
                     </#list>
                 </#if>

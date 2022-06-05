@@ -141,8 +141,7 @@ public class DiscussionGroups {
         int id = 0;
         if (group.containsKey("course")) {
             int courseId = (int) group.get("course_id");
-            Map<String, Object> course = Proxy.findCourseByCourseId(String.valueOf(courseId), conn);
-            id = (int) course.get("prof_id");
+            id = Proxy.findCourseByCourseId(String.valueOf(courseId), conn).getProfessorId();
         }
         return id;
     }

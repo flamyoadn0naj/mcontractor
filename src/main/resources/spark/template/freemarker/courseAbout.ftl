@@ -18,7 +18,7 @@
     <div style="display: flex;justify-content: center">
         <div class="card text-black mb-3" style="width:100%; border: none">
             <h2 class="card-header border-primary text-black-50 mb-3">
-                ${course.name}
+                ${course.getName()}
             </h2>
             <div style="width: 90%; margin-left: 2%">
                 <ul class="nav nav-tabs">
@@ -46,33 +46,33 @@
 
                 <div id="myTabContent" class="tab-content" style="margin:2%">
                     <div class="tab-pane fade active show" id="about">
-                        <form action="/course/about/${courseId}" method="post">
-                            <p class="mb-3"><b>Professor:</b> ${course.prof_name}</p>
-                            <p class="mb-3"><b>Meeting Days:</b> ${course.meeting_days}</p>
-                            <p class="mb-3"><b>Meeting Time:</b> ${course.start_time} - ${course.end_time} </p>
-                            <p class="mb-3"><b>Pre-requisite:</b> ${course.preReq!"None"}</p>
+                        <form action="/course/about/${course.getId()}" method="post">
+                            <p class="mb-3"><b>Professor:</b> ${course.getProfessorName()}</p>
+                            <p class="mb-3"><b>Meeting Days:</b> ${course.getMeeting_days()}</p>
+                            <p class="mb-3"><b>Meeting Time:</b> ${course.getStartTime()} - ${course.getEndTime()} </p>
+                            <p class="mb-3"><b>Pre-requisite:</b> ${course.getPreReqName()}</p>
                             <#if role == "prof">
                                 <div class="mb-3">
                                     <b>Requirements:</b>
-                                    <input required style="width: 80%" name="req" pattern="\S.*\S" id="req" value="${course.requirements}">
+                                    <input required style="width: 80%" name="req" pattern="\S.*\S" id="req" value="${course.getRequirements()}">
                                 </div>
                             <#else>
-                                <p class="mb-3"><b>Requirements:</b>${course.requirements}</p>
+                                <p class="mb-3"><b>Requirements:</b>${course.getRequirements()}</p>
                             </#if>
-                            <p class="mb-3"><b>Course Objectives:</b> ${course.obj}</p>
-                            <p class="mb-3"><b>Status</b> ${course.status}</p>
+                            <p class="mb-3"><b>Course Objectives:</b> ${course.getLearningObj()}</p>
+                            <p class="mb-3"><b>Status</b> ${course.getStatus()}</p>
                             <div style="display: flex">
                             <b>Rating: </b>
-                            <#if rating??>
+                            <#if course.getRating()??>
                             <div class="mb-3" style="margin-left: 5pt; width: 125pt; display: flex; justify-content: space-evenly">
-                                <#if rating.rating == 0>
+                                <#if course.getRating() == 0>
                                     <div style="text-align: center; margin-top: 2%"> No Rating Found </div>
                                 <#else>
-                                    <#list 1..rating.rating as i>
+                                    <#list 1..course.getRating() as i>
                                         <span class="fa fa-star checked large"></span>
                                     </#list>
-                                    <#if rating.unchecked !=0>
-                                    <#list 1..rating.unchecked as j>
+                                    <#if course.getUnchecked() !=0>
+                                    <#list 1..course.getUnchecked() as j>
                                         <span class="fa fa-star large"></span>
                                     </#list>
                                     </#if>

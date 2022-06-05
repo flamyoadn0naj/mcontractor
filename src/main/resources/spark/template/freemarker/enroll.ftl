@@ -41,26 +41,28 @@
                         <#if courses??>
                             <#list courses as c>
                                 <tr>
-                                    <th scope="row"><a class="text-muted" href="enroll/about/${c.id}">${c.name}</a></th>
-                                    <td>${c.prof}</td>
-                                    <td>${c.state}</td>
-                                    <td>${c.credits}</td>
-                                    <td>${c.meeting_days}</td>
-                                    <td>${c.startTime} - ${c.endTime}</td>
+                                    <th scope="row">
+                                        <a class="text-muted" href="enroll/about/${c.getId()}">
+                                            ${c.getName()}
+                                        </a>
+                                    </th>
+                                    <td>${c.getProfessorName()}</td>
+                                    <td>${c.getState()}</td>
+                                    <td>${c.getCredits()}</td>
+                                    <td>${c.getMeeting_days()}</td>
+                                    <td>${c.getStartTime()} - ${c.getEndTime()}</td>
                                     <td>
-                                        <#if c.rating??>
-                                            <#if c.rating == 0>
-                                                No Rating Available
-                                            <#else>
-                                                <#list 1..c.rating as i>
-                                                    <span class="fa fa-star checked large"></span>
-                                                </#list>
-                                                <#list 1..c.unchecked as j>
+                                        <#if c.rating == 0>
+                                            No Rating Available
+                                        <#else>
+                                            <#list 1..c.getRating() as i>
+                                                <span class="fa fa-star checked large"></span>
+                                            </#list>
+                                            <#if c.getUnchecked() != 0>
+                                                <#list 1..c.getUnchecked() as j>
                                                     <span class="fa fa-star large"></span>
                                                 </#list>
                                             </#if>
-                                            <#else>
-                                            No Rating Available
                                         </#if>
                                     </td>
                                 </tr>
