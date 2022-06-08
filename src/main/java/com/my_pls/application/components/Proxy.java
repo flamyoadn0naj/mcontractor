@@ -774,6 +774,22 @@ public class Proxy {
         }
         return flag;
     }
+
+    public static boolean deleteQuizAttempt(Quiz question, Connection conn) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("delete from grades where userId=? AND courseId=? AND lessonId=? AND quizId=?");
+            pst.setInt(1,question.learnerId);
+            pst.setInt(2, question.courseId);
+            pst.setInt(3,question.lessonId);
+            pst.setInt(4, question.quizId);
+            int i = pst.executeUpdate();
+            if (i != 0) flag = true;
+        } catch(Exception e) {
+            System.out.println("Exception at deleteQuizAttempt " + e);
+        }
+        return flag;
+    }
     public static boolean updateQuiz(Quiz question1, Connection conn) {
         boolean flag = false;
         try {

@@ -48,17 +48,25 @@
                             <th scope="col">Quiz name</th>
                             <th scope="col">Total marks</th>
                             <th scope="col">Minimum Score to Pass</th>
-                            <th scope="col">Score</th>
+                            <#if role == "learner">
+                                <th scope="col">Score</th>
+                            </#if>
                             <th scope="col">Action</th>
                         </tr>
                         <#if quizzes??>
                             <#list quizzes as k,c>
                                 <tr>
 <#--                                    <td>${c.name}</td>-->
-                                    <th scope="row"><a class="text-muted" href="${courseId}/${k}">${c.name}</a></th>
+                                    <#if role == "prof">
+                                        <th scope="row"><a class="text-muted" href="${courseId}/${c.quizId}">${c.name}</a></th>
+                                    <#else>
+                                        <th scope="row"><a class="text-muted">${c.name}</a></th>
+                                    </#if>
                                     <td>${c.marks}</td>
                                     <td>${c.minMark}</td>
-                                    <td>${c.marks}</td>
+                                    <#if role == "learner">
+                                        <td>${c.marks}</td>
+                                    </#if>
                                     <td>
                                         <#if role == "prof">
                                             <a class="btn-download padding2right" href="/course/${courseId}/create-quiz?courseId=${courseId}&quizId=${c.quizId!""}&e=e"><i class="fa fa-edit"></i></a>
@@ -66,7 +74,9 @@
 <#--                                            <a class="btn-download" href="#"><i class="fa fa-share"></i></a>-->
                                         <#else>
                                             <#if c.status == 1>
-                                                <button type="button" class="btn btn-primary">Take</button>
+                                                <button type="button" class="btn btn-primary" href="${courseId}/${c.quizId}?&e=t">Take</button>
+                                            <#elseif c.status == 2>
+                                                <button type="button" class="btn btn-primary" href="${courseId}/${c.quizId}?&e=rt">Retake</button>
                                             </#if>
                                         </#if>
                                     </td>
