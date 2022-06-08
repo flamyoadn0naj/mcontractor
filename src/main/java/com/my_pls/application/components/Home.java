@@ -9,7 +9,7 @@ import java.util.Map;
 public class Home {
     private int id = -1;
     private String role = "learner";
-    private Map<Integer,Object> courses = new HashMap<>();
+    private ArrayList<Course> courses = new ArrayList<>();
     private ArrayList<Map<String,Object>> groups = new ArrayList<>();
     private Map<String,Object> rating = new HashMap<>();
 
@@ -17,22 +17,15 @@ public class Home {
         id = id;
         role = role;
 
-        Map<Integer,Object> allCourses = Courses.getMyCourses(id, role, conn);
-        if (allCourses.size() > 5) {
-            Iterator it = allCourses.keySet().iterator();
-            for (int j = 0; j < 5; j++) {
-                Integer i = (Integer) it.next();
-                courses.put(i, allCourses.get(i));
-            }
-        } else courses.putAll(allCourses);
+        courses = Course.getMyCourses(id, conn);
+        if (courses.size() > 5) courses = new ArrayList<>(courses.subList(0, 5));
 
         groups = Proxy.getMyDiscussionGroups(id, conn);
-
         if (groups.size() > 5) groups = new ArrayList<>(groups.subList(0, 5));
         rating = Proxy.getRatingAndFeedbackOfUserGivenUserId(id, "", "", conn);
     }
 
-    public Map<Integer,Object> getCourses() {
+    public ArrayList<Course> getCourses() {
         return courses;
     }
 

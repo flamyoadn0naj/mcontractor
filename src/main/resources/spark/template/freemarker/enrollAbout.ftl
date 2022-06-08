@@ -22,22 +22,32 @@
             <div id="myTabContent" class="tab-content" style="margin:2%">
                 <div class="tab-pane fade active show" id="about">
 
-                    <p><b>Professor:</b> ${profName}</p>
-                    <p><b>Meeting Days:</b> ${meeting_days}</p>
-                    <p><b>Meeting Time:</b> ${start_time} - ${end_time} </p>
-                    <p><b>Credits:</b> ${credits}</p>
-                    <p><b>Pre-requisite:</b> ${prereq_course}</p>
+                    <p><b>Professor:</b> ${c.getProfessorName()}</p>
+                    <p><b>Meeting Days:</b> ${c.getMeeting_days()}</p>
+                    <p><b>Meeting Time:</b> ${c.getStartTime()} - ${c.getEndTime()} </p>
+                    <p><b>Credits:</b> ${c.getCredits()}</p>
+                    <p><b>Pre-requisite:</b> ${c.getPreReqName()}</p>
                     <p><b>Requirements:</b> To pass, you must get a C minimum</p>
-                    <p><b>Learning Objectives:</b> ${obj}</p>
-                    <p><b>Total Capacity:</b> ${cap}</p>
+                    <p><b>Learning Objectives:</b> ${c.getLearningObj()}</p>
+                    <p><b>Total Capacity:</b> ${c.getCapacity()}</p>
                     <p><b>Seats Available:</b> 5</p>
-                    <p><b>Rating:</b>
-                        <span class="fa fa-star checked "></span>
-                        <span class="fa fa-star checked "></span>
-                        <span class="fa fa-star checked "></span>
-                        <span class="fa fa-star checked"></span>
-                        <span class="fa fa-star "></span>
-                    </p>
+                    <div style="display: flex">
+                        <b>Rating: </b>
+                        <div class="mb-3" style="margin-left: 5pt; width: 125pt; display: flex; justify-content: space-evenly">
+                            <#if course.getRating() == 0>
+                                <div style="text-align: center; margin-top: 2%"> No Rating Found </div>
+                            <#else>
+                                <#list 1..course.getRating() as i>
+                                    <span class="fa fa-star checked large"></span>
+                                </#list>
+                                <#if course.getUnchecked() !=0>
+                                    <#list 1..course.getUnchecked() as j>
+                                        <span class="fa fa-star large"></span>
+                                    </#list>
+                                </#if>
+                            </#if>
+                        </div>
+                    </div>
                     <p class="mb-3"><b>Schedule Compatability:</b> Yes</p>
                     <button type="button" class="btn btn-primary mb-3" style="float: right">
                         Enroll

@@ -66,20 +66,20 @@
                     <#if courses??>
                         <#list courses as c>
                             <tr>
-                                <th scope="row" style="position: sticky"><div class="text-muted">${c.name}</div></th>
-                                <td >${c.prof}</td>
-                                <td style="text-align: center">${c.prereq}</td>
-                                <td>${c.startDate}</td>
-                                <td>${c.endDate}</td>
-                                <td>${c.meeting_days}</td>
-                                <td>${c.startTime} - ${c.endTime}</td>
-                                <td>${c.status}</td>
-                                <#if c.status == "Upcoming">
+                                <th scope="row" style="position: sticky"><div class="text-muted">${c.getName()}</div></th>
+                                <td >${c.getProfessorName()}</td>
+                                <td style="text-align: center">${c.getPreReqName()}</td>
+                                <td>${c.getStartDate()}</td>
+                                <td>${c.getEndDate()}</td>
+                                <td>${c.getMeeting_days()}</td>
+                                <td>${c.getStartTime()} - ${c.getEndTime()}</td>
+                                <td>${c.getStatus()}</td>
+                                <#if c.getStatus() == "Upcoming">
                                     <td>
                                         <a class="btn-download padding2right" href="/courses/all?edit=${c.id}"><i class="fa fa-edit"></i></a>
                                         <a class="btn-download" href="/courses/all?del=${c.id}"><i class="fa fa-trash"></i></a>
                                     </td>
-                                <#elseif c.status == "Current">
+                                <#elseif c.getStatus() == "Current">
                                     <td>
                                         <a class="btn-download padding2right" href="/courses/all?edit=${c.id}"><i class="fa fa-edit"></i></a>
                                     </td>

@@ -93,36 +93,6 @@ public class Proxy {
         return profs;
     }
 
-    public static int findCourseIdFromCourseDetails (String name, int prof_id, String daysString,
-                                                     String startTime, String endTime, String startDate,
-                                                     String endDate, int credits, int capacity, String obj,
-                                                     Connection conn) {
-        int id = -1;
-        try {
-            PreparedStatement pst = conn.prepareStatement(
-                    "select id from courses where course_name=? and profId=? and meeting_days=? and " +
-                            "start_time=? and end_time=? and start_date=? and end_date=? and credits=? and " +
-                            "total_capacity=? and obj=?");
-            pst.setString(1, name);
-            pst.setInt(2, prof_id);
-            pst.setString(3, daysString);
-            pst.setString(4, startTime);
-            pst.setString(5, endTime);
-            pst.setString(6, startDate);
-            pst.setString(7, endDate);
-            pst.setInt(8, credits);
-            pst.setInt(9, capacity);
-            pst.setString(10, obj);
-            ResultSet rs = pst.executeQuery();
-            if (rs.next()) {
-                id = rs.getInt("id");
-            }
-        } catch (Exception e ) {
-            System.out.println("Exception at findCourseIdFromCourseDetails " + e);
-        }
-        return id;
-    }
-
     public static int addDiscussionGroup(String name, int course_id, int privacy, Connection conn) {
         int i = -1;
         String sqlQuery = "insert into discussion_groups (name, course_id, privacy) VALUES (?,?,?)";
@@ -172,34 +142,45 @@ public class Proxy {
         return flag;
     }
 
-    public static Map<String, Object> findCourseByCourseId(String id, Connection conn) {
+    public static Course findCourseByCourseId(String id, Connection conn) {
         id = id.replaceAll("\\s","");
-        Map<String, Object> map = new HashMap<>();
+        Course c = new Course();
         try {
             PreparedStatement pst = conn.prepareStatement("select * from courses where id=?");
             pst.setInt(1, Integer.parseInt(id));
             ResultSet rs = pst.executeQuery();
             if(rs.next()) {
-                map.put("name",rs.getString("course_name"));
-                map.put("obj",rs.getString("obj"));
-                map.put("start_date",rs.getString("start_date"));
-                map.put("end_date",rs.getString("end_date"));
-                map.put("start_time",rs.getString("start_time"));
-                map.put("end_time",rs.getString("end_time"));
-                map.put("credits",rs.getInt("credits"));
-                map.put("cap",rs.getInt("total_capacity"));
-                int prof_id = rs.getInt("profId");
-                map.put("prof_id", prof_id);
-                map.put("status", rs.getString("status"));
-                String meeting_days = rs.getString("meeting_days");
-                map.put("meeting_days", meeting_days);
-                map.put("prereq_course", rs.getInt("prereq"));
-                map.put("requirements", rs.getString("requirements"));
+                String prof = Proxy.findProfName(rs.getInt("profId"), conn);
+                LocalDate startDate = LocalDate.parse(rs.getString("start_date"));
+                String s = startDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+                LocalDate endDate = LocalDate.parse(rs.getString("end_date"));
+                String e = endDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+
+                DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm");
+                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("hh:mm a");
+                LocalTime startTime = LocalTime.parse(String.valueOf(rs.getString("start_time")), df);
+                String st = startTime.format(df2);
+                LocalTime endTime = LocalTime.parse(String.valueOf(rs.getString("end_time")), df);
+                String et = endTime.format(df2);
+                String prereq = "None";
+                Integer p = rs.getInt("prereq");
+
+                c = new Course(rs.getString("course_name"), rs.getInt("id"), s, e, st, et,
+                        rs.getString("meeting_days"), prof, rs.getInt("profId"),
+                        rs.getInt("credits"), rs.getInt("total_capacity"), rs.getString("status"),
+                        rs.getInt("enrolled"));
+                if (p != null && p != 0) {
+                    c.setPreReq(p);
+                    prereq = String.valueOf(findCourseByCourseId(String.valueOf(p), conn).getName());
+                    c.setPreReqName(prereq);
+                }
+                c.setRequirements(rs.getString("requirements"));
+                c.setLearningObj(rs.getString("obj"));
             }
         } catch (Exception e) {
             System.out.println("Exception at findCourseByCourseId " + e);
         }
-        return map;
+        return c;
     }
 
     public static Map<String, Object> getGroupDetailsByGroupId(int dg_id, Connection conn) {
@@ -506,8 +487,8 @@ public class Proxy {
         return profs;
     }
 
-    public static ArrayList<Map<String,String>> viewCourses(String filterstatus, Connection conn) {
-        ArrayList<Map<String,String>> courses = new ArrayList<Map<String, String>>();
+    public static ArrayList<Course> viewCourses(String filterstatus, Connection conn) {
+        ArrayList<Course> courses = new ArrayList<>();
 
         try {
             PreparedStatement pst;
@@ -520,35 +501,32 @@ public class Proxy {
             ResultSet rs = pst.executeQuery();
 
             while(rs.next()) {
-                Map<String,String> details = new HashMap<>();
-                details.put("name",rs.getString("course_name"));
                 String prof = Proxy.findProfName(rs.getInt("profId"), conn);
-                details.put("prof",prof);
                 LocalDate startDate = LocalDate.parse(rs.getString("start_date"));
                 String s = startDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
                 LocalDate endDate = LocalDate.parse(rs.getString("end_date"));
                 String e = endDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
-                details.put("startDate",s);
-                details.put("endDate",e);
-                details.put("status",rs.getString("status"));
-                details.put("id",String.valueOf(rs.getInt("id")));
-                details.put("cap", String.valueOf(rs.getInt("total_capacity")));
-                details.put("enrolled", String.valueOf(rs.getInt("enrolled")));
-                details.put("credits", String.valueOf(rs.getInt("credits")));
+
                 DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm");
                 DateTimeFormatter df2 = DateTimeFormatter.ofPattern("hh:mm a");
                 LocalTime startTime = LocalTime.parse(String.valueOf(rs.getString("start_time")), df);
                 String st = startTime.format(df2);
                 LocalTime endTime = LocalTime.parse(String.valueOf(rs.getString("end_time")), df);
                 String et = endTime.format(df2);
-                details.put("startTime", st);
-                details.put("endTime", et);
-                details.put("meeting_days",rs.getString("meeting_days"));
                 String prereq = "None";
                 Integer p = rs.getInt("prereq");
-                if (p != null && p != 0) prereq = String.valueOf(findCourseByCourseId(String.valueOf(p), conn).get("name"));
-                details.put("prereq", prereq);
-                courses.add(details);
+
+                Course c = new Course(rs.getString("course_name"), rs.getInt("id"), s, e, st, et,
+                        rs.getString("meeting_days"), prof, rs.getInt("profId"),
+                        rs.getInt("credits"), rs.getInt("total_capacity"), rs.getString("status"),
+                        rs.getInt("enrolled"));
+                if (p != null && p != 0) {
+                    c.setPreReq(p);
+                    prereq = String.valueOf(findCourseByCourseId(String.valueOf(p), conn).getName());
+                    c.setPreReqName(prereq);
+                }
+
+                courses.add(c);
             }
         } catch (Exception e) {
             System.out.println("Exception at courses "+e);
@@ -1151,13 +1129,11 @@ public class Proxy {
                         rs.getString("name"),
                         rs.getString("requirements"));
                 temp.materials = getLearningMaterialsByLessonId(rs.getInt("Id"), conn);
-                //System.out.println(rs.getString("requirements"));
                 allLessons.add(temp);
             }
         } catch (Exception e) {
             System.out.println("Exception at getPendingGroupRequests " + e);
         }
-        //System.out.println(allLessons);
         return allLessons;
     }
 
@@ -1175,12 +1151,10 @@ public class Proxy {
         } catch (Exception e) {
             System.out.println("Exception at getPendingGroupRequests " + e);
         }
-        //System.out.println(allLessons);
         return lesson;
     }
 
     public static void createOrUpdateLesson(Lesson value, int courseId, Connection conn){
-        //System.out.println("Create or Update lesson");
         try {
             //check if lesson exists by id
             PreparedStatement existCheck = conn.prepareStatement("select * from lessons where Id="+value.getId());
@@ -1202,7 +1176,6 @@ public class Proxy {
             //add all learning materials
             PreparedStatement addMat;
             for(String mat : value.getMaterials()){
-                //System.out.println("insert into learning_materials (lessonId, content) values("+value.getId()+", \""+mat+"\")");
                 addMat = conn.prepareStatement("insert into learning_materials (lessonId, content) values("+value.getId()+", \""+mat+"\")");
                 addMat.execute();
             }
@@ -1391,82 +1364,18 @@ public class Proxy {
         return requests;
     }
 
-    public static Map<Integer, Object> getMyCourses(int id, Connection conn) {
-        Map<Integer,Object> courses = new HashMap<>();
+    public static ArrayList<Course> getMyCourses(int id, Connection conn) {
+        ArrayList<Course> courses = new ArrayList<>();
         try {
-            PreparedStatement ps = conn.prepareStatement("select * from enrollments where userId="+ id);
+            PreparedStatement ps = conn.prepareStatement("select courseId from enrollments where userId="+ id);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                Map<String, Object> details = findCourseByCourseId(String.valueOf(rs.getInt("courseId")), conn);
-                String prof = Proxy.findProfName((Integer) details.get("prof_id"), conn);
-                details.put("prof",prof);
-                String prereq = "None";
-                Integer p = (Integer) details.get("prereq_course");
-                if (p != null && p != 0) prereq = String.valueOf(findCourseByCourseId(String.valueOf(p), conn).get("name"));
-                details.put("prereq", prereq);
-                LocalDate startDate = LocalDate.parse(details.get("start_date").toString());
-                String s = startDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
-                LocalDate endDate = LocalDate.parse(details.get("end_date").toString());
-                String e = endDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
-                DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm");
-                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("h:mm a");
-                LocalTime startTime = LocalTime.parse(String.valueOf(details.get("start_time").toString()), df);
-                String st = startTime.format(df2);
-                LocalTime endTime = LocalTime.parse(String.valueOf(details.get("end_time").toString()), df);
-                String et = endTime.format(df2);
-                details.put("startTime", st);
-                details.put("endTime", et);
-                details.put("startDate",s);
-                details.put("endDate",e);
-                courses.put(rs.getInt("courseId"), details);
+                Course details = findCourseByCourseId(String.valueOf(rs.getInt("courseId")), conn);
+                courses.add(details);
             }
 
         } catch (Exception e) {
             System.out.println("Exception at getMyCourses");
-        }
-        return courses;
-    }
-
-    public static Map<Integer, Object> getTaughtCourses(int id, Connection conn) {
-        Map<Integer,Object> courses = new HashMap<>();
-        try {
-            PreparedStatement ps = conn.prepareStatement("select * from courses where profId="+ id);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Map<String, Object> details = new HashMap<>();
-                details.put("name",rs.getString("course_name"));
-                String prof = Proxy.findProfName(rs.getInt("profId"), conn);
-                details.put("prof",prof);
-                LocalDate startDate = LocalDate.parse(rs.getString("start_date"));
-                String s = startDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
-                LocalDate endDate = LocalDate.parse(rs.getString("end_date"));
-                String e = endDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
-                details.put("startDate",s);
-                details.put("endDate",e);
-                details.put("status",rs.getString("status"));
-                details.put("id",rs.getInt("id"));
-                details.put("cap",rs.getInt("total_capacity"));
-                details.put("enrolled", rs.getInt("enrolled"));
-                details.put("credits", rs.getInt("credits"));
-                DateTimeFormatter df = DateTimeFormatter.ofPattern("HH:mm");
-                DateTimeFormatter df2 = DateTimeFormatter.ofPattern("hh:mm a");
-                LocalTime startTime = LocalTime.parse(String.valueOf(rs.getString("start_time")), df);
-                String st = startTime.format(df2);
-                LocalTime endTime = LocalTime.parse(String.valueOf(rs.getString("end_time")), df);
-                String et = endTime.format(df2);
-                details.put("startTime", st);
-                details.put("endTime", et);
-                details.put("meeting_days",rs.getString("meeting_days"));
-                String prereq = "None";
-                Integer p = rs.getInt("prereq");
-                if (p != null && p != 0)
-                    prereq = String.valueOf(findCourseByCourseId(String.valueOf(p), conn).get("name"));
-                details.put("prereq", prereq);
-                courses.put(rs.getInt("id"), details);
-            }
-
-        } catch (Exception e) {
-            System.out.println("Exception at getTaughtCourses");
         }
         return courses;
     }
@@ -1582,7 +1491,6 @@ public class Proxy {
         } catch (Exception e) {
             System.out.println("Exception at getPendingGroupRequests " + e);
         }
-        //System.out.println(allLessons);
         return allPosts;
     }
 

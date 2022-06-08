@@ -78,7 +78,7 @@ public class CreateCourse {
                     map.put("end_date","");
                     flag = false;
                 }
-                old_profId = (int) Proxy.findCourseByCourseId(edit, conn).get("prof_id");
+                old_profId = (int) Proxy.findCourseByCourseId(edit, conn).getProfessorId();
             } else {
                 if(LocalDate.parse(endDate).isBefore(LocalDate.parse(startDate))
                         || LocalDate.parse(startDate).isBefore(LocalDate.now())) {
@@ -116,7 +116,7 @@ public class CreateCourse {
         Map.Entry<Integer,String> entry = profs.entrySet().iterator().next();
         int prof_id = entry.getKey();
         LinkedHashMap<String, Boolean> days = findAllDays();
-        map.putAll(Proxy.findCourseByCourseId(id, conn));
+//        map.putAll(Proxy.findCourseByCourseId(id, conn));
         prof_id = (int) map.get("prof_id");
         String meeting_days = String.valueOf(map.get("meeting_days"));
         days.forEach((k, v)-> {
@@ -159,10 +159,10 @@ public class CreateCourse {
 
     public static Map<Integer, String> allCourses(Connection conn) {
         Map<Integer, String> all_Courses = new HashMap<>();
-        ArrayList<Map<String, String>> courses = Proxy.viewCourses("Completed", conn);
-        for (Map<String, String> c: courses) {
-            int id = Integer.parseInt(c.get("id"));
-            String name = c.get("name");
+        ArrayList<Course> courses = Proxy.viewCourses("Completed", conn);
+        for (Course c: courses) {
+            int id = c.getId();
+            String name = c.getName();
             all_Courses.put(id, name);
         }
         return all_Courses;
