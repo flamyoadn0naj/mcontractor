@@ -606,9 +606,9 @@ public class App {
             String courseId = request.queryParams("courseId");
             courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
 
-            Map<String,Object> course = Courses.getCourse(courseId, conn);
+            Course course = Course.getCourse(courseId, conn);
             String edit = request.queryParams("e");
-            if((int)course.get("prof_id") == id) map.put("role", "prof");
+            if((int)course.getProfessorId() == id) map.put("role", "prof");
             else if (edit.length()>0)
             {
                 map.put("role","learner");
@@ -619,7 +619,7 @@ public class App {
                 response.redirect("/err");
             }
             map.put("courseId", courseId);
-            map.put("name", course.get("name"));
+            map.put("name", course.getName());
 
             String quizId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("quizId")));
             map.put("quizId",quizId);
