@@ -628,11 +628,12 @@ public class App {
             map.put("tot",quiz.totalMark);
             map.put("min",quiz.MinMark);
             map.put("lessonId", quiz.lessonId);
-
+            quiz.learnerId = id;
             if (edit == null || edit.contains("-1")) edit = "c";
             String questionId;
             Map<String, Object> question;
             Object questionText;
+            quiz.quizId = Integer.parseInt(quizId);
             switch (edit){
                 case "c":
                     map.put("e",-1);
@@ -654,6 +655,21 @@ public class App {
                     map.put("e","t");
                     questionId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId")));
                     question = Proxy.getQuestion(Integer.parseInt(questionId), conn);
+                    quiz.questionId = Integer.parseInt(questionId);
+                    question.replace("answer","");
+                    questionText = question.get("questionText");
+                    sess.attribute("questionId",question);
+                    map.put("title","Modify "+questionText);
+                    map.put("questionText",questionText);
+                    map.put("question",question);
+                    map.put("questionId",questionId);
+                    break;
+                case "rt":
+                    map.put("e","rt");
+                    questionId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId")));
+                    question = Proxy.getQuestion(Integer.parseInt(questionId), conn);
+                    quiz.questionId = Integer.parseInt(questionId);
+                    question.replace("answer",Proxy.viewQuizResponse(quiz,conn));
                     questionText = question.get("questionText");
                     sess.attribute("questionId",question);
                     map.put("title","Modify "+questionText);
@@ -686,19 +702,41 @@ public class App {
 
             String quizId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("quizId")));
 
-            newQuiz.questionText = URLDecoder.decode(formFields.get("QText"), "UTF-8");
+            if (!edit.contains("t")){
+                newQuiz.questionText = URLDecoder.decode(formFields.get("QText"), "UTF-8");
+                newQuiz.mark = Integer.parseInt(formFields.get("marks"));
 
-            newQuiz.mark = Integer.parseInt(formFields.get("marks"));
+                newQuiz.responseA = URLDecoder.decode(formFields.get("QA"), "UTF-8");
+                newQuiz.responseB = URLDecoder.decode(formFields.get("QB"), "UTF-8");
+                newQuiz.responseC = URLDecoder.decode(formFields.get("QC"), "UTF-8");
+                newQuiz.responseD = URLDecoder.decode(formFields.get("QD"), "UTF-8");
+
+            }
             newQuiz.quizId = Integer.parseInt(quizId);
-            newQuiz.responseA = URLDecoder.decode(formFields.get("QA"), "UTF-8");
-            newQuiz.responseB = URLDecoder.decode(formFields.get("QB"), "UTF-8");
-            newQuiz.responseC = URLDecoder.decode(formFields.get("QC"), "UTF-8");
-            newQuiz.responseD = URLDecoder.decode(formFields.get("QD"), "UTF-8");
             newQuiz.answer = URLDecoder.decode(formFields.get("ans"), "UTF-8");
             if (edit == null || edit.contains("-1"))
             {
                 Proxy.createQuestion(newQuiz,conn);
                 Proxy.updateTotalMark(newQuiz,conn);
+            }
+            else if (edit.contains("t") || edit.contains("rt")){
+                newQuiz.learnerId = id;
+                int questionId = Integer.parseInt(formFields.get("action"));
+                newQuiz.questionId = questionId;
+                Map<String, Object> dbQuestion = Proxy.getQuestion(questionId,conn);
+                String correctAnswer = String.valueOf(dbQuestion.get("answer"));
+                int grade = 0;
+                if (newQuiz.answer.equals(correctAnswer))
+                    grade = (int) dbQuestion.get("mark");
+
+                switch (edit){
+                    case "t":
+                        Proxy.takeQuestion(newQuiz,grade,conn);
+                        break;
+                    case "rt":
+                        Proxy.reTakeQuestion(newQuiz,grade,conn);
+                        break;
+                }
             }
             else
             {

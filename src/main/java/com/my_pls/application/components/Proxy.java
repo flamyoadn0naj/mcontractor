@@ -836,6 +836,9 @@ public class Proxy {
         }
         return mark;
     }
+
+
+
     public static Map<Integer,Object> getQuestions(Quiz quiz, Connection conn){
 
         Map<Integer,Object> questions = new HashMap<>();
@@ -888,6 +891,41 @@ public class Proxy {
         return questions;
     }
 
+    public static boolean takeQuestion(Quiz question,int grade,Connection conn){
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("insert into question_grades (quizId,learnerId,questionId,response,score) VALUES (?,?,?,?,?)");
+            pst.setInt(1, question.quizId);
+            pst.setInt(2, question.learnerId);
+            pst.setInt(3,question.questionId);
+            pst.setString(4,question.answer);
+            pst.setInt(5, grade);
+            System.out.println(pst);
+            int i = pst.executeUpdate();
+            flag = true;
+        } catch(Exception e) {
+            System.out.println("Exception at take question " + e);
+        }
+        return flag;
+    }
+    public static boolean reTakeQuestion(Quiz question,int grade,Connection conn){
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("update question_grades set response = ?, score = ? where quizId = ? AND learnerId = ? AND questionId = ?");
+            pst.setString(1,question.answer);
+            pst.setInt(2,grade);
+            pst.setInt(3,question.quizId);
+            pst.setInt(4,question.learnerId);
+            pst.setInt(5,question.questionId);
+
+            int i = pst.executeUpdate();
+            flag = true;
+        } catch(Exception e) {
+            System.out.println("Exception at re take question " + e);
+        }
+        return flag;
+    }
+
     public static Map<String, Object> getQuestion(int QuestionId, Connection conn) {
 
         Map<String, Object> question = new HashMap<>();
@@ -938,6 +976,23 @@ public class Proxy {
             /* System.out.println("Exception at view Quizes "+e); */
         }
         return quizzes;
+    }
+
+    public static String viewQuizResponse(Quiz question,Connection conn){
+        String response = null;
+        try {
+            PreparedStatement pst1 = conn.prepareStatement("select * from question_grades where quizId=? AND learnerId=? AND questionId=?");
+            pst1.setInt(1,question.quizId);
+            pst1.setInt(2,question.learnerId);
+            pst1.setInt(3,question.questionId);
+            ResultSet rs = pst1.executeQuery();
+            while(rs.next()) {
+                response = rs.getString("response");
+            }
+        }catch (Exception e) {
+                System.out.println("Exception at view Quiz Attempt "+e);
+            }
+        return response;
     }
 
     public static Map<Integer, Object>  viewQuiz(int quizId, Connection conn) throws Exception {
