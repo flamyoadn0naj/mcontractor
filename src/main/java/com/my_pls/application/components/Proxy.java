@@ -900,7 +900,6 @@ public class Proxy {
             pst.setInt(3,question.questionId);
             pst.setString(4,question.answer);
             pst.setInt(5, grade);
-            System.out.println(pst);
             int i = pst.executeUpdate();
             flag = true;
         } catch(Exception e) {
