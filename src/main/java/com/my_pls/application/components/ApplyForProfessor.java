@@ -29,8 +29,8 @@ public class ApplyForProfessor {
         return map;
     }
 
-    public static Map<String, Object> postMethodFunctionality(Map<String, String> formFields,
-                                                              String fname, String lname, String email, Connection conn) {
+    public static Map<String, Object> postApplyForProfessor(Map<String, String> formFields,
+                                                            String fname, String lname, String email, Connection conn) {
         Map<String,Object> map = checkForErrors(fname, lname, formFields);
         boolean err = (boolean) map.get("applyProfErr");
         if (!err) {

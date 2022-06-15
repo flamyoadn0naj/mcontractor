@@ -52,7 +52,6 @@
                     <div class="form-group mb-3" style="display: flex">
                         <label class="col-3" for="1b">Associated Lesson:</label>
                         <select required class="form-control col-9" name="linkedLesson" id="exampleSelect1" style="margin-right: 2%">
-                            <option value=-1>None</option>
                             <#list lessons as lesson>
                                 <option value=${lesson.id}>${lesson.name}</option>
                             </#list>

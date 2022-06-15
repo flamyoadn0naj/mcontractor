@@ -458,6 +458,8 @@ public class App {
              String courseId = request.params(":courseId");
              Connection conn = MySqlConnection.getConnection();
             Course course = Course.getCourse(courseId, conn);
+            map.put("lessonCount",Proxy.getLessonsByCourseId(course.getId(),conn).size());
+            System.out.println(Proxy.getLessonsByCourseId(course.getId(),conn).size());
              courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
              if((int)course.getProfessorId() == id) map.put("role", "prof");
              else map.put("role","learner");
@@ -1348,7 +1350,7 @@ public class App {
             if (!role.contentEquals("learner")) response.redirect("/err");
             Map<String,String> formFields = extractFields(request.body());
             Connection conn = MySqlConnection.getConnection();
-            Map<String, Object> map = ApplyForProfessor.postMethodFunctionality(formFields,
+            Map<String, Object> map = ApplyForProfessor.postApplyForProfessor(formFields,
                     sess.attribute("firstName").toString(),
                     sess.attribute("lastName").toString(),
                     sess.attribute("email").toString(),
