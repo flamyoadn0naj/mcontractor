@@ -564,11 +564,11 @@ public class App {
             quizId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(quizId));
 
             Course course = Course.getCourse(courseId, conn);
-
-            if(course.getProfessorId() == id) map.put("role", "prof");
-            else map.put("role","learner");
+            String role;
+            if(course.getProfessorId() == id) role = "prof";
+            else role = "learner";
             map.put("courseId", courseId);
-
+            map.put("role",role);
             Quiz quiz = Proxy.viewSingleQuiz(Integer.parseInt(quizId),conn);
             Map<Integer,Object> questions = Proxy.getQuestions(quiz,conn);
             map.put("quizName", quiz.quizName);
@@ -578,14 +578,16 @@ public class App {
             quiz.learnerId = id;
             quiz.quizId = Integer.parseInt(quizId);
             quiz.courseId = Integer.parseInt(courseId);
-            map.put("status",1);
+            if (role.equals("learner")){
+                questions = Proxy.getQuestionAttempts(quiz, questions,conn);
+            }
             if (edit != null){
-                if (edit.contains("rt"))
+                if (edit.compareTo("rt")==0)
                 {
                 Proxy.deleteQuizAttempt(quiz,conn);
                 }
-                else if (edit.compareTo("t")==0){
-                    questions = Proxy.getQuestionAttempts(quiz,questions,conn);
+                if (edit.compareTo("t")==0){
+                    questions = Proxy.getQuestionAttempts(quiz, questions,conn);
                 }
             }
             if (!questions.isEmpty()) {

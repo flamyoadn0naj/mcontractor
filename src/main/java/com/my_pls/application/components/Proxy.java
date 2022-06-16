@@ -877,11 +877,11 @@ public class Proxy {
             pst1.setInt(2,quiz.learnerId);
             ResultSet dbrs = pst1.executeQuery();
             while (dbrs.next()){
-                int questionId = dbrs.getInt("learnerId");
+                int questionId = dbrs.getInt("questionId");
                 String response = dbrs.getString("response");
-                Map<String, Object> question = new HashMap<>();
+                Map<String, Object> question = (Map<String, Object>) questions.get(questionId);
                 question.put("status",2);
-                question.put("answer",response);
+                question.replace("answer",response);
                 questions.put(questionId,question);
             }
 
