@@ -27,7 +27,7 @@ public class Proxy {
         boolean flag = false;
         String sqlQuery = "";
 
-        if (prereq != null) {
+        if (prereq != -1) {
             sqlQuery = "insert into courses (course_name, profId, meeting_days, " +
                     "start_time, end_time, start_date, end_date, credits, total_capacity, enrolled, " +
                     "status, obj, prereq) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
@@ -65,7 +65,7 @@ public class Proxy {
             pst.setInt(10, 0);
             pst.setString(11, "Upcoming");
             pst.setString(12, obj);
-            if (prereq != null) pst.setInt(13, prereq);
+            if (prereq != -1) pst.setInt(13, prereq);
             int i = pst.executeUpdate();
             if (i != 0) {
                 flag = true;
@@ -176,6 +176,10 @@ public class Proxy {
                 }
                 c.setRequirements(rs.getString("requirements"));
                 c.setLearningObj(rs.getString("obj"));
+                c.setOrigEndDate(rs.getString("end_date"));
+                c.setOrigStartDate(rs.getString("start_date"));
+                c.setOrigStartTime(rs.getString("start_time"));
+                c.setOrigEndTime(rs.getString("end_time"));
             }
         } catch (Exception e) {
             System.out.println("Exception at findCourseByCourseId " + e);
