@@ -92,12 +92,27 @@
                                 <label class="padding2right" for="1d">D</label>
                                 <input required type="text" name="QD" class="form-control" id="QD"  <#if question ??>value="${question.responseD!""}"</#if> >
                             </div>
-                            <div class="form-group space-between">
+                            <div class="form-group" style="display: flex">
                                 <label class="padding2right" for="ans1">Answer</label>
-                                <input required type="text" name="ans" class="form-control" id="ans"  <#if question ??>value="${question.answer!""}"</#if> >
+                                <div class="custom-control custom-radio padding2right">
+                                    <input type="radio" id="customRadio1" value="A" <#if question?? && question.answer == "A">checked="true"</#if> name="customRadio" class="custom-control-input">
+                                    <label class="custom-control-label" for="customRadio1">A</label>
+                                </div>
+                                <div class="custom-control custom-radio padding2right">
+                                    <input type="radio" id="customRadio2" value="B" <#if question?? && question.answer == "B">checked="true"</#if> name="customRadio" class="custom-control-input">
+                                    <label class="custom-control-label" for="customRadio2">B</label>
+                                </div>
+                                <div class="custom-control custom-radio padding2right">
+                                    <input type="radio" id="customRadio3" value="C" <#if question?? && question.answer == "C">checked="true"</#if> name="customRadio" class="custom-control-input">
+                                    <label class="custom-control-label" for="customRadio3">C</label>
+                                </div>
+                                <div class="custom-control custom-radio padding2right">
+                                    <input type="radio" id="customRadio4" value="D" <#if question?? && question.answer == "D">checked="true"</#if> name="customRadio" class="custom-control-input">
+                                    <label class="custom-control-label" for="customRadio4">D</label>
+                                </div>
                             </div>
                             <#if question ??>
-                                <button type="submit" name="action" value=${questionId} class="btn btn-primary" style="width:10rem; float:right;">Save Submission</button>
+                                <button type="submit" name="action" value=${questionId} class="btn btn-primary" style="width:10rem; float:right;">Save Edit</button>
                             <#else>
                                 <button type="submit" name="action" value="AddQ" class="btn btn-primary" style="width:10rem; float:right; margin-right: 2%">
                                     Add Question
@@ -123,9 +138,24 @@
                                 <label class="padding2right" for="1d">D: ${question.responseD!""}</label>
 
                             </div>
-                            <div class="form-group space-between">
+                            <div class="form-group" style="display: flex">
                                 <label class="padding2right" for="ans1">Answer</label>
-                                <input required type="text" name="ans" class="form-control" id="ans" <#if question ??>value="${question.answer!""}"</#if> >
+                                <div class="custom-control custom-radio padding2right">
+                                    <input type="radio" id="customRadio1" value="A" <#if question?? && question.answer == "A">checked="true"</#if> name="customRadio" class="custom-control-input">
+                                    <label class="custom-control-label" for="customRadio1">A</label>
+                                </div>
+                                <div class="custom-control custom-radio padding2right">
+                                    <input type="radio" id="customRadio2" value="B" <#if question?? && question.answer == "B">checked="true"</#if> name="customRadio" class="custom-control-input">
+                                    <label class="custom-control-label" for="customRadio2">B</label>
+                                </div>
+                                <div class="custom-control custom-radio padding2right">
+                                    <input type="radio" id="customRadio3" value="C" <#if question?? && question.answer == "C">checked="true"</#if> name="customRadio" class="custom-control-input">
+                                    <label class="custom-control-label" for="customRadio3">C</label>
+                                </div>
+                                <div class="custom-control custom-radio padding2right">
+                                    <input type="radio" id="customRadio4" value="D" <#if question?? && question.answer == "D">checked="true"</#if> name="customRadio" class="custom-control-input">
+                                    <label class="custom-control-label" for="customRadio4">D</label>
+                                </div>
                             </div>
                             <#if question ??>
                                 <button type="submit" name="action" value=${questionId} class="btn btn-primary" style="width:10rem; float:right;">Save Submission</button>

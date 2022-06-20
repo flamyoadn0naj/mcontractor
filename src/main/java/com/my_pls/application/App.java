@@ -612,11 +612,8 @@ public class App {
 
             Course course = Course.getCourse(courseId, conn);
             String edit = request.queryParams("e");
-            if((int)course.getProfessorId() == id) map.put("role", "prof");
-            else if (edit.length()>0)
-            {
-                map.put("role","learner");
-            }
+            if(course.getProfessorId() == id) map.put("role", "prof");
+            else if (edit.length()>0) map.put("role", "learner");
             else
             {
                 conn.close();
@@ -717,7 +714,7 @@ public class App {
 
             }
             newQuiz.quizId = Integer.parseInt(quizId);
-            newQuiz.answer = URLDecoder.decode(formFields.get("ans"), "UTF-8");
+            newQuiz.answer = URLDecoder.decode(formFields.get("customRadio"), "UTF-8");
             if (edit == null || edit.contains("-1"))
             {
                 Proxy.createQuestion(newQuiz,conn);
