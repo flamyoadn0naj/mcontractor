@@ -11,8 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.text.NumberFormat;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.*;
 import java.net.URLDecoder;
 
@@ -1402,7 +1400,7 @@ public class App {
             if (!role.contentEquals("learner")) response.redirect("/err");
             Map<String,String> formFields = extractFields(request.body());
             Connection conn = MySqlConnection.getConnection();
-            Map<String, Object> map = ApplyForProfessor.postMethodFunctionality(formFields,
+            Map<String, Object> map = Learner.applyForProfessor(formFields,
                     sess.attribute("firstName").toString(),
                     sess.attribute("lastName").toString(),
                     sess.attribute("email").toString(),
