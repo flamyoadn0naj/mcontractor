@@ -598,11 +598,12 @@ public class App {
                 Proxy.calculateGrades(quiz,conn);
             }
             if (edit != null){
-                if (edit.compareTo("rt")==0)
+                if (edit.equals("rt"))
                 {
-                Proxy.deleteQuizAttempt(quiz,conn);
+                    Proxy.deleteQuizAttempt(quiz,conn);
+                    Proxy.deleteQuestionAttempts(quiz,conn);
                 }
-                if (edit.compareTo("t")==0){
+                if (edit.equals("t")){
                     questions = Proxy.getQuestionAttempts(quiz, questions,conn);
                 }
             }

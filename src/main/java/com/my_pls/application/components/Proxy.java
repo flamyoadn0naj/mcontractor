@@ -793,6 +793,20 @@ public class Proxy {
         }
         return flag;
     }
+
+    public static boolean deleteQuestionAttempts(Quiz question, Connection conn) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("delete from question_grades where quizId=? AND learnerId=?");
+            pst.setInt(1, question.quizId);
+            pst.setInt(2,question.learnerId);
+            int i = pst.executeUpdate();
+            if (i != 0) flag = true;
+        } catch(Exception e) {
+            System.out.println("Exception at delete question attempts " + e);
+        }
+        return flag;
+    }
     public static boolean updateQuiz(Quiz question1, Connection conn) {
         boolean flag = false;
         try {
