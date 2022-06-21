@@ -65,7 +65,7 @@
                                     <td>${c.marks}</td>
                                     <td>${c.minMark}</td>
                                     <#if role == "learner">
-                                        <td>${c.marks}</td>
+                                        <td>${c.score!"0"}</td>
                                     </#if>
                                     <td>
                                         <#if role == "prof">
@@ -73,12 +73,12 @@
                                             <a class="btn-download" href="/course/${courseId}/create-quiz?courseId=${courseId}&quizId=${c.quizId!""}&e=d"><i class="fa fa-trash"></i></a>
 <#--                                            <a class="btn-download" href="#"><i class="fa fa-share"></i></a>-->
                                         <#else>
-                                            <#if c.status == 1>
-                                                <a href="${courseId}/${c.quizId}?&e=t" class="btn btn-primary">Take</a>
 <#--                                                <button type="button" class="btn btn-primary" href="${courseId}/${c.quizId}?&e=t">Take</button>-->
-                                            <#elseif c.status == 2>
+                                            <#if c.status == 2>
                                                 <a href="${courseId}/${c.quizId}?&e=rt" class="btn btn-primary">Retake</a>
 <#--                                                <button type="button" class="btn btn-primary" href="${courseId}/${c.quizId}?&e=rt">Retake</button>-->
+                                            <#else>
+                                                <a href="${courseId}/${c.quizId}?&e=t" class="btn btn-primary">Take</a>
                                             </#if>
                                         </#if>
                                     </td>

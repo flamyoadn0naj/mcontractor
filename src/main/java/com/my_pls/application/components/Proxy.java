@@ -929,6 +929,45 @@ public class Proxy {
         return flag;
     }
 
+    public static boolean calculateGrades(Quiz newQuiz,Connection conn){
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("INSERT INTO grades(userId, courseId, lessonId, quizId, score) SELECT ?,?,?,?,SUM(score) from question_grades where quizId=? and learnerId=?;");
+            pst.setInt(1,newQuiz.learnerId);
+            pst.setInt(2,newQuiz.courseId);
+            pst.setInt(3,newQuiz.lessonId);
+            pst.setInt(4,newQuiz.quizId);
+            pst.setInt(5,newQuiz.quizId);
+            pst.setInt(6,newQuiz.learnerId);
+            int i = pst.executeUpdate();
+            flag = true;
+        } catch(Exception e) {
+            System.out.println("Exception at updating grades " + e);
+        }
+        return flag;
+    }
+
+    public static Map<Integer,Object> getQuizGrades(Quiz quiz,Map<Integer,Object> quizzes, Connection conn){
+
+        try {
+            PreparedStatement pst = conn.prepareStatement("select * from grades where userId=? and courseId=?");
+            pst.setInt(1,quiz.learnerId);
+            pst.setInt(2,quiz.courseId);
+            ResultSet dbrs = pst.executeQuery();
+            while (dbrs.next()) {
+                int quizId = dbrs.getInt("quizId");
+                int score = dbrs.getInt("score");
+                Map<String, Object> question = (Map<String, Object>) quizzes.get(quizId);
+                question.put("score",score);
+                question.put("status",2);
+                quizzes.put(quizId,question);
+            }
+        } catch(Exception e) {
+            System.out.println("Exception at get quiz grades " + e);
+        }
+        return quizzes;
+    }
+
     public static Map<String, Object> getQuestion(int QuestionId, Connection conn) {
 
         Map<String, Object> question = new HashMap<>();
