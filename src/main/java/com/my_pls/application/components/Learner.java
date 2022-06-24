@@ -5,7 +5,7 @@ import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ApplyForProfessor {
+public class Learner {
     public static Map<String,Object> checkForErrors(String fname, String lname,
                                         Map<String,String> formfields) {
         Map <String,Object> map = new HashMap<String, Object>();
@@ -29,8 +29,9 @@ public class ApplyForProfessor {
         return map;
     }
 
-    public static Map<String, Object> postApplyForProfessor(Map<String, String> formFields,
-                                                            String fname, String lname, String email, Connection conn) {
+
+    public static Map<String, Object> applyForProfessor(Map<String, String> formFields,
+                                                        String fname, String lname, String email, Connection conn) {
         Map<String,Object> map = checkForErrors(fname, lname, formFields);
         boolean err = (boolean) map.get("applyProfErr");
         if (!err) {

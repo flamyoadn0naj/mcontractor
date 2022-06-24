@@ -457,17 +457,30 @@ public class App {
              int id = sess.attribute("id");
              String courseId = request.params(":courseId");
              Connection conn = MySqlConnection.getConnection();
+
             Course course = Course.getCourse(courseId, conn);
             map.put("lessonCount",Proxy.getLessonsByCourseId(course.getId(),conn).size());
-            System.out.println(Proxy.getLessonsByCourseId(course.getId(),conn).size());
              courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
-             if((int)course.getProfessorId() == id) map.put("role", "prof");
-             else map.put("role","learner");
+//             if((int)course.getProfessorId() == id) map.put("role", "prof");
+//             else map.put("role","learner");
+             String role;
+             if((int)course.getProfessorId() == id) role = "prof";
+             else role = "learner";
+             map.put("role",role);
+
              map.put("courseId", courseId);
              map.put("name", course.getName());
             if (course.allowRating()) map.put("viewRate", true);
             Map<Integer, Object>  quizzes = Quiz.getQuizzes(Integer.parseInt(courseId), conn);
-            if (!quizzes.isEmpty()) map.put("quizzes",quizzes);
+            if (!quizzes.isEmpty()) {
+                if (role.equals("learner")){
+                    Quiz course_details = new Quiz();
+                    course_details.learnerId = id;
+                    course_details.courseId = Integer.parseInt(courseId);
+                    quizzes = Proxy.getQuizGrades(course_details,quizzes,conn);
+                }
+                map.put("quizzes",quizzes);
+            }
             conn.close();
             return new ModelAndView(map,"courseQuiz.ftl");
         }),engine);
@@ -566,11 +579,11 @@ public class App {
             quizId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(quizId));
 
             Course course = Course.getCourse(courseId, conn);
-
-            if(course.getProfessorId() == id) map.put("role", "prof");
-            else map.put("role","learner");
+            String role;
+            if(course.getProfessorId() == id) role = "prof";
+            else role = "learner";
             map.put("courseId", courseId);
-
+            map.put("role",role);
             Quiz quiz = Proxy.viewSingleQuiz(Integer.parseInt(quizId),conn);
             Map<Integer,Object> questions = Proxy.getQuestions(quiz,conn);
             map.put("quizName", quiz.quizName);
@@ -580,14 +593,18 @@ public class App {
             quiz.learnerId = id;
             quiz.quizId = Integer.parseInt(quizId);
             quiz.courseId = Integer.parseInt(courseId);
-            map.put("status",1);
+            if (role.equals("learner")){
+                questions = Proxy.getQuestionAttempts(quiz, questions,conn);
+                Proxy.calculateGrades(quiz,conn);
+            }
             if (edit != null){
-                if (edit.contains("rt"))
+                if (edit.equals("rt"))
                 {
-                Proxy.deleteQuizAttempt(quiz,conn);
+                    Proxy.deleteQuizAttempt(quiz,conn);
+                    Proxy.deleteQuestionAttempts(quiz,conn);
                 }
-                else if (edit.compareTo("t")==0){
-                    questions = Proxy.getQuestionAttempts(quiz,questions,conn);
+                if (edit.equals("t")){
+                    questions = Proxy.getQuestionAttempts(quiz, questions,conn);
                 }
             }
             if (!questions.isEmpty()) {
@@ -610,11 +627,8 @@ public class App {
 
             Course course = Course.getCourse(courseId, conn);
             String edit = request.queryParams("e");
-            if((int)course.getProfessorId() == id) map.put("role", "prof");
-            else if (edit.length()>0)
-            {
-                map.put("role","learner");
-            }
+            if(course.getProfessorId() == id) map.put("role", "prof");
+            else if (edit.length()>0) map.put("role", "learner");
             else
             {
                 conn.close();
@@ -715,7 +729,7 @@ public class App {
 
             }
             newQuiz.quizId = Integer.parseInt(quizId);
-            newQuiz.answer = URLDecoder.decode(formFields.get("ans"), "UTF-8");
+            newQuiz.answer = URLDecoder.decode(formFields.get("customRadio"), "UTF-8");
             if (edit == null || edit.contains("-1"))
             {
                 Proxy.createQuestion(newQuiz,conn);
@@ -1038,29 +1052,43 @@ public class App {
             String role = sess.attribute("role").toString();
             if (!role.contentEquals("admin")) response.redirect("/err");
             Map<String,Object> map = new HashMap<>();
-            map.put("name","");
-            map.put("obj","");
             map.put("role", "admin");
             Connection conn = MySqlConnection.getConnection();
             map.put("profList", Proxy.findAllProfs(conn));
             map.put("e",-1);
-            Map<Integer, String> allCourses = CreateCourse.allCourses(conn);
+            Map<Integer, String> allCourses = Course.allCourses(conn);
             map.put("title","Create Course");
             String e_id = request.queryParams("e");
             if (e_id != null) {
-                map = CreateCourse.editCourse(map,e_id.replaceAll(" ",""), allCourses, conn);
-                Map<String, Object> finalMap = map;
-                map.forEach((k, v)-> finalMap.put(k,v));
+                Map<Integer,String> profs = Proxy.findAllProfs(conn);
+                Map.Entry<Integer,String> entry = profs.entrySet().iterator().next();
+                int prof_id = entry.getKey();
+                Course course = new Course();
+                LinkedHashMap<String, Boolean> days = Course.findAllDays();
+                String editId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(e_id));
+                course.setId(Integer.parseInt(editId.replaceAll(" ","")));
+                course = course.editCourse(conn);
+                prof_id = course.getProfessorId();
+                String meeting_days = course.getMeeting_days();
+                map.put("course", course);
+                days.forEach((k, v)-> {
+                    if (meeting_days.contains(k)) days.put(k,true);
+                });
+                map.put("currProf",course.getProfessorName());
+                map.put("prof_id", prof_id);
+                profs.remove(prof_id);
+                map.put("days",days);
+                map.put("profList",profs);
                 map.put("e",e_id);
                 allCourses.remove(e_id);
-                map.put("currPreq", allCourses.get(map.get("prereq_course")));
-                allCourses.remove(map.get("prereq_course"));
-                map.put("course_id", map.get("prereq_course"));
+                map.put("currPreq", course.getPreReqName());
+                allCourses.remove(course.getPreReq());
+                map.put("course_id",course.getPreReq());
                 map.put("prereqs", allCourses);
                 map.put("headingChange", true);
 
             } else {
-                LinkedHashMap<String, Boolean> days = CreateCourse.findAllDays();
+                LinkedHashMap<String, Boolean> days = Course.findAllDays();
                 System.out.println(days);
                 map.put("days",days);
                 map.put("prereqs", allCourses);
@@ -1076,21 +1104,60 @@ public class App {
             if (!role.contentEquals("admin")) response.redirect("/err");
             String edit = request.queryParams("e");
             Connection conn = MySqlConnection.getConnection();
-            Map<Integer, String> allCourses = CreateCourse.allCourses(conn);
-            Map<String,Object> map = CreateCourse.postMethodDefaults(formFields, edit, conn);
-            if((boolean)map.get("created") == true) {
+            Map<String,Object> map = new HashMap<>();
+            boolean flag = true;
+            Map<Integer,String> profs = Proxy.findAllProfs(conn);
+            LinkedHashMap<String, Boolean> allDays = Course.findAllDays();
+            edit = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(edit));
+            map.put("e",edit);
+            Map<Integer, String> allCourses = Course.allCourses(conn);
+            int old_profId = -1;
+            Course course = new Course();
+            course.createCourseObj(formFields);
+            allDays.forEach((k, v)-> {
+                if (course.getMeeting_days().contains(k)) allDays.put(k,true);
+            });
+
+            if(course.checkTimeError()) {
+                map.put("errTime", "true");
+                flag = false;
+            }
+            if(course.checkNameError()) {
+                flag = false;
+                map.put("nameErr", true);
+            }
+            if (!edit.contentEquals("-1")) {
+                if(course.checkDateErrorEdit()) {
+                    map.put("errDate", "true");
+                    flag = false;
+                }
+                old_profId = (int) Proxy.findCourseByCourseId(edit, conn).getProfessorId();
+            } else {
+                if(course.checkDateError()) {
+                    map.put("errDate", "true");
+                    flag = false;
+                }
+            }
+
+            if (flag) flag = course.createOrUpdateCourse(edit, old_profId, conn);
+            if(flag) {
                 conn.close();
                 response.redirect("/courses/all");
             }
-            if (map.containsKey("prereq_course")) {
+            if (course.getPreReq() != -1) {
                 allCourses.remove(Integer.parseInt(edit));
-                map.put("currPreq", allCourses.get(map.get("prereq_course")));
-                allCourses.remove(map.get("prereq_course"));
-                map.put("course_id", map.get("prereq_course"));
+                map.put("currPreq", course.getPreReqName());
+                allCourses.remove(course.getPreReq());
+                map.put("course_id", course.getPreReq());
             }
+            map.put("days",allDays);
+            map.put("currProf",profs.get(course.getProfessorId()));
+            map.put("prof_id",course.getProfessorId());
+            profs.remove(course.getProfessorId());
+            map.put("profList",profs);
             map.put("prereqs", allCourses);
-            map.forEach((k,v)->map.put(k,v));
             map.put("role", "admin");
+            map.put("course", course);
             conn.close();
             return new ModelAndView(map,"createCourse.ftl");
         },engine);
@@ -1350,7 +1417,7 @@ public class App {
             if (!role.contentEquals("learner")) response.redirect("/err");
             Map<String,String> formFields = extractFields(request.body());
             Connection conn = MySqlConnection.getConnection();
-            Map<String, Object> map = ApplyForProfessor.postApplyForProfessor(formFields,
+            Map<String, Object> map = Learner.applyForProfessor(formFields,
                     sess.attribute("firstName").toString(),
                     sess.attribute("lastName").toString(),
                     sess.attribute("email").toString(),

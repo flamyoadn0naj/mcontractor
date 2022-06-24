@@ -27,7 +27,7 @@ public class Proxy {
         boolean flag = false;
         String sqlQuery = "";
 
-        if (prereq != null) {
+        if (prereq != -1) {
             sqlQuery = "insert into courses (course_name, profId, meeting_days, " +
                     "start_time, end_time, start_date, end_date, credits, total_capacity, enrolled, " +
                     "status, obj, prereq) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
@@ -65,7 +65,7 @@ public class Proxy {
             pst.setInt(10, 0);
             pst.setString(11, "Upcoming");
             pst.setString(12, obj);
-            if (prereq != null) pst.setInt(13, prereq);
+            if (prereq != -1) pst.setInt(13, prereq);
             int i = pst.executeUpdate();
             if (i != 0) {
                 flag = true;
@@ -176,6 +176,10 @@ public class Proxy {
                 }
                 c.setRequirements(rs.getString("requirements"));
                 c.setLearningObj(rs.getString("obj"));
+                c.setOrigEndDate(rs.getString("end_date"));
+                c.setOrigStartDate(rs.getString("start_date"));
+                c.setOrigStartTime(rs.getString("start_time"));
+                c.setOrigEndTime(rs.getString("end_time"));
             }
         } catch (Exception e) {
             System.out.println("Exception at findCourseByCourseId " + e);
@@ -789,6 +793,20 @@ public class Proxy {
         }
         return flag;
     }
+
+    public static boolean deleteQuestionAttempts(Quiz question, Connection conn) {
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("delete from question_grades where quizId=? AND learnerId=?");
+            pst.setInt(1, question.quizId);
+            pst.setInt(2,question.learnerId);
+            int i = pst.executeUpdate();
+            if (i != 0) flag = true;
+        } catch(Exception e) {
+            System.out.println("Exception at delete question attempts " + e);
+        }
+        return flag;
+    }
     public static boolean updateQuiz(Quiz question1, Connection conn) {
         boolean flag = false;
         try {
@@ -877,11 +895,11 @@ public class Proxy {
             pst1.setInt(2,quiz.learnerId);
             ResultSet dbrs = pst1.executeQuery();
             while (dbrs.next()){
-                int questionId = dbrs.getInt("learnerId");
+                int questionId = dbrs.getInt("questionId");
                 String response = dbrs.getString("response");
-                Map<String, Object> question = new HashMap<>();
+                Map<String, Object> question = (Map<String, Object>) questions.get(questionId);
                 question.put("status",2);
-                question.put("answer",response);
+                question.replace("answer",response);
                 questions.put(questionId,question);
             }
 
@@ -923,6 +941,45 @@ public class Proxy {
             System.out.println("Exception at re take question " + e);
         }
         return flag;
+    }
+
+    public static boolean calculateGrades(Quiz newQuiz,Connection conn){
+        boolean flag = false;
+        try {
+            PreparedStatement pst = conn.prepareStatement("INSERT INTO grades(userId, courseId, lessonId, quizId, score) SELECT ?,?,?,?,SUM(score) from question_grades where quizId=? and learnerId=?;");
+            pst.setInt(1,newQuiz.learnerId);
+            pst.setInt(2,newQuiz.courseId);
+            pst.setInt(3,newQuiz.lessonId);
+            pst.setInt(4,newQuiz.quizId);
+            pst.setInt(5,newQuiz.quizId);
+            pst.setInt(6,newQuiz.learnerId);
+            int i = pst.executeUpdate();
+            flag = true;
+        } catch(Exception e) {
+            System.out.println("Exception at updating grades " + e);
+        }
+        return flag;
+    }
+
+    public static Map<Integer,Object> getQuizGrades(Quiz quiz,Map<Integer,Object> quizzes, Connection conn){
+
+        try {
+            PreparedStatement pst = conn.prepareStatement("select * from grades where userId=? and courseId=?");
+            pst.setInt(1,quiz.learnerId);
+            pst.setInt(2,quiz.courseId);
+            ResultSet dbrs = pst.executeQuery();
+            while (dbrs.next()) {
+                int quizId = dbrs.getInt("quizId");
+                int score = dbrs.getInt("score");
+                Map<String, Object> question = (Map<String, Object>) quizzes.get(quizId);
+                question.put("score",score);
+                question.put("status",2);
+                quizzes.put(quizId,question);
+            }
+        } catch(Exception e) {
+            System.out.println("Exception at get quiz grades " + e);
+        }
+        return quizzes;
     }
 
     public static Map<String, Object> getQuestion(int QuestionId, Connection conn) {

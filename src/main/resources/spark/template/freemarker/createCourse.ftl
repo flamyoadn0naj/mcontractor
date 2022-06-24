@@ -32,7 +32,7 @@
                     </#if>
                     <div class="form-group space-between mb-3">
                         <label class="padding2right col-3" for="1a">Name:</label>
-                        <input required type="text" name="name" class="form-control col-9" id="name"  value="${name}">
+                        <input required type="text" name="name" class="form-control col-9" id="name" <#if course??>value="${course.name!""}"</#if>>
                     </div>
                     <div class="form-group mb-3" style="display: flex">
                         <label class="col-3" for="1b">Professor</label>
@@ -59,7 +59,7 @@
                     </div>
                     <div class="form-group mb-3" style="display: flex">
                         <label class="col-3" for="1c">Learning Objectives</label>
-                        <input required pattern="\S.*\S" name="obj" class="form-control col-9" id="obj"  value="${obj}">
+                        <input required pattern="\S.*\S" name="obj" class="form-control col-9" id="obj" <#if course??>value="${course.name!""}"</#if>>
                     </div>
                     <div class="form-group" style="display: flex">
                         <label class="col-3">Meeting Days</label>
@@ -89,10 +89,10 @@
                         <label class="col-3" for="exampleSelect2">Meeting Time</label>
                         <div class="col-9" style="display: flex">
                             <input min="09:00" max="18:00" required type="time" name="start_time"
-                                   class="form-control col-4" id="start_time" value=${start_time!""}>
+                                   class="form-control col-4" id="start_time" <#if course??>value="${course.origStartTime!""}"</#if>>
                             <div class="col-4 text-center"> to </div>
                             <input min="09:00" max="18:00" required type="time" name="end_time"
-                                   class="form-control col-4" id="end_time" value=${end_time!""}>
+                                   class="form-control col-4" id="end_time" <#if course??>value="${course.origEndTime!""}"</#if>>
                         </div>
                     </div>
                     <#if errDate??>
@@ -105,19 +105,19 @@
                         <label class="col-3" for="exampleSelect2">Starts</label>
                         <div class="col-9" style="display: flex">
                             <input required type="date" name="start_date" class="form-control col-4"
-                                   id="start_date" value=${start_date!""}>
+                                   id="start_date" <#if course??>value="${course.origStartDate!""}"</#if>>
                             <div class="col-4 text-center"> Ends </div>
                             <input required type="date" name="end_date" class="form-control col-4"
-                                   id="end_date" value=${end_date!""}>
+                                   id="end_date" <#if course??>value="${course.origEndDate!""}"</#if>>
                         </div>
                     </div>
                     <div class="form-group mb-3" style="display: flex">
                         <label class="col-3" for="1d">Credits</label>
-                        <input required type="number" name="credits" class="form-control col-9" id="1d" value=${credits!3}>
+                        <input required type="number" name="credits" class="form-control col-9" id="1d" <#if course??>value="${course.credits!""}"</#if>>
                     </div>
                     <div class="form-group mb-3" style="display: flex;">
                         <label class="col-3" for="ans1">Total Capacity</label>
-                        <input required type="number" name="capacity" class="form-control col-9" id="capacity" value=${cap!""}>
+                        <input required type="number" name="capacity" class="form-control col-9" id="capacity" <#if course??>value="${course.capacity!""}"</#if>>
                     </div>
 
                     <button type="submit" name="action" value="Save" class="btn btn-primary" style="width:10rem; float:right;">

@@ -35,6 +35,10 @@ public class Course {
     private String learningObj = "";
     private String requirements = "";
     private String feedback = "";
+    private String origStartDate = "";
+    private String origEndDate = "";
+    private String origEndTime = "";
+    private String origStartTime = "";
     private ArrayList<Course> courses = new ArrayList<>();
 
     public Course(String name, int id, String startDate, String endDate, String startTime,
@@ -151,6 +155,22 @@ public class Course {
         return state;
     }
 
+    public String getOrigEndDate() {
+        return origEndDate;
+    }
+
+    public String getOrigEndTime() {
+        return origEndTime;
+    }
+
+    public String getOrigStartDate() {
+        return origStartDate;
+    }
+
+    public String getOrigStartTime() {
+        return origStartTime;
+    }
+
     public void setState(String state) {
         this.state = state;
     }
@@ -165,6 +185,22 @@ public class Course {
 
     public void setRequirements(String requirements) {
         this.requirements = requirements;
+    }
+
+    public void setOrigEndDate(String origEndDate) {
+        this.origEndDate = origEndDate;
+    }
+
+    public void setOrigEndTime(String origEndTime) {
+        this.origEndTime = origEndTime;
+    }
+
+    public void setOrigStartDate(String origStartDate) {
+        this.origStartDate = origStartDate;
+    }
+
+    public void setOrigStartTime(String origStartTime) {
+        this.origStartTime = origStartTime;
     }
 
     public void setLearningObj(String learningObj) {
@@ -268,5 +304,130 @@ public class Course {
             LocalDate comparingDate = LocalDate.now().plusDays(7);
             if (!startDate.isBefore(comparingDate)) setState("Closed");
         }
+    }
+    public static LinkedHashMap<String,Boolean> findAllDays() {
+        LinkedHashMap<String, Boolean> allDays = new LinkedHashMap<String, Boolean>();
+        allDays.put("Monday",false);
+        allDays.put("Tuesday",false);
+        allDays.put("Wednesday",false);
+        allDays.put("Thursday",false);
+        allDays.put("Friday",false);
+        return allDays;
+    }
+
+    public Course editCourse(Connection conn) {
+        return Proxy.findCourseByCourseId(String.valueOf(id), conn);
+    }
+
+    public boolean addDiscussionGroupAndEnrolmentForCourse(int prof_id, Connection conn) {
+        boolean flag = false;
+        int id = Proxy.findLastInsertedId("courses", conn);
+        if (id != -1) {
+            int j = Proxy.enroll(id, prof_id, conn);
+            if (j != 0) {
+                int i = Proxy.addDiscussionGroup(name, id, 1, conn);
+                if (i != 0) {
+                    int d_id = Proxy.findLastInsertedId("discussion_groups", conn);
+                    if (d_id != -1) {
+                        flag = Proxy.addDGmember(prof_id, d_id, conn);
+                    }
+                }
+            }
+        }
+        return  flag;
+    }
+
+    public void createCourseObj(Map<String, String> formFields) {
+        try {
+
+            origStartTime = URLDecoder.decode(formFields.get("start_time"), "UTF-8");
+            origEndTime = URLDecoder.decode(formFields.get("end_time"), "UTF-8");
+            origStartDate = formFields.get("start_date");
+            origEndDate = formFields.get("end_date");
+            name = URLDecoder.decode(formFields.get("name"), "UTF-8").trim();
+            professorId = Integer.parseInt(formFields.get("prof"));
+            learningObj = URLDecoder.decode(formFields.get("obj"), "UTF-8");
+            if (formFields.containsKey("Monday")) meeting_days += "Monday, ";
+            if (formFields.containsKey("Tuesday")) meeting_days += "Tuesday, ";
+            if (formFields.containsKey("Wednesday")) meeting_days += "Wednesday, ";
+            if (formFields.containsKey("Thursday")) meeting_days += "Thursday, ";
+            if (formFields.containsKey("Friday")) meeting_days += "Friday, ";
+            meeting_days = meeting_days.trim().substring(0, meeting_days.length()-2);
+            credits = Integer.parseInt(formFields.get("credits"));
+            capacity = Integer.parseInt(formFields.get("capacity"));
+            preReq = Integer.parseInt(formFields.get("reqs"));
+//            if (req != -1) {
+//                preReq = req;
+//            } else preReq = Integer.parseInt(null);
+        } catch (Exception e) {
+            System.out.println("Exception at addOrUpdateCourse " + e);
+        }
+    }
+
+    public boolean checkTimeError(){
+        boolean flag = LocalTime.parse(origEndTime).isBefore(LocalTime.parse(origStartTime));
+        if (flag) {
+            origEndTime = "";
+            origStartTime = "";
+        }
+        return flag;
+    }
+
+    public boolean checkNameError() {
+        boolean flag = name.length() == 0;
+        if (flag) name = "";
+        return flag;
+    }
+
+    public boolean checkDateErrorEdit() {
+        boolean flag = LocalDate.parse(origEndDate).isBefore(LocalDate.parse(origStartDate));
+        if (flag) {
+            origEndDate = "";
+            origStartDate = "";
+        }
+        return flag;
+    }
+
+    public boolean checkDateError() {
+        boolean flag = LocalDate.parse(origEndDate).isBefore(LocalDate.parse(origStartDate))
+                || LocalDate.parse(origStartDate).isBefore(LocalDate.now());
+        if (flag) {
+            origEndDate = "";
+            origStartDate = "";
+        }
+        return flag;
+    }
+
+    public static Map<Integer, String> allCourses(Connection conn) {
+        Map<Integer, String> all_Courses = new HashMap<>();
+        Course c1 = new Course();
+        ArrayList<Course> courses = c1.getCourses("Completed", conn);
+        for (Course c: courses) {
+            int id = c.getId();
+            String name = c.getName();
+            all_Courses.put(id, name);
+        }
+        return all_Courses;
+    }
+
+    public boolean createOrUpdateCourse(String edit, int old_profId, Connection conn) {
+        boolean flag2 = Proxy.createOrUpdateCourse(edit, name, professorId, meeting_days, origStartTime, origEndTime,
+                    origStartDate, origEndDate, credits, capacity, learningObj, preReq, conn);
+        if(flag2) {
+            if (edit.contentEquals("-1")) {
+                flag2 = addDiscussionGroupAndEnrolmentForCourse(professorId, conn);
+            } else flag2 = editDiscussionGroupAndEnrollmentForCourse(Integer.parseInt(edit), old_profId, conn);
+        }
+        return flag2;
+    }
+
+    private boolean editDiscussionGroupAndEnrollmentForCourse(int edit, int old_profId, Connection conn) {
+        boolean flag = Proxy.updateEnroll(edit, professorId, old_profId, conn);
+        if (flag) {
+            int d_id = Proxy.findDiscussionGroupIdByCourseId(edit, conn);
+            boolean flag2 = Proxy.updateDGMembers(old_profId, professorId, d_id, conn);
+            if (flag2) flag = Proxy.updateDiscussionGroup(d_id, name, conn);
+        }
+        return flag;
     }
 }
