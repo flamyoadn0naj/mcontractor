@@ -457,15 +457,28 @@ public class App {
              int id = sess.attribute("id");
              String courseId = request.params(":courseId");
              Connection conn = MySqlConnection.getConnection();
-            Course course = Course.getCourse(courseId, conn);
+             Course course = Course.getCourse(courseId, conn);
              courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
-             if((int)course.getProfessorId() == id) map.put("role", "prof");
-             else map.put("role","learner");
+//             if((int)course.getProfessorId() == id) map.put("role", "prof");
+//             else map.put("role","learner");
+             String role;
+             if((int)course.getProfessorId() == id) role = "prof";
+             else role = "learner";
+             map.put("role",role);
+
              map.put("courseId", courseId);
              map.put("name", course.getName());
             if (course.allowRating()) map.put("viewRate", true);
             Map<Integer, Object>  quizzes = Quiz.getQuizzes(Integer.parseInt(courseId), conn);
-            if (!quizzes.isEmpty()) map.put("quizzes",quizzes);
+            if (!quizzes.isEmpty()) {
+                if (role.equals("learner")){
+                    Quiz course_details = new Quiz();
+                    course_details.learnerId = id;
+                    course_details.courseId = Integer.parseInt(courseId);
+                    quizzes = Proxy.getQuizGrades(course_details,quizzes,conn);
+                }
+                map.put("quizzes",quizzes);
+            }
             conn.close();
             return new ModelAndView(map,"courseQuiz.ftl");
         }),engine);
@@ -580,13 +593,15 @@ public class App {
             quiz.courseId = Integer.parseInt(courseId);
             if (role.equals("learner")){
                 questions = Proxy.getQuestionAttempts(quiz, questions,conn);
+                Proxy.calculateGrades(quiz,conn);
             }
             if (edit != null){
-                if (edit.compareTo("rt")==0)
+                if (edit.equals("rt"))
                 {
-                Proxy.deleteQuizAttempt(quiz,conn);
+                    Proxy.deleteQuizAttempt(quiz,conn);
+                    Proxy.deleteQuestionAttempts(quiz,conn);
                 }
-                if (edit.compareTo("t")==0){
+                if (edit.equals("t")){
                     questions = Proxy.getQuestionAttempts(quiz, questions,conn);
                 }
             }
