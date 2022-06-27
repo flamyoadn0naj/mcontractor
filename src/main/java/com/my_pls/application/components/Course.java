@@ -238,16 +238,6 @@ public class Course {
         return my_courses;
     }
 
-    public static Map<Integer, Object> filterCourses(String filterBy, Map<Integer, Object> courses) {
-        Map<Integer, Object> allCourses = new HashMap<>();
-        for(Integer i : courses.keySet()) {
-            Map<String,Object> c = (Map<String, Object>) courses.get(i);
-            String status = String.valueOf(c.get("status"));
-            if (status.contentEquals(filterBy)) allCourses.put(i,c);
-        }
-        return allCourses;
-    }
-
     public static Course getCourse(String courseId, Connection conn) {
         try {
             courseId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(courseId));
@@ -356,9 +346,6 @@ public class Course {
             credits = Integer.parseInt(formFields.get("credits"));
             capacity = Integer.parseInt(formFields.get("capacity"));
             preReq = Integer.parseInt(formFields.get("reqs"));
-//            if (req != -1) {
-//                preReq = req;
-//            } else preReq = Integer.parseInt(null);
         } catch (Exception e) {
             System.out.println("Exception at addOrUpdateCourse " + e);
         }
