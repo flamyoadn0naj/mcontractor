@@ -81,8 +81,7 @@
                         <a href="/course/quiz/${courseId}" class="btn btn-primary">Submit Quiz</a>
                     </#if>
                     <#if !questions??>
-                        <div style="margin-left: 2%"> No Questions Found. Please add questions using the "Add"
-                            button.</div>
+                        <div style="margin-left: 2%"> No Questions Found.</div>
                     </#if>
                 </div>
             </div>
