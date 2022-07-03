@@ -675,7 +675,7 @@ public class App {
                     question.replace("answer","");
                     questionText = question.get("questionText");
                     sess.attribute("questionId",question);
-                    map.put("title","Modify "+questionText);
+                    map.put("title","Q: "+questionText);
                     map.put("questionText",questionText);
                     map.put("question",question);
                     map.put("questionId",questionId);
@@ -685,10 +685,10 @@ public class App {
                     questionId = String.valueOf(NumberFormat.getNumberInstance(Locale.US).parse(request.queryParams("questionId")));
                     question = Proxy.getQuestion(Integer.parseInt(questionId), conn);
                     quiz.questionId = Integer.parseInt(questionId);
-                    question.replace("answer",Proxy.viewQuizResponse(quiz,conn));
+                    question.replace("answer","");//Proxy.viewQuizResponse(quiz,conn));
                     questionText = question.get("questionText");
                     sess.attribute("questionId",question);
-                    map.put("title","Modify "+questionText);
+                    map.put("title","Q: "+questionText);
                     map.put("questionText",questionText);
                     map.put("question",question);
                     map.put("questionId",questionId);
