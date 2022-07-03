@@ -675,7 +675,7 @@ public class App {
                     question.replace("answer","");
                     questionText = question.get("questionText");
                     sess.attribute("questionId",question);
-                    map.put("title","Modify "+questionText);
+                    map.put("title","Q: "+questionText);
                     map.put("questionText",questionText);
                     map.put("question",question);
                     map.put("questionId",questionId);
@@ -688,7 +688,7 @@ public class App {
                     question.replace("answer",Proxy.viewQuizResponse(quiz,conn));
                     questionText = question.get("questionText");
                     sess.attribute("questionId",question);
-                    map.put("title","Modify "+questionText);
+                    map.put("title","Q: "+questionText);
                     map.put("questionText",questionText);
                     map.put("question",question);
                     map.put("questionId",questionId);
