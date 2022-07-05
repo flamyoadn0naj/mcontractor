@@ -5,7 +5,7 @@ import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Learner extends User{
+public class Learner{
     public static Map<String,Object> checkForErrors(String fname, String lname,
                                         Map<String,String> formfields) {
         Map <String,Object> map = new HashMap<String, Object>();

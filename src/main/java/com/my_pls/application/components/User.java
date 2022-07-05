@@ -4,7 +4,7 @@ import com.my_pls.securePassword;
 
 import java.sql.Connection;
 
-public class User {
+public class User extends Learner {
     private String firstName = "";
     private String lastName = "";
     private String password = "";

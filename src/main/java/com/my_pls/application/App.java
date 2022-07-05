@@ -35,7 +35,7 @@ public class App {
     public static void main(String[] args) {
 
         port(8080);
-        String ip = "10.181.95.232:8080";
+        String ip = "72.230.140.105:8080";
         final TemplateEngine engine = new FreeMarkerEngine();
         staticFileLocation("/public"); //So that it has access to the pubic resources(stylesheets, etc.)
 
@@ -522,7 +522,7 @@ public class App {
                 case "d":
                     quizEdit.quizId = Integer.parseInt(quizId);
                     Proxy.deleteQuiz(quizEdit,conn);
-                    response.redirect("/course/quiz/"+courseId+"/");
+                    response.redirect("/course/quiz/"+courseId);
                     break;
                 case "c":
                     map.put("e",-1);
@@ -970,7 +970,7 @@ public class App {
             boolean done = false;
 
             if (d_id != null) {
-                course.setId(Integer.parseInt(d_id));
+                course.setId(NumberFormat.getNumberInstance(Locale.US).parse(d_id).intValue());
                 done = course.deleteCourse(conn);
                 if(done) {
                     conn.close();
