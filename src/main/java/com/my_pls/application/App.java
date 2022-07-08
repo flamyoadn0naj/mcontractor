@@ -595,6 +595,7 @@ public class App {
             quiz.courseId = Integer.parseInt(courseId);
             if (role.equals("learner")){
                 questions = Proxy.getQuestionAttempts(quiz, questions,conn);
+                Proxy.deleteQuizAttempt(quiz,conn);
                 Proxy.calculateGrades(quiz,conn);
             }
             if (edit != null){
