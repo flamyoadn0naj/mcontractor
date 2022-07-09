@@ -1,6 +1,6 @@
 package com.my_pls.application.components;
 
-public class DiscussionPost extends DiscussionGroups{
+public class DiscussionPost {
     private String username;
     private int dgId;
     private String postName;
