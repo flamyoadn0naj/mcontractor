@@ -595,6 +595,7 @@ public class App {
             quiz.courseId = Integer.parseInt(courseId);
             if (role.equals("learner")){
                 questions = Proxy.getQuestionAttempts(quiz, questions,conn);
+                Proxy.deleteQuizAttempt(quiz,conn);
                 Proxy.calculateGrades(quiz,conn);
             }
             if (edit != null){
@@ -793,7 +794,7 @@ public class App {
             Course course = Course.getCourse(courseId, conn);
             if((int)course.getProfessorId() == id) map.put("role", "prof");
             else {
-                conn.close();
+//                conn.close();
                 response.redirect("/course/grade/individual/" + courseId);
             }
             Map<Integer, Map<String,String>> classList = Proxy.getClassList(Integer.parseInt(courseId), conn);

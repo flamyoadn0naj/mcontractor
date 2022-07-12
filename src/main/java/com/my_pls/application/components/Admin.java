@@ -6,7 +6,7 @@ import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Admin extends User{
+public class Admin {
 
     public static Map<String,String> getSearchOptions(String filterBy) {
         Map<String,String> options = new HashMap<String, String>();
