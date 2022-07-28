@@ -18,4 +18,4 @@
 ############
 .idea/
 *.iml
-.DS_Store
+.DS_Storesrc/main/java/com/my_pls/sendEmail.java
